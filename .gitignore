@@ -1,0 +1,61 @@
+# Python 缓存
+__pycache__/
+*.pyc
+
+# 虚拟环境 / Conda 环境
+.env
+.venv/
+venv/
+env/
+envs/*
+!envs/README.md
+conda_env/
+
+# 数据集：只保留 README，不上传大数据
+data/
+datasets/*
+!datasets/README.md
+
+# 模型权重：只保留 README，不上传大权重
+weights/*
+!weights/README.md
+
+# 训练输出 / 临时文件
+runs/
+tmp/
+
+# 结果文件：默认只保留轻量说明和小型图片/表格
+results/*
+!results/README.md
+!results/*.md
+!results/*.txt
+!results/*.csv
+!results/*.png
+!results/*.jpg
+!results/*.jpeg
+
+# 模型文件
+*.pt
+*.pth
+*.onnx
+*.engine
+
+# 压缩包和视频
+*.zip
+*.tar
+*.tar.gz
+*.mp4
+*.avi
+*.mkv
+
+# 密钥和敏感信息
+id_rsa
+id_rsa.pub
+*.pem
+*.key
+*.token
+config_secret.*
+
+# 系统文件
+.DS_Store
+Thumbs.db
