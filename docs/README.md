@@ -10,3 +10,7 @@
 - 仿真方案分析
 - 视觉模型学习记录
 - 挑战杯项目方案拆解
+
+Windows / GitHub Desktop：主力 commit + push
+GitHub：云端存档
+服务器 / VS Code Remote：pull + 跑实验 + 必要时本地 commit
