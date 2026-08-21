@@ -39,6 +39,12 @@ def _expand(context, *args):
                 "flip_vertical": False,
                 "white_min_value": 185,
                 "white_max_saturation": 60,
+                "use_depth": True,
+                "position_frame_ids": ["map", "odom"],
+                "depth_topic": "/camera/depth/image_rect_raw",
+                "camera_hfov_deg": 60.0,
+                "depth_max_stamp_delta_s": 0.5,
+                "depth_patch_radius": 4,
             }
         ],
     )

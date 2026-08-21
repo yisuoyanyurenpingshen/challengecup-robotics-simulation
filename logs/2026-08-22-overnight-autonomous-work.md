@@ -188,3 +188,38 @@ git push --dry-run origin main  # Everything up-to-date, exit=0
 - `06b5283` feat(gazebo): add local trash scene —— 已推送。
 - `7d7fe2b` feat(gazebo): add verified RGB camera bridge and headless Xvfb rendering —— 已推送。
 - `dfa3b29` feat(perception): add image-based trash detector —— 已推送。
+
+### 2026-08-22 Phase 9 垃圾位置估计（深度反投影，验证通过）
+
+- 方案：RGB-D 对齐深度反投影（第一优先方案）。相机传感器改为单个 `rgbd_camera`
+  （RGB 640×480 10Hz + depth 640×480 10Hz，同一光心/内参，depth clip 0.05–20 m）。
+- 关键踩坑一：先尝试的「独立 depth_camera 传感器」曾因编辑脚本把传感器误嵌套进
+  RGB 传感器导致被 Gazebo 静默忽略（无任何报错）；已修复并新增契约测试
+  `test_sdf_declares_single_rgbd_sensor` 防止传感器嵌套回归。
+- 关键踩坑二（Gazebo Fortress 6.16 实测行为）：`depth_camera`/`rgbd_camera` 的
+  CameraInfo 焦距错误（k=277，真值应为 554.26，即少乘 2），且独立双相机时两个
+  CameraInfo 会交错发布到同一 topic。结论：用单一 rgbd_camera + 由分辨率与 HFOV
+  解析计算内参（`CameraIntrinsics.from_hfov`，fx=(w/2)/tan(30°)=554.26），不信任
+  该版本 CameraInfo 的焦距字段；probe 显式记录该 quirk（270<k<285）。
+- 桥接新增 `/camera/depth/image_rect_raw`（gz Image→sensor_msgs/Image，32FC1）
+  ；depth 与 RGB 同一光学帧、像素级对齐，故为 image_rect_raw。
+- `position_estimator.py`：depth_to_meters（16UC1 mm/32FC1 m）、patch_median_depth
+  （忽略 0/NaN/Inf，图像边缘裁剪）、backproject_optical（fx≤0 拒绝）、
+  transform_point（xyzw 四元数旋转+平移）、estimate_position（全管线，transform
+  缺失/结果非有限时返回 None）。`TrashDetection.position_valid=false` 覆盖所有
+  不可靠路径。
+- 节点集成：订阅深度 + TF（先 map 后 odom，`position_frame_ids=["map","odom"]`），
+  帧差 >0.5s 不用旧深度；`camera_hfov_deg=60.0` 参数化；use_depth 可关。
+- 单元测试 15 项：正常深度/零深度/NaN/Inf/图像边缘/内参非法/TF 缺失/坐标变换/
+  位置误差（纯数学 <0.01m）/非有限结果/配置默认值。
+- E2E `bash scripts/ros2.sh position-verify`（`scripts/verify_position.sh` +
+  `scripts/position_probe.py`）exit=0：
+  - 深度 640×480 32FC1、时间戳推进、有效测距占比合格；
+  - CameraInfo 到场且符合 6.16 已知行为；
+  - camera_optical_frame→odom TF 连通；
+  - 最佳估计 aluminum_can (3.17,1.09) vs 真值 (3.2,1.1)：误差 0.032 m < 0.45 m；
+  - 静态断言估计器/节点不含任何真值读取路径；真值仅用于误差评估。
+- 回归：build/test 109 项、pytest 41、verify/gazebo-verify/drive-verify/
+  camera-verify/trash-verify/perception-verify/position-verify 全部 exit=0。
+- 提交与推送：`feat(perception): add depth-based trash position estimation`
+  （哈希见下方提交记录）。

@@ -45,6 +45,31 @@ def test_launch_file_declares_defaults() -> None:
     assert "flip_vertical" in launch
 
 
+def test_node_declares_depth_position_pipeline() -> None:
+    node = (
+        PACKAGE_ROOT / "smartclean_perception" / "trash_detector_node.py"
+    ).read_text(encoding="utf-8")
+    for required in (
+        "use_depth",
+        "/camera/depth/image_rect_raw",
+        "camera_hfov_deg",
+        "position_frame_ids",
+        "tf2_ros",
+        "from_hfov",
+        "position_valid = True",
+        "position_frame_id = position.frame_id",
+    ):
+        assert required in node, required
+
+
+def test_launch_file_enables_depth_by_default() -> None:
+    launch = (PACKAGE_ROOT / "launch" / "perception.launch.py").read_text(
+        encoding="utf-8"
+    )
+    assert '"use_depth": True' in launch
+    assert '"position_frame_ids": ["map", "odom"]' in launch
+
+
 def test_python_syntax_and_compile() -> None:
     for name in (
         "detector_core.py",

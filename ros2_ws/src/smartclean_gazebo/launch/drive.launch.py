@@ -210,10 +210,18 @@ def generate_launch_description() -> LaunchDescription:
                 "/smartclean/camera/camera_info@"
                 "sensor_msgs/msg/CameraInfo[ignition.msgs.CameraInfo"
             ),
+            (
+                "/smartclean/camera/depth_image@"
+                "sensor_msgs/msg/Image[ignition.msgs.Image"
+            ),
         ],
         remappings=[
             ("/smartclean/camera/image", "/camera/image_raw"),
             ("/smartclean/camera/camera_info", "/camera/camera_info"),
+            (
+                "/smartclean/camera/depth_image",
+                "/camera/depth/image_rect_raw",
+            ),
         ],
         condition=IfCondition(LaunchConfiguration("camera")),
         output="screen",

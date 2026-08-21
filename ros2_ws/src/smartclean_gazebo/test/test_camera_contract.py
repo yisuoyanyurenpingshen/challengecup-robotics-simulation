@@ -21,16 +21,13 @@ def _sdf_root() -> ET.Element:
 
 def test_sdf_declares_rgb_camera_sensor() -> None:
     root = _sdf_root()
-    sensors = root.findall(".//sensor[@type='camera']")
-    assert sensors, "model.sdf is missing a camera sensor"
+    sensors = root.findall(".//sensor[@type='rgbd_camera']")
+    assert sensors, "model.sdf is missing an rgbd camera sensor"
     sensor = sensors[0]
-    assert sensor.attrib["name"] == "rgb_camera"
+    assert sensor.attrib["name"] == "rgbd_camera"
     topic = sensor.find("topic")
     assert topic is not None
-    assert topic.text == "/smartclean/camera/image"
-    info_topic = sensor.find("camera_info_topic")
-    assert info_topic is not None
-    assert info_topic.text == "/smartclean/camera/camera_info"
+    assert topic.text == "/smartclean/camera"
     assert sensor.findtext("update_rate") == "10"
     camera = sensor.find("camera")
     assert camera is not None
@@ -39,6 +36,12 @@ def test_sdf_declares_rgb_camera_sensor() -> None:
     assert image.findtext("width") == "640"
     assert image.findtext("height") == "480"
     assert image.findtext("format") == "R8G8B8"
+    depth = camera.find("depth_camera")
+    assert depth is not None
+    depth_clip = depth.find("clip")
+    assert depth_clip is not None
+    assert float(depth_clip.findtext("near")) > 0
+    assert float(depth_clip.findtext("far")) > float(depth_clip.findtext("near"))
 
     camera_link = root.find(".//link[@name='camera_link']")
     assert camera_link is not None
@@ -49,6 +52,22 @@ def test_sdf_declares_rgb_camera_sensor() -> None:
     assert joint is not None
     assert joint.findtext("parent") == "base_link"
     assert joint.findtext("child") == "camera_link"
+
+
+def test_sdf_declares_single_rgbd_sensor() -> None:
+    """One rgbd_camera must own both color and depth to keep one CameraInfo
+    stream. Two separate cameras in this Gazebo version would publish
+    conflicting CameraInfo messages on the same topic.
+    """
+
+    root = _sdf_root()
+    camera_link = root.find(".//link[@name='camera_link']")
+    assert camera_link is not None
+    sensors = camera_link.findall("sensor")
+    assert len(sensors) == 1, "camera_link 应只有一个 rgbd_camera 传感器"
+    assert sensors[0].attrib["type"] == "rgbd_camera"
+    for nested in sensors[0].findall(".//sensor"):
+        raise AssertionError("传感器不得嵌套：{}".format(nested.attrib))
 
 
 def test_server_configs_split_sensors_from_headless_baseline() -> None:
@@ -82,6 +101,7 @@ def test_launch_bridges_camera_with_default_off() -> None:
     assert "sensor_msgs/msg/CameraInfo" in text
     assert "/camera/image_raw" in text
     assert "/camera/camera_info" in text
+    assert "/camera/depth/image_rect_raw" in text
     assert "IfCondition(LaunchConfiguration(\"camera\")" in text
     assert "sensors_config_path" in text
 

@@ -47,4 +47,5 @@ gazebo-drive-gui = { cmd = "bash scripts/gazebo_drive_gui.sh", depends-on = ["ro
 gazebo-trash-verify = { cmd = "bash scripts/verify_trash_scene.sh", depends-on = ["ros-build"] }
 gazebo-camera-verify = { cmd = "bash scripts/verify_camera.sh", depends-on = ["ros-build"] }
 gazebo-perception-verify = { cmd = "bash scripts/verify_perception.sh", depends-on = ["ros-build"] }
+gazebo-position-verify = { cmd = "bash scripts/verify_position.sh", depends-on = ["ros-build"] }
 ros-doctor = "ros2 doctor --report"
