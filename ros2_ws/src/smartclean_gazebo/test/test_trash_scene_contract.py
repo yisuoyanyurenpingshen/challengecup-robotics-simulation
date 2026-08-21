@@ -111,6 +111,10 @@ def test_trash_sizes_are_suitable_for_camera_recognition() -> None:
                     length = float(primitive.find("length").text)
                     values = [2.0 * radius, 2.0 * radius, length]
                 spans.append(values)
+            elif tag == "sphere":
+                radius = float(primitive.find("radius").text)
+                values = [2.0 * radius, 2.0 * radius, 2.0 * radius]
+                spans.append(values)
         assert spans
         # The smallest span must still be image-visible, the largest must not
         # turn the trash into a navigation obstacle.

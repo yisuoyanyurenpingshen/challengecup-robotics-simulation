@@ -1,0 +1,31 @@
+{
+  "schema_version": 1,
+  "kind": "smartclean_perception_model_card",
+  "model_name": "例如 trash-yolo-small-v1",
+  "model_type": "yolo-onnx",
+  "source_url": "必须是可直接核对的原始下载地址（GitHub release / 官网镜像）",
+  "license": "必须填写明确许可证 SPDX 标识，例如 Apache-2.0；AGPL 类 copyleft 或未注明许可的权重禁止进入项目",
+  "sha_256": "下载后以 sha256sum 计算的十六进制摘要（64 字符）",
+  "file_name": "模型文件名，例如 trash-yolo-small-v1.onnx",
+  "input_size": [640, 640],
+  "coords_normalized": true,
+  "conf_threshold": 0.25,
+  "iou_threshold": 0.45,
+  "class_map": {
+    "0": "fallen_leaves",
+    "1": "plastic_bottle",
+    "2": "paper_scrap",
+    "3": "paper_cup",
+    "4": "aluminum_can"
+  },
+  "canonical_classes": [
+    "fallen_leaves",
+    "plastic_bottle",
+    "paper_scrap",
+    "paper_cup",
+    "aluminum_can"
+  ],
+  "provenance_note": "记录数据集/训练来源与验证方式；未经验证的类别映射不得直接替换合成视觉基线",
+  "downloaded_at": "2026-08-22T00:00:00Z",
+  "downloaded_by": "操作人标识"
+}

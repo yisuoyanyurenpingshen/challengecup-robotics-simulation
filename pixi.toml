@@ -14,6 +14,7 @@ channel-priority = "strict"
 [dependencies]
 python = "3.12.*"
 ros-humble-ros-base = "*"
+ros-humble-rosidl-generator-py = "*"
 ros-humble-desktop = "*"
 ros-humble-demo-nodes-cpp = "*"
 ros-humble-demo-nodes-py = "*"
@@ -22,6 +23,7 @@ ros-humble-ros-gz = "*"
 colcon-common-extensions = "*"
 pytest = ">=8,<9"
 vcstool = "*"
+empy = "3.*"
 
 [activation.env]
 PYTHONPATH = "$PIXI_PROJECT_ROOT/src"
@@ -44,4 +46,5 @@ gazebo-drive-verify = { cmd = "bash scripts/verify_gazebo_drive.sh", depends-on 
 gazebo-drive-gui = { cmd = "bash scripts/gazebo_drive_gui.sh", depends-on = ["ros-build"] }
 gazebo-trash-verify = { cmd = "bash scripts/verify_trash_scene.sh", depends-on = ["ros-build"] }
 gazebo-camera-verify = { cmd = "bash scripts/verify_camera.sh", depends-on = ["ros-build"] }
+gazebo-perception-verify = { cmd = "bash scripts/verify_perception.sh", depends-on = ["ros-build"] }
 ros-doctor = "ros2 doctor --report"

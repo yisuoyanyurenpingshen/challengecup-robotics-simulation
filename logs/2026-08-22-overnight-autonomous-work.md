@@ -145,5 +145,46 @@ git push --dry-run origin main  # Everything up-to-date, exit=0
   - `bash scripts/ros2.sh run python -m pytest -q tests`：41 passed。
   - `bash scripts/ros2.sh verify` / `gazebo-verify` / `drive-verify` / `trash-verify`：exit=0。
 - 踩坑补充：`ign topic -l` 输出在 setsid launch 下正常；`ign topic -p --req` 必须与 `--timeout` 同时给出。
-- 视觉标定（后续感知用）：实测相机画面为上下镜像（垂直翻转）。用 5 个紫色标记柱（0.12×0.12×0.7、z=0.35，hue 140-160）验证像素↔世界映射：把行坐标 y 映射为 480-y 后与 trash 世界坐标吻合。不修改 SDF/CameraInfo（fx=554.3 已标定），感知侧统一做一次 `flip(image, 0)` 修正，并如实记录为“Gazebo 渲染特性”。
+- 视觉标定（后续感知用）：最终结论为**画面不需要翻转**。用 5 个紫色标记柱（0.12×0.12×0.7、z=0.35，hue 140-160）拟合出相机俯仰 θ=+0.148 rad（向下 8.5°，SDF roll/pitch 语义与先前假设相反），标准针孔映射（fx≈554.3、cx=320、cy=240）下 4 个已渲染 blob 拟合 RMS<2px；感知侧 `flip_vertical=False`。此处推翻本行更早草稿中的“垂直翻转”结论。
 - 中断实验记录：删除 trash_plastic_bottle 后验证蓝色 blob 消失的因果实验在 launch 完成后被会话截断（进程已清理，结果未取得）；相机真实性已由原地旋转帧变化证明，后续 Phase 8 空场景测试会重新覆盖该因果链。
+
+### 2026-08-22 02:0x Phase 7 提交与推送
+
+- 提交 `7d7fe2b` `feat(gazebo): add verified RGB camera bridge and headless Xvfb rendering`（13 文件，+780/-14）。
+- 提交前全量回归：install/test(65)/pytest(41)/verify/gazebo-verify/drive-verify/camera-verify/trash-verify 全部 exit=0；`git diff --check`、`bash -n scripts/*.sh`、`py_compile` 全过；无残留 Gazebo/Xvfb 进程。
+- 普通推送成功：`06b5283..7d7fe2b main -> main`。
+- `git rev-parse HEAD` == `git ls-remote origin refs/heads/main` == `7d7fe2bdd7a9c1960501f99a2ebc5d5c79d0e6aa`。
+
+### 2026-08-22 Phase 8 图像垃圾识别（进行中 → 验证通过）
+
+- 环境修复（识别包前置）：
+  - `pixi.toml` 增加 `empy = "3.*"`（旧 empy 4.2.1 破坏 rosidl `em.BUFFERED_OPT`）与 `ros-humble-rosidl-generator-py`；`pixi.lock` 重新生成。
+  - `scripts/ros2_build.sh` 增加 `-DPYTHON_EXECUTABLE=${CONDA_PREFIX}/bin/python3`（宿主 /usr/bin/python3.6 导致 cpython-36m typesupport + generate_py ModuleNotFound）。
+  - 必须清除旧 `ros2_ws/build/smartclean_interfaces` 与 `install/smartclean_interfaces` 后重建，cpython-312 typesupport 生成后可用；`ros2 interface show` 与 Python bindings 复验通过。
+- 相机几何修正：拟合解 pitch θ=+0.148 rad（相机向下 8.5°），不翻转，标准针孔映射（fx≈554.3），4 个渲染 blob RMS<2px。
+- 场景可识别性修复：落叶改为 r=0.15/高0.06 圆堆（cylinder+两片 visual）、纸屑改为 r=0.06 球（crumpled ball）；太阳方向改到 `0.45 0.25 -0.86` 照到垃圾面向相机一侧，新增 `camera_fill` 补光（diffuse 0.30），ambient 0.35→0.42；5 垃圾位置 bottle(2.4,0)、cup(3.2,-1.1)、can(3.2,1.1)、leaves(2.9,-0.55)、scrap(3.9,0.75)，`configs/gazebo_scene.json` 同步；`test_trash_scene_contract.py` 增加 sphere 几何 span 解析。
+- 真实渲染帧 `/tmp/cap4_frame.png`：5 个对象全部可检测（bottle/can/leaves/cup/scrap），地面 V≈156-170、天空 V≈243；horizon_row=360 屏蔽天空假阳性。
+- 新增 `smartclean_interfaces`：`TrashDetection.msg`（schema_version/detection_id/class_name/confidence/bbox_xyxy[4]/image_stamp/source/position_valid/position[3]/position_frame_id/area_px）与 `TrashDetectionArray.msg`（Header+数组+processing_ms/fps）。
+- 新增 `smartclean_perception`（ament_python）：
+  - `detector_core.py`：DetectorConfig（horizon_row=360、min_area=50、flip_vertical=False、HSV 阈值）+ HSV 颜色/形状/面积评分 + IoU 去重 + annotate；置信度=0.55·颜色+0.25·形状+0.20·尺寸；自称「合成Gazebo场景图像识别基线」，不冒充通用识别。
+  - `trash_detector_node.py`：订阅 /camera/image_raw（best_effort），发布 /smartclean/detections 与 /smartclean/debug/detection_image（有订阅者才发调试图）；source=smartclean_perception.color_baseline。
+  - `synthetic_dataset.py`：确定性合成图生成（5 类 + all_five + empty，天空/地面 HSV 与真实渲染相符）+ evaluate()（GT 仅用于评估）。
+  - `launch/perception.launch.py`：Include drive.launch.py（gui/rviz=false）+ detector 节点。
+  - `onnx_adapter.py`：可插拔 ONNX 适配器（letterbox、NMS、类别映射、coords_normalized 反归一化），`_FakeSession` 单测不依赖真实权重。
+  - 测试 28 项（detector_core 9 + synthetic_eval 3 + node_contract 5 + onnx_adapter 11）全部通过。
+- 端到端验证 `bash scripts/ros2.sh perception-verify`（`scripts/verify_perception.sh` + `scripts/perception_probe.py`）：
+  - Phase A（smartclean_trash）：真实渲染帧识别到全部 5 类垃圾，bbox/类别/置信度合法，调试图有标注，检测消息非空。
+  - Phase B（smartclean_empty.sdf，去垃圾副本）：连续 5 条检测消息全部为空（无虚假检测）。
+  - exit=0；日志 `/tmp/p8_pverify2.log`。probe 静态断言 detector/node 不读 Gazebo 真值（gazebo_scene/configs/model:///subprocess/ign 等禁止符）；真值仅用于 Phase A 校验“检测类别∈场景类别”。
+- 合成评估（build_scenes() 21 图）：overall P=1.0、R=1.0、FP=0、FN=0；CPU 单帧 mean 2.848ms、p95 2.924ms、FPS≈351。
+- ONNX 权重调研（第一轮）：未找到同时满足「明确宽松许可证 + 5 类兼容 + 原始地址」的轻量垃圾 ONNX 权重（AGPL copyleft / 类别不兼容 / 未注明许可），本轮不下载、不装 onnxruntime。落地：`weights/model-card-template.json`、`scripts/download_onnx_model.sh`（幂等下载+SHA-256 校验）、`weights/README.md` 流程说明、`.gitignore` 放行模型卡模板。ONNX 权重绝不进 Git。
+- 提交与推送：`feat(perception): add image-based trash detector`（哈希见下方「提交记录」）。
+- 全量回归（提交前）：install / test（65+28 项新增）/ pytest tests（41）/ verify / gazebo-verify / drive-verify / camera-verify / trash-verify / perception-verify 全部 exit=0；`git diff --check`、`bash -n`、`py_compile` 通过；无残留 ign/Xvfb/bridge 进程。
+
+## 提交记录（2026-08-22）
+
+- `1227134` fix(scripts): make Gazebo verification portable —— 已推送，本地==origin==GitHub。
+- `d342ad2` feat(gui): add Gazebo and RViz drive view —— 已推送。
+- `06b5283` feat(gazebo): add local trash scene —— 已推送。
+- `7d7fe2b` feat(gazebo): add verified RGB camera bridge and headless Xvfb rendering —— 已推送。
+- Phase 8 提交（哈希以最终 git log 为准）—— 已推送。

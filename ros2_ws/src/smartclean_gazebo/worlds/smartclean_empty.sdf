@@ -1,6 +1,6 @@
 <?xml version="1.0"?>
 <sdf version="1.8">
-  <world name="smartclean_trash">
+  <world name="smartclean_empty">
     <gravity>0 0 -9.8</gravity>
 
     <physics name="1ms" type="ignored">
@@ -129,31 +129,6 @@
     </model>
 
     <!-- Local trash scene: same robot, plus five synthetic litter models. -->
-    <include>
-      <uri>model://trash_plastic_bottle</uri>
-      <name>trash_plastic_bottle</name>
-      <pose>2.4 0.0 0.0 0 0 0.0</pose>
-    </include>
-    <include>
-      <uri>model://trash_paper_cup</uri>
-      <name>trash_paper_cup</name>
-      <pose>3.2 -1.1 0.0 0 0 0.0</pose>
-    </include>
-    <include>
-      <uri>model://trash_aluminum_can</uri>
-      <name>trash_aluminum_can</name>
-      <pose>3.2 1.1 0.0 0 0 0.0</pose>
-    </include>
-    <include>
-      <uri>model://trash_fallen_leaves</uri>
-      <name>trash_fallen_leaves</name>
-      <pose>2.9 -0.55 0.0 0 0 0.0</pose>
-    </include>
-    <include>
-      <uri>model://trash_paper_scrap</uri>
-      <name>trash_paper_scrap</name>
-      <pose>3.9 0.75 0.0 0 0 0.0</pose>
-    </include>
 
     <include>
       <uri>model://smartclean_robot</uri>

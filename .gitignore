@@ -34,6 +34,7 @@ datasets/*
 weights/*
 !weights/README.md
 !weights/*.md
+!weights/model-card-template.json
 
 # 训练输出 / 临时文件
 runs/

@@ -15,15 +15,15 @@
         </inertia>
       </inertial>
       <collision name="trash_fallen_leaves_collision">
-        <pose>0 0 0.008 0 0 0</pose>
+        <pose>0 0 0.03 0 0 0</pose>
         <geometry>
-<cylinder><radius>0.14</radius><length>0.016</length></cylinder>
+<cylinder><radius>0.15</radius><length>0.06</length></cylinder>
         </geometry>
       </collision>
     <visual name="leaf_patch_1">
-      <pose>0 0 0.008 0 0 0</pose>
+      <pose>0 0 0.04 0 0 0</pose>
       <geometry>
-<cylinder><radius>0.13</radius><length>0.016</length></cylinder>
+<cylinder><radius>0.15</radius><length>0.05</length></cylinder>
       </geometry>
       <material>
         <ambient>0.25 0.45 0.12 1</ambient>
@@ -32,9 +32,9 @@
       </material>
     </visual>
     <visual name="leaf_patch_2">
-      <pose>0.06 0.05 0.007 0 0 0</pose>
+      <pose>0.07 0.05 0.03 0 0 0</pose>
       <geometry>
-<cylinder><radius>0.09</radius><length>0.014</length></cylinder>
+<cylinder><radius>0.10</radius><length>0.04</length></cylinder>
       </geometry>
       <material>
         <ambient>0.45 0.55 0.20 1</ambient>

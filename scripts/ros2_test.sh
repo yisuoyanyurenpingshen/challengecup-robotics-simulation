@@ -16,6 +16,6 @@ colcon --log-base ros2_ws/log test \
   --base-paths ros2_ws/src \
   --build-base ros2_ws/build \
   --install-base ros2_ws/install \
-  --packages-select smartclean_gazebo smartclean_ros \
+  --packages-select smartclean_gazebo smartclean_ros smartclean_perception \
   --event-handlers console_direct+
 colcon test-result --test-result-base ros2_ws/build --verbose
