@@ -29,11 +29,16 @@ setup(
     zip_safe=True,
     maintainer="SmartClean Team",
     maintainer_email="smartclean@example.com",
-    description="ROS 2 bridge and deterministic trajectory replay for SmartClean-Sim",
+    description=(
+        "ROS 2 bridge, deterministic trajectory replay, and velocity safety guard "
+        "for SmartClean-Sim"
+    ),
     license="Proprietary",
     url="https://github.com/yisuoyanyurenpingshen/challengecup-robotics-simulation",
     entry_points={
         "console_scripts": [
+            "cmd_vel_guard = smartclean_ros.cmd_vel_guard_node:main",
+            "smartclean_cmd_vel_guard = smartclean_ros.cmd_vel_guard_node:main",
             "smartclean_bridge = smartclean_ros.bridge_node:main",
         ],
     },

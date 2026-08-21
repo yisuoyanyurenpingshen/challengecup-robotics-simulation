@@ -19,9 +19,10 @@
 - 仓库内可复现的 ROS 2 Humble Desktop、Nav2、SLAM Toolbox 与 `ros_gz` 环境
 - 将二维闭环发布为状态、完整轨迹和逐帧位姿的 ROS 2 回放桥
 - Gazebo Fortress 本地智慧环卫最小 World 与 ROS `/clock` 自动冒烟验证
+- Gazebo 差速清扫车模型、`/cmd_vel` 安全看门狗、`/odom` 与 `odom -> base_link` TF 闭环
 - 面向 Gazebo、YOLO、LLM 和 RDK 的稳定适配边界
 
-当前已验证二维算法、ROS 2 回放桥以及 Gazebo 最小场景/时钟冒烟，但还不是 `/cmd_vel`、`/odom`、Nav2 或实车控制闭环；RDK 目前是有官方版本依据的部署设计，尚未做板端实测。状态边界见 [项目章程](docs/00_project_charter.md)。
+当前已验证二维算法、ROS 2 回放桥和 Gazebo 差速运动闭环；标准 `/cmd_vel` 能驱动车辆，里程计与 TF 可回读，命令断流 0.5 秒后会自动停车。LiDAR、完整 `map -> odom -> base_link` TF、Nav2、实车控制和 RDK 板端实测仍未完成。状态边界见 [项目章程](docs/00_project_charter.md)。
 
 ## 立即运行
 
@@ -43,7 +44,7 @@ firefox results/demo_animation.html
 运行测试：
 
 ```bash
-pytest -q
+bash scripts/ros2.sh run python -m pytest -q tests
 ```
 
 更多命令和指标解释见 [快速开始](docs/04_quickstart.md)。
@@ -57,6 +58,7 @@ bash scripts/ros2.sh install
 bash scripts/ros2.sh build
 bash scripts/ros2.sh verify
 bash scripts/ros2.sh gazebo-verify
+bash scripts/ros2.sh drive-verify
 ```
 
 启动清扫轨迹回放节点：
@@ -70,6 +72,22 @@ bash scripts/ros2.sh demo loop_replay:=true
 ```bash
 bash scripts/ros2.sh gazebo
 ```
+
+启动可接收 `/cmd_vel` 的 Gazebo 差速清扫车（按 `Ctrl+C` 停止）：
+
+```bash
+bash scripts/ros2.sh drive
+```
+
+在另一个新终端持续发送前进命令：
+
+```bash
+bash scripts/ros2.sh run ros2 topic pub --rate 10 /cmd_vel \
+  geometry_msgs/msg/Twist \
+  '{linear: {x: 0.25}, angular: {z: 0.0}}'
+```
+
+停止命令发布后，安全看门狗会在默认 0.5 秒内把底盘速度置零。
 
 另开终端检查：
 
@@ -95,7 +113,8 @@ bash scripts/ros2.sh run ros2 topic list -t
 
 已接入：ROS2 状态 / 轨迹 / 位姿回放
 已接入：Gazebo 最小场景 / ROS 仿真时钟
-下一步：机器人动力学 / Nav2 控制 / YOLO / Web / LLM / RDK BPU
+已接入：/cmd_vel → 安全看门狗 → Gazebo 差速驱动 → /odom + TF
+下一步：LiDAR / 完整 TF / Nav2 控制 / YOLO / Web / LLM / RDK BPU
 ```
 
 技术分层、数据流和扩展规则见：

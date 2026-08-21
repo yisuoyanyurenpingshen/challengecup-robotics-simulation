@@ -39,4 +39,6 @@ ros-demo = "bash scripts/ros2_demo.sh"
 ros-verify = "bash scripts/verify_ros2.sh"
 gazebo-smoke = "bash scripts/gazebo_smoke.sh"
 gazebo-verify = "bash scripts/verify_gazebo.sh"
+gazebo-drive = { cmd = "bash scripts/gazebo_drive.sh", depends-on = ["ros-build"] }
+gazebo-drive-verify = { cmd = "bash scripts/verify_gazebo_drive.sh", depends-on = ["ros-build"] }
 ros-doctor = "ros2 doctor --report"

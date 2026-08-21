@@ -23,6 +23,14 @@
 - 增加无在线资源依赖的 Gazebo Fortress 最小环卫 World，并自动验证 ROS `/clock` 桥接。
 - 提供 Ubuntu 22.04 / Humble 官方容器蓝图；当前代理会话因 Docker daemon 权限未完成镜像构建。
 
+### P4-M1：Gazebo 差速底盘最小闭环
+
+- 建立仓库内 `smartclean_robot` SDF 模型、碰撞/惯性、左右驱动轮与万向支撑轮。
+- 使用 Gazebo Fortress DiffDrive 接入标准 ROS2 `/cmd_vel`，回传 `/odom` 与 `odom -> base_link` TF。
+- 在控制入口增加独立安全看门狗：0.5 秒断流、NaN/Inf 或异常时持续输出零速度。
+- 自动验证前进、原地转向、里程计、TF、仿真时钟、断流停车和 World 服务。
+- 模型与 World 全部使用仓库内资源，不依赖 Gazebo Fuel 在线下载。
+
 ## 后续优先级
 
 ### P2：场景与实验体系
@@ -52,11 +60,12 @@
 目标：把核心算法接入机器人通信和三维仿真。
 
 - 已完成版本决策、独立工作空间、基础桥接节点、可复现环境和 Gazebo `/clock` 冒烟。
-- 将当前轨迹回放升级为 Gazebo 机器人模型和闭环控制。
-- 对接 `/odom`、`/scan`、相机、`/cmd_vel` 和清扫 Action。
+- 已完成 Gazebo 差速机器人、`/cmd_vel`、`/odom`、基础 TF 和断流安全停车。
+- 下一里程碑 P4-M2：增加 LiDAR `/scan`、传感器坐标系与完整 `map -> odom -> base_link` TF 链。
+- 随后接入 Nav2 最小导航，再增加相机和清扫 Action。
 - 再评估 Nav2 与 OpenNav Coverage，而不是复制第二套状态机。
 
-最终验收：一条 launch 命令启动、可取消任务、动态障碍时安全停车或重规划、CLI 基线不回归。当前只达到“环境 + 回放桥 + Gazebo World/时钟自动验收”，不得提前宣称完成 P4。
+最终验收：一条 launch 命令启动、可取消任务、动态障碍时安全停车或重规划、CLI 基线不回归。当前达到 P4-M1“底盘运动闭环”，尚未达到 Nav2 自主导航、任务 Action 或完整 P4 验收，不得提前宣称完成 P4。
 
 ### P5：LLM、Web 与 RDK
 

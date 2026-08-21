@@ -56,10 +56,10 @@ smartclean-sim --config configs/demo.json --show-map
 
 ## 测试
 
-如果环境已安装 pytest：
+使用仓库内锁定环境运行核心测试：
 
 ```bash
-pytest -q
+bash scripts/ros2.sh run python -m pytest -q tests
 ```
 
 ## ROS 2 Humble 快速开始
@@ -72,6 +72,7 @@ bash scripts/ros2.sh install
 bash scripts/ros2.sh build
 bash scripts/ros2.sh verify
 bash scripts/ros2.sh gazebo-verify
+bash scripts/ros2.sh drive-verify
 ```
 
 `verify` 会自动启动桥接节点并订阅三个 Topic，只有同时满足以下条件才返回 0：
@@ -86,6 +87,10 @@ bash scripts/ros2.sh gazebo-verify
 `gazebo-verify` 会在无界面模式启动本地 Fortress World，通过
 `ros_gz_bridge` 收到非负且推进中的 `/clock` 后自动退出。
 
+`drive-verify` 会启动差速清扫车，自动检查 `/cmd_vel` 前进、原地转向、
+`/odom`、`odom -> base_link` TF，以及停止发命令后的自动停车；验证完成后
+会清理本轮进程。
+
 启动持续回放，保留这个终端：
 
 ```bash
@@ -96,6 +101,29 @@ bash scripts/ros2.sh demo replay_period_s:=0.1 loop_replay:=true
 
 ```bash
 bash scripts/ros2.sh gazebo
+```
+
+启动可控制的 Gazebo 差速清扫车，保留终端并用 `Ctrl+C` 停止：
+
+```bash
+bash scripts/ros2.sh drive
+```
+
+另开一个新终端发送前进速度；按 `Ctrl+C` 停止发布后，底盘会在默认
+0.5 秒内自动置零：
+
+```bash
+bash scripts/ros2.sh run ros2 topic pub --rate 10 /cmd_vel \
+  geometry_msgs/msg/Twist \
+  '{linear: {x: 0.25}, angular: {z: 0.0}}'
+```
+
+原地左转可用：
+
+```bash
+bash scripts/ros2.sh run ros2 topic pub --rate 10 /cmd_vel \
+  geometry_msgs/msg/Twist \
+  '{linear: {x: 0.0}, angular: {z: 0.6}}'
 ```
 
 另开一个终端检查 ROS 图：
@@ -119,6 +147,10 @@ bash scripts/ros2.sh run ros2 topic echo --once \
 | `/smartclean/status` | `std_msgs/msg/String` | Schema v1 JSON 状态、指标和当前回放帧 |
 | `/smartclean/trajectory` | `nav_msgs/msg/Path` | `map` 坐标系中的完整轨迹 |
 | `/smartclean/robot_pose` | `geometry_msgs/msg/PoseStamped` | 按帧回放的当前位置 |
+| `/cmd_vel` | `geometry_msgs/msg/Twist` | Gazebo 差速车标准速度入口 |
+| `/odom` | `nav_msgs/msg/Odometry` | Gazebo 差速里程计，`odom -> base_link` |
+| `/tf` | `tf2_msgs/msg/TFMessage` | 当前包含 `odom -> base_link` |
+| `/clock` | `rosgraph_msgs/msg/Clock` | Gazebo 仿真时钟 |
 
 打开完整环境 shell：
 
@@ -129,7 +161,7 @@ source ros2_ws/install/setup.bash
 
 退出 shell 使用 `exit`。不要在同一个终端再 source 系统 ROS 或其他 Conda 环境。
 
-当前桥接器回放确定性二维结果，不接收 `/cmd_vel`，也没有发布真实 `/odom` 或 TF。Gazebo 最小 World 与 ROS 仿真时钟已经独立冒烟通过，但没有机器人模型、传感器或动力学控制；Nav2 也尚未接入闭环。技术边界见 `docs/08_ros2_environment_and_bridge.md`。
+二维回放节点和 Gazebo 差速节点是两条独立入口：`demo` 用于确定性算法回放，`drive` 用于真实物理步进下的底盘接口验证。当前已经有机器人模型、差速动力学、`/cmd_vel`、`/odom` 和基础 TF；还没有 LiDAR、相机、`map -> odom` 定位或 Nav2 自主导航闭环。技术边界见 `docs/08_ros2_environment_and_bridge.md`。
 
 ## 结果说明
 

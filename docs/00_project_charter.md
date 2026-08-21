@@ -30,12 +30,15 @@
 - 规则式中文任务解析和结构化任务接口
 - 垃圾、障碍、危险区、动态障碍的数据模型
 - A* 路径规划、任务执行和基础指标
-- ROS2、感知模型、LLM、RDK 的适配边界设计
+- 仓库内 ROS2 Humble / Gazebo Fortress 复现环境
+- ROS2 状态回放桥和 Gazebo 差速运动闭环
+- `/cmd_vel` 命令断流安全停车、`/odom` 与基础 TF
+- 感知模型、LLM、Web、Nav2 和 RDK 的适配边界设计
 
 后续范围：
 
-- Gazebo 场景和机器人模型
-- ROS2 节点、Topic、Action 与 Nav2 集成
+- Gazebo 多场景、LiDAR、相机与更完整的机器人模型
+- ROS2 Action、完整 TF 树、定位与 Nav2 集成
 - YOLO 垃圾识别与像素坐标到地图坐标转换
 - 受 JSON Schema 约束的 LLM 任务分解
 - Web 控制面板
@@ -53,9 +56,12 @@
 | --- | --- | --- |
 | P0 | 二维清扫闭环、配置、CLI、自动测试 | 已完成并验证 |
 | P1 | 命名区域、全覆盖规划、逐帧轨迹、离线动画 | 已完成并验证 |
-| P2 | Gazebo + ROS2 + Nav2 闭环 | 待实现 |
-| P3 | YOLO/LLM/Web 适配 | 待实现 |
-| P4 | RDK 模型转换和板端验证 | 待硬件验证 |
+| P1.5 | ROS2 环境、回放桥、Gazebo World 与时钟桥 | 已完成并验证 |
+| P2 | 多场景与批量对比实验 | 待实现 |
+| P3 | YOLO/ONNX 感知闭环 | 待实现 |
+| P4-M1 | Gazebo 差速模型、`/cmd_vel`、`/odom`、TF 与安全停车 | 已完成并验证 |
+| P4-M2 | LiDAR、完整 TF 与 Nav2 最小导航闭环 | 下一步 |
+| P5 | LLM、Web、RDK 模型转换和板端验证 | 待实现/待硬件 |
 
 ## 工程原则
 

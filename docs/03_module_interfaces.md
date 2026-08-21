@@ -36,7 +36,7 @@ build_status_payload(run, frame_index) -> JSON-compatible dict
 SmartCleanBridgeNode -> status(String JSON), trajectory(Path), robot_pose(PoseStamped)
 ```
 
-这组接口用于把现有确定性仿真结果送入 ROS2，并不接受 `/odom`、`/scan` 或 `/cmd_vel`，也不具备 Nav2 导航控制语义。
+这组**回放接口**只负责把确定性二维结果送入 ROS2，本身不接受 `/odom`、`/scan` 或 `/cmd_vel`。独立的 Gazebo 差速启动链已经接入 `/cmd_vel`、`/odom` 与 TF，但仍不具备 Nav2 自主导航语义。
 
 ## 2. 全局约定
 
@@ -400,7 +400,7 @@ Controller.compute(robot_state, waypoint, dt) -> ControlCommand
 SafetyLimiter.apply(command, robot_state, snapshot) -> ControlCommand
 ```
 
-所有命令在进入世界或 ROS2 `/cmd_vel` 前必须经过 `SafetyLimiter`。急停优先级最高，其次是故障、暂停、碰撞风险和普通速度限制。
+所有自主控制命令在发布到 ROS2 `/cmd_vel` 前必须经过领域 `SafetyLimiter`。传输链末端还必须经过 `CmdVelGuard`：命令断流或包含非有限数值时强制输出零速度。急停优先级最高，其次是故障、暂停、碰撞风险和普通速度限制。
 
 ### 4.6 任务解析器
 
@@ -448,6 +448,24 @@ MetricsCollector.finalize(run_context) -> RunSummary
 | `/smartclean/trajectory` | `nav_msgs/msg/Path` | Reliable、Transient Local、depth 1 | 完整仿真轨迹，`frame_id=map` |
 | `/smartclean/robot_pose` | `geometry_msgs/msg/PoseStamped` | Reliable、Transient Local、depth 1 | 当前回放帧的格中心位置，`frame_id=map`；晚加入者可取得最近一帧 |
 
+当前已实现并通过动力学探针的 Gazebo 差速契约：
+
+| Topic | ROS2 类型 | 方向 | 语义 |
+|---|---|---|---|
+| `/cmd_vel` | `geometry_msgs/msg/Twist` | 控制器/人工 → 安全看门狗 | 标准外部速度入口；当前差速底盘使用 `linear.x` 与 `angular.z` |
+| `/smartclean/safe_cmd_vel` | `geometry_msgs/msg/Twist` | 看门狗 → ROS-Gazebo bridge | 内部安全速度，不作为上层控制入口 |
+| `/odom` | `nav_msgs/msg/Odometry` | Gazebo → ROS2 | 差速里程计；`header.frame_id=odom`，`child_frame_id=base_link` |
+| `/tf` | `tf2_msgs/msg/TFMessage` | Gazebo → ROS2 | 当前发布 `odom -> base_link` |
+| `/clock` | `rosgraph_msgs/msg/Clock` | Gazebo → ROS2 | 推进中的仿真时钟 |
+
+速度安全契约：
+
+- 默认以 20 Hz 发布最后一条安全命令。
+- 从最后一条有效输入开始 0.5 秒未收到新命令时输出全零 `Twist`。
+- 任一分量为 NaN 或 Inf 时立即废弃缓存并输出全零命令。
+- 超时计时使用 ROS2 `STEADY_TIME`，不因仿真暂停或时钟复位而失效。
+- 看门狗只负责新鲜度与数值有效性；速度/加速度上限由底盘插件和后续领域安全限制器共同约束。
+
 状态 JSON 的稳定顶层字段为：
 
 ```text
@@ -470,12 +488,12 @@ map_y = origin_y_m + (grid_height - grid_y - 0.5) * cell_size_m
 
 其中 `origin_x_m`、`origin_y_m` 表示完整栅格左下角，发布位置位于格中心。转换必须拒绝非正栅格尺寸、非正分辨率、非有限原点和越界格坐标。当前核心没有连续朝向，`PoseStamped` 暂用单位四元数，调用方不得把它解释为实车航向。
 
-后续导航闭环的目标映射：
+当前和后续导航闭环的目标映射：
 
 | 核心对象 | ROS2 接口 |
 |---|---|
-| `ControlCommand` | `geometry_msgs/msg/Twist`，清扫开关另用项目消息或服务 |
-| `RobotState.pose` | `nav_msgs/msg/Odometry` / TF |
+| `ControlCommand` | `geometry_msgs/msg/Twist`，运动入口已接入；清扫开关另用项目消息或服务 |
+| `RobotState.pose` | `nav_msgs/msg/Odometry` / TF；当前只有 `odom -> base_link`，`map -> odom` 待定位模块提供 |
 | 范围观测 | `sensor_msgs/msg/LaserScan` |
 | 图像观测 | `sensor_msgs/msg/Image` |
 | `Detection[]` | `smartclean_interfaces/msg/DetectionArray` |
@@ -552,7 +570,9 @@ Web 与 CLI 都调用任务执行器的公开命令接口，不直接修改状�
 6. 任务进入 `COMPLETED`，碰撞数为零。
 7. 连续运行两次，事件序列和 `RunSummary` 一致。
 
-ROS2 回放桥另有一组已通过的集成验收：工作空间可构建、19 项 `colcon` 测试通过；探针在 20 秒内收到状态、完整轨迹和位姿，并等待当前回放帧进入 `COMPLETED`；最终目标清除率与覆盖率均为 1.0、碰撞为 0 且已经返航。Gazebo 另有独立的 headless World 与 `/clock` 冒烟；这两组验收都不覆盖机器人动力学、Nav2、RDK 或真实底盘。
+ROS2 回放桥另有一组已通过的集成验收：工作空间可构建、48 项 `colcon` 测试通过；探针在 20 秒内收到状态、完整轨迹和位姿，并等待当前回放帧进入 `COMPLETED`；最终目标清除率与覆盖率均为 1.0、碰撞为 0 且已经返航。
+
+Gazebo 有两层独立验收：最小 World `/clock` 冒烟；以及差速清扫车前进、原地转向、`/odom`、`odom -> base_link` TF、命令断流停车和 World 服务探针。后一层已经覆盖底盘动力学，但不覆盖 LiDAR、`map -> odom`、Nav2、RDK 或真实底盘。
 
 接口实现的最低测试范围：
 

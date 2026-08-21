@@ -4,8 +4,8 @@
 
 ```text
 ros2_ws/src/smartclean_core/     将根目录二维核心与 demo 配置安装到 ROS 前缀
-ros2_ws/src/smartclean_ros/      状态、轨迹与逐帧位姿回放桥
-ros2_ws/src/smartclean_gazebo/   Fortress 最小 World、headless launch 与时钟桥
+ros2_ws/src/smartclean_ros/      状态回放桥与 cmd_vel 安全看门狗
+ros2_ws/src/smartclean_gazebo/   Fortress World、差速清扫车、headless launch 与桥接
 ros2_ws/build/                   colcon 构建产物，Git 忽略
 ros2_ws/install/                 colcon 安装空间，Git 忽略
 ros2_ws/log/                     colcon 日志，Git 忽略
@@ -19,7 +19,11 @@ bash scripts/ros2.sh build
 bash scripts/ros2.sh test
 bash scripts/ros2.sh verify
 bash scripts/ros2.sh gazebo-verify
+bash scripts/ros2.sh drive-verify
 bash scripts/ros2.sh gazebo
+bash scripts/ros2.sh drive
 ```
 
-不要在这里复制二维规划状态机；ROS 包只做协议转换、系统编排和外部平台适配。
+`demo` 是二维算法回放，`gazebo` 是最小 World/时钟冒烟，`drive` 是
+`/cmd_vel -> 看门狗 -> Gazebo -> /odom + /tf` 底盘闭环。不要在这里复制
+二维规划状态机；ROS 包只做协议转换、系统编排和外部平台适配。

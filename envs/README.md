@@ -10,7 +10,7 @@
 - 仓库内环境管理器：Pixi 0.77.0
 - ROS 2：Humble（RoboStack 社区构建，Python 3.12.13）
 - ROS 包：Desktop、Nav2 1.1.20、SLAM Toolbox 2.6.10、`ros_gz` 0.244.24
-- Gazebo：Fortress 6.16.0；本地最小 World headless 启动并通过 ROS `/clock` 探针
+- Gazebo：Fortress 6.16.0；本地最小 World `/clock` 与差速清扫车运动闭环均通过探针
 - ROS 中间件：默认 Fast DDS；项目固定 `ROS_DOMAIN_ID=42`
 - 自动测试：宿主与 Pixi 环境均已验证
 
@@ -32,7 +32,9 @@ bash scripts/ros2.sh build
 bash scripts/ros2.sh test
 bash scripts/ros2.sh verify
 bash scripts/ros2.sh gazebo-verify
+bash scripts/ros2.sh drive-verify
 bash scripts/ros2.sh gazebo
+bash scripts/ros2.sh drive
 bash scripts/ros2.sh shell
 ```
 

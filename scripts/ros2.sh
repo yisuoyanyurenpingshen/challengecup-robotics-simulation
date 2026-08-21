@@ -41,6 +41,13 @@ case "${1:-shell}" in
   gazebo-verify)
     exec "${pixi_bin}" run gazebo-verify
     ;;
+  drive)
+    shift
+    exec "${pixi_bin}" run gazebo-drive -- "$@"
+    ;;
+  drive-verify)
+    exec "${pixi_bin}" run gazebo-drive-verify
+    ;;
   doctor)
     exec "${pixi_bin}" run ros-doctor
     ;;
@@ -53,7 +60,7 @@ case "${1:-shell}" in
     exec "${pixi_bin}" run -- "$@"
     ;;
   *)
-    echo "用法：scripts/ros2.sh {install|shell|build|test|demo|verify|gazebo|gazebo-verify|doctor|run}" >&2
+    echo "用法：scripts/ros2.sh {install|shell|build|test|demo|verify|gazebo|gazebo-verify|drive|drive-verify|doctor|run}" >&2
     exit 2
     ;;
 esac

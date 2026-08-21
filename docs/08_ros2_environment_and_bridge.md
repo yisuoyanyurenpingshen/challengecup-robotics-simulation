@@ -1,4 +1,4 @@
-# ROS2 环境与 SmartClean 回放桥
+# ROS2 环境、SmartClean 回放桥与 Gazebo 差速闭环
 
 ## 1. 结论与状态
 
@@ -7,7 +7,12 @@
 - **正式复现主线**：Ubuntu 22.04（Jammy）+ ROS2 Humble + Gazebo Fortress，封装在 `compose.ros2.yaml` 和 `containers/ros2-humble/Dockerfile` 中。这是后续团队协作、CI 和答辩复现采用的基线。
 - **本机已验证路径**：在 Ubuntu 20.04.6 宿主机中，使用仓库内 Pixi 0.77.0 与 RoboStack Humble 环境完成安装、构建和通信验证。该路径不修改宿主机 `/opt/ros`，用于当前无 Docker daemon 权限时继续开发；项目内部把它列为 Tier 3 辅助路径，不替代 Jammy 容器正式基线。
 
-当前 ROS2 成果是**确定性二维核心的只读回放桥**：它运行一次既有仿真，把状态、完整轨迹和逐帧位姿发布为 ROS2 Topic。它不是 Gazebo 车辆控制桥，也还没有接入 `/odom`、`/scan`、TF、`/cmd_vel` 或 Nav2 导航闭环。
+当前 ROS2 成果包含两条互相独立、都已验证的链路：
+
+1. **确定性二维核心回放桥**：运行既有二维仿真，把状态、完整轨迹和逐帧位姿发布为 ROS2 Topic。
+2. **Gazebo 差速运动闭环**：标准 `/cmd_vel` 经安全看门狗和 ROS-Gazebo bridge 驱动车辆，并回传 `/odom`、`odom -> base_link` TF 与 `/clock`。
+
+第二条链路证明了底盘命令—动力学—里程计闭环，但还没有 LiDAR、`map -> odom` 定位或 Nav2 自主导航。
 
 | 项目 | 状态 | 已验证事实 |
 | --- | --- | --- |
@@ -16,10 +21,11 @@
 | ROS2 Desktop | 已安装、CLI 可发现 | RoboStack `ros-humble-desktop` 0.10.0；本轮未验证 RViz GUI |
 | Nav2 与 SLAM 工具 | 已安装、未接入闭环 | Nav2 1.1.20、`slam_toolbox` 2.6.10 |
 | ROS-Gazebo 集成包 | 已安装、基础冒烟通过 | `ros_gz` 0.244.24、Gazebo Fortress 6.16.0；`/clock` 桥通过 |
-| ROS2 工作空间 | 已验证 | `colcon` 构建成功，19 项包测试通过 |
+| ROS2 工作空间 | 已验证 | `colcon` 构建成功，48 项包测试通过 |
 | DDS Topic 通信 | 已验证 | Topic 探针收到完整状态、轨迹与位姿 |
 | Docker/Compose 配置 | 已生成、未运行验证 | Docker 客户端 28.1.1、Compose 2.35.1；当前代理会话无 daemon 权限 |
 | Gazebo 最小 World | 已验证 | 本地 SDF 可解析；headless 启动并收到推进中的 ROS `/clock` |
+| Gazebo 差速清扫车 | 已验证 | 前进、原地转向、`/odom`、基础 TF 与命令断流停车全部通过 |
 
 ## 2. 为什么选择 Humble + Fortress
 
@@ -48,8 +54,8 @@ Humble 距离支持结束时间已经不长，但当前 RDK X3/X5 的共同产�
 ├── containers/ros2-humble/Dockerfile Jammy/Humble 镜像定义
 └── ros2_ws/
     ├── src/smartclean_core/           将平台无关核心安装到 ROS 前缀
-    ├── src/smartclean_ros/            ROS2 回放桥源码
-    ├── src/smartclean_gazebo/         Fortress 最小 World 与启动编排
+    ├── src/smartclean_ros/            ROS2 回放桥与速度安全看门狗
+    ├── src/smartclean_gazebo/         Fortress World、差速模型与启动编排
     ├── build/                         colcon 构建目录（不入 Git）
     ├── install/                       colcon 安装目录（不入 Git）
     └── log/                           colcon 日志（不入 Git）
@@ -73,7 +79,7 @@ Humble 距离支持结束时间已经不长，但当前 RDK X3/X5 的共同产�
 # 首次下载并安装仓库内环境；后续会复用 pixi.lock
 ./scripts/ros2.sh install
 
-# 构建并运行 19 项包测试
+# 构建并运行 48 项包测试
 ./scripts/ros2.sh test
 
 # 启动桥接节点并运行 Topic 探针
@@ -82,10 +88,14 @@ Humble 距离支持结束时间已经不长，但当前 RDK X3/X5 的共同产�
 # 启动 Gazebo 并自动验证 ROS 仿真时钟
 ./scripts/ros2.sh gazebo-verify
 
+# 自动验证差速运动、里程计、TF 和断流停车
+./scripts/ros2.sh drive-verify
+
 # 分步开发或持续启动演示
 ./scripts/ros2.sh build
 ./scripts/ros2.sh demo
 ./scripts/ros2.sh gazebo
+./scripts/ros2.sh drive
 ```
 
 `./scripts/ros2.sh shell` 会进入已激活环境；临时执行单条命令可用：
@@ -98,19 +108,19 @@ Humble 距离支持结束时间已经不长，但当前 RDK X3/X5 的共同产�
 验证标准不是“命令退出码为 0”这一项，而是同时满足：
 
 - `smartclean_ros` 可由 `colcon` 构建并安装；
-- 19 项包测试全部通过；
+- 48 项包测试全部通过；
 - 探针在 20 秒内收到三条目标 Topic；
 - 状态为 `COMPLETED`，4 个目标全部清除，覆盖率为 1.0，碰撞数为 0，且已经返航；
 - `Path` 至少有两个位姿，轨迹和位姿的 `frame_id` 均为 `map`。
 
-两个自动探针会仅在自身进程内选择临时 ROS domain；Gazebo 探针还使用唯一
+各自动探针会仅在自身进程内选择临时 ROS domain；Gazebo 探针还使用唯一
 Ignition partition，并检查本轮子进程仍存活及
-`/world/smartclean_smoke/control` 服务存在，避免被其他已运行节点误判为通过。
+对应 World 控制服务存在，避免被其他已运行节点误判为通过。
 正常开发、PC—RDK 通信仍使用项目约定的 domain 42。
 
 Gazebo 使用独立门槛：SDF 必须通过解析，Fortress 以 headless 模式启动，
-`ros_gz_bridge` 必须在超时内把推进中的仿真 `/clock` 送到 ROS2。当前最小
-World 已满足这个门槛；这不代表机器人、传感器或控制闭环已经完成。
+`ros_gz_bridge` 必须在超时内把推进中的仿真 `/clock` 送到 ROS2。差速闭环
+还必须证明前进位移、转向角、里程计、TF 和断流停车均满足探针阈值。
 
 ### 4.2 正式 Docker 路径
 
@@ -155,6 +165,46 @@ Physics、User Commands 和 Scene Broadcaster 的 server 配置也随包安装�
 launch 显式指定，不依赖用户目录里已有的 Gazebo 配置。默认控制台日志、完整
 状态录制、二进制、依赖、模型和项目配置因此都留在仓库范围内；不要覆盖或取消
 `IGN_LOG_PATH`，否则 Gazebo 上游会回退到 `~/.ignition/`。
+
+### 4.4 Gazebo 差速清扫车
+
+持续运行入口：
+
+```bash
+./scripts/ros2.sh drive
+```
+
+另开一个没有 source 其他 ROS 环境的新终端发送速度：
+
+```bash
+./scripts/ros2.sh run ros2 topic pub --rate 10 /cmd_vel \
+  geometry_msgs/msg/Twist \
+  '{linear: {x: 0.25}, angular: {z: 0.0}}'
+```
+
+数据链如下：
+
+```text
+/cmd_vel
+   ↓
+smartclean_cmd_vel_guard（默认 timeout=0.5 s，20 Hz）
+   ↓
+/smartclean/safe_cmd_vel
+   ↓ ros_gz_bridge
+Gazebo Fortress DiffDrive
+   ├── /smartclean/odom ── bridge/remap ──→ /odom
+   ├── /smartclean/tf   ── bridge/remap ──→ /tf
+   └── /clock           ── bridge ─────────→ /clock
+```
+
+`smartclean_robot` 是本仓库内的 SDF 模型：45 kg 主体、左右驱动轮、球形
+支撑轮、碰撞与惯性参数，以及 Fortress DiffDrive system plugin。模型和
+`smartclean_drive.sdf` 全部从 ROS 包安装目录解析，不访问 Gazebo Fuel。
+
+安全看门狗用 `STEADY_TIME` 计时，不依赖可能暂停或复位的仿真时钟。任一
+`Twist` 分量出现 NaN/Inf 时会丢弃命令；正常命令断流达到 0.5 秒后持续输出
+全零 `Twist`。自动探针会故意停止发布命令，并检查三秒内速度归零、停车后
+平移和角度漂移都低于阈值。
 
 ## 5. ROS2 回放桥
 
@@ -211,13 +261,15 @@ map_y = origin_y_m + (grid_height - grid_y - 0.5) × cell_size_m
 
 当前明确没有完成：
 
-- 机器人 URDF/SDF、差速驱动、LiDAR、相机和碰撞物理；
-- `/odom`、TF、`/scan`、`/cmd_vel` 与 Nav2 的定位—规划—控制闭环；
-- 除 `/clock` 外的 ROS-Gazebo 双向 Topic、机器人控制与传感器数据桥；
+- LiDAR、相机以及相应传感器噪声与标定；
+- `map -> odom` 定位、`/scan` 与 Nav2 的定位—规划—控制闭环；
 - ROS2 Action 的任务提交、反馈、取消、返航和急停；
 - PC 与真实 RDK 的 DDS 跨机通信和板端 BPU 推理。
 
-Gazebo headless 与 `/clock` 门槛已经通过。下一阶段只有在机器人模型与差速驱动、ROS-Gazebo 控制/传感器双向 Topic、Nav2 最小导航和停止安全测试分别留下可复现日志后，才能将状态升级为“机器人闭环已验证”。
+Gazebo headless、`/clock` 和底盘运动门槛已经通过，因此可以准确表述为
+“Gazebo 差速底盘闭环已验证”。下一步 P4-M2 是增加 LiDAR `/scan`、完整
+`map -> odom -> base_link` TF 和 Nav2 最小导航；这些验证完成前不能表述为
+“自主导航闭环已验证”。
 
 ## 7. 官方依据
 
@@ -227,6 +279,8 @@ Gazebo headless 与 `/clock` 门槛已经通过。下一阶段只有在机器人
 - [ROS2 发行版生命周期](https://docs.ros.org/en/humble/Releases.html)
 - [Gazebo 与 ROS 的官方配对说明](https://gazebosim.org/docs/latest/ros_installation/)
 - [Gazebo Fortress ROS2 集成](https://gazebosim.org/docs/fortress/ros2_integration/)
+- [Gazebo Fortress 6.16.0 DiffDrive 实现](https://github.com/gazebosim/gz-sim/blob/ignition-gazebo6_6.16.0/src/systems/diff_drive/DiffDrive.cc)
+- [Gazebo 官方 DiffDrive SDF 示例](https://github.com/gazebosim/gz-sim/blob/main/examples/worlds/diff_drive.sdf)
 - [ROS 官方 Docker 镜像](https://hub.docker.com/_/ros)
 - [RoboStack Getting Started](https://robostack.github.io/GettingStarted.html)
 - [Pixi 环境说明](https://pixi.prefix.dev/latest/workspace/environment/)

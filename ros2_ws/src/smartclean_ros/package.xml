@@ -2,7 +2,7 @@
 <package format="3">
   <name>smartclean_ros</name>
   <version>0.1.0</version>
-  <description>SmartClean-Sim 的 ROS 2 薄适配与轨迹回放节点。</description>
+  <description>SmartClean-Sim 的 ROS 2 薄适配、轨迹回放与速度安全看门狗节点。</description>
   <maintainer email="smartclean@example.com">SmartClean Team</maintainer>
   <license>Proprietary</license>
   <url type="repository">https://github.com/yisuoyanyurenpingshen/challengecup-robotics-simulation</url>

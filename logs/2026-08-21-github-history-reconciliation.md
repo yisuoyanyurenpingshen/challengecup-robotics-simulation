@@ -82,3 +82,9 @@ bash scripts/ros2.sh gazebo-verify
 - 最终推送只允许普通快进更新；如果远端在验证期间再次变化，应重新 fetch 和比较，禁止自动强推。
 - `.tools/gh-config/` 含登录凭据且已被 `.gitignore` 排除；不得复制到 `docs/`、`logs/` 或提交中。
 - 推送后必须用远端 `refs/heads/main` 哈希与本地 `HEAD` 比对，哈希一致才可报告上传完成。
+
+## 最终上传结果
+
+- 普通 `git push origin main` 已成功，没有使用强制推送。
+- 本地 `main`、本地远端跟踪分支 `origin/main` 与 GitHub `main` 最终均指向 `d9bd6ea411069f836b79aa74cddf339b2590f70f`。
+- GitHub 的原有提交历史保留在合并提交第二父链中，当前完整工程位于第一父链工作树。

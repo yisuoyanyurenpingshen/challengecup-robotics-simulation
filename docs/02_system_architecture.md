@@ -6,11 +6,11 @@
 
 项目的正式定位是：**面向 RDK 国产机器人平台的智慧环卫无人清扫车仿真与边缘部署验证系统**。
 
-当前已经交付可重复验证的 PC 端二维闭环，并通过 ROS2 Humble 回放桥发布状态、轨迹和位姿；Gazebo 物理闭环、YOLO、LLM、Web 和 RDK 仍按适配器边界逐步接入。本文中的“核心”不依赖这些外部系统；外部能力统一通过适配器接入。
+当前已经交付可重复验证的 PC 端二维闭环，通过 ROS2 Humble 回放桥发布状态、轨迹和位姿，并打通 Gazebo 差速车运动闭环；LiDAR/Nav2、YOLO、LLM、Web 和 RDK 仍按适配器边界逐步接入。本文中的“核心”不依赖这些外部系统；外部能力统一通过适配器接入。
 
 ## 0. 实现状态（2026-08-21）
 
-本文同时描述“已经落地的 P0/P1 与 ROS2 回放基线”和“后续目标架构”。除本节明确列为已实现的部分外，其余分层、数据对象和外部适配器均是设计约束，不能在汇报中表述为已经完成。
+本文同时描述“已经落地的 P0/P1、ROS2 回放基线与 P4-M1 差速闭环”和“后续目标架构”。除本节明确列为已实现的部分外，其余分层、数据对象和外部适配器均是设计约束，不能在汇报中表述为已经完成。
 
 | 能力 | 状态 | 当前实现 |
 | --- | --- | --- |
@@ -23,13 +23,15 @@
 | CLI 与 ASCII 路线图 | 已实现、已测试 | `cli.py`、`rendering.py` |
 | 命名栅格区域与蛇形全覆盖规划 | 已实现、已测试 | `grid.py`、`planning.py`、`simulation.py` |
 | 逐帧轨迹与离线 HTML 动画 | 已实现、已测试 | `simulation.py`、`html_visualization.py` |
-| 仓库内 ROS2 Humble 环境 | 已实现、已验证 | Pixi/RoboStack、`pixi.lock`；19 项 `colcon` 测试通过 |
+| 仓库内 ROS2 Humble 环境 | 已实现、已验证 | Pixi/RoboStack、`pixi.lock`；48 项 `colcon` 测试通过 |
 | ROS2 状态、轨迹与位姿回放桥 | 已实现、已验证 | `ros2_ws/src/smartclean_ros`；三条 Topic 探针通过 |
 | Jammy/Humble Docker 复现定义 | 已实现、待 daemon 验证 | `compose.ros2.yaml`、`containers/ros2-humble/Dockerfile` |
 | Gazebo Fortress 最小 World 与 `/clock` | 已实现、已验证 | `smartclean_gazebo`；headless 启动和 ROS-Gazebo 时钟桥通过 |
+| Gazebo 差速车、`/cmd_vel`、`/odom` 与 TF | 已实现、已验证 | `drive.launch.py`；前进、转向、里程计与 `odom -> base_link` 探针通过 |
+| 速度命令安全看门狗 | 已实现、已验证 | 0.5 秒断流停车；拒绝 NaN/Inf；使用单调时钟 |
 | Nav2、SLAM Toolbox | 包已安装、未形成闭环 | 不等同于定位、规划或控制已经接入 |
 | 固定 `dt`、感知与控制器分层 | 设计中 | 尚未实现 |
-| Gazebo 物理闭环、YOLO、LLM、Web、RDK | 适配规划 | 尚未集成或硬件验证 |
+| LiDAR、完整 TF、Nav2、YOLO、LLM、Web、RDK | 适配规划 | 尚未集成或硬件验证 |
 
 P0 使用整数栅格坐标，每次移动一个单元，不包含随机行为；因此当前可复现性来自确定性排序和算法，而不是随机种子。引入噪声或随机场景时再把 `seed` 纳入配置和结果。
 
@@ -181,8 +183,8 @@ domain ← tasking ← orchestration → perception / planning / control
 
 | 适配器 | 输入 | 输出 | 明确边界 |
 |---|---|---|---|
-| ROS2 | Topic、Service、Action | 核心数据对象或 ROS2 消息 | 已实现只读回放桥；核心不出现 `rclpy` 和 ROS 消息类型 |
-| Gazebo | 模型状态、相机、雷达 | `Observation`、`RobotState` | 高保真世界替换二维世界，但不改变任务语义 |
+| ROS2 | Topic、Service、Action | 核心数据对象或 ROS2 消息 | 已实现只读回放桥与速度安全中继；核心不出现 `rclpy` 和 ROS 消息类型 |
+| Gazebo | 速度命令、模型状态、相机、雷达 | `/odom`、TF、`Observation`、`RobotState` | 差速运动已接入；传感器与 Nav2 待接入，不改变任务语义 |
 | YOLO | 图像帧 | 标准 `Detection` | 不做路径规划和任务决策 |
 | LLM | 自然语言和受限上下文 | 候选 `TaskSpec` | 必须校验；失败时拒绝或回退规则解析器 |
 | Web | HTTP/WebSocket | 命令、状态和指标 DTO | 不直接操作仿真内部对象 |
@@ -281,8 +283,10 @@ ros2_ws/src/
 │   ├── launch/              回放演示编排
 │   └── test/                转换与桥接契约测试
 └── smartclean_gazebo/
-    ├── launch/              Fortress headless 与 `/clock` 桥接
-    └── worlds/              无在线资源依赖的最小环卫场景
+    ├── launch/              Fortress headless、差速车与 ROS-Gazebo 桥接
+    ├── models/              本地差速清扫车 SDF 模型
+    ├── test/                SDF 与接口契约测试
+    └── worlds/              无在线资源依赖的环卫场景
 ```
 
 当前已经验证的只读输出：
@@ -291,16 +295,28 @@ ros2_ws/src/
 - `/smartclean/trajectory`：`nav_msgs/msg/Path`，发布完整 `map` 轨迹。
 - `/smartclean/robot_pose`：`geometry_msgs/msg/PoseStamped`，发布逐帧回放位置。
 
+当前已经验证的 Gazebo 运动链：
+
+```text
+/cmd_vel
+   ↓
+速度安全看门狗（0.5 秒断流或非法数值时输出零速度）
+   ↓
+/smartclean/safe_cmd_vel → ros_gz_bridge → Gazebo DiffDrive
+                                      ├── /odom
+                                      └── /tf（odom -> base_link）
+```
+
 栅格桥接显式完成“左上原点、`y` 向下、整数格”到“左下原点、`y` 向上、米制 `map` 格中心”的转换。实现、QoS、参数和验证结果见 `08_ros2_environment_and_bridge.md`。
 
-后续导航闭环的首批映射目标：
+下一段导航闭环的映射目标：
 
-- 标准输入：`/odom`、`/scan`、相机图像。
-- 标准输出：`/cmd_vel`。
+- 已接入底盘接口：`/cmd_vel`、`/odom`、`odom -> base_link` TF。
+- 待接入传感器与定位：`/scan`、相机、`map -> odom`。
 - 项目消息：`/smartclean/detections`、`/smartclean/robot_state`、`/smartclean/metrics`。
 - 项目动作：`/smartclean/clean_area`，支持反馈、取消和最终结果。
 
-ROS2 节点只转换协议并调用核心服务；不得在回调中复制一套独立状态机。ROS2 不可用时，CLI 闭环仍必须正常运行。当前三条 Topic 只证明回放通信已打通，不能表述为 `/odom`—Nav2—`/cmd_vel` 导航闭环。
+ROS2 节点只转换协议并调用核心服务；不得在回调中复制一套独立状态机。ROS2 不可用时，CLI 闭环仍必须正常运行。当前已经证明底盘命令—动力学—里程计闭环，仍不能表述为 `map` 定位—Nav2 规划—`/cmd_vel` 自主导航闭环。
 
 ## 7. 故障与降级策略
 
@@ -331,7 +347,8 @@ ROS2 节点只转换协议并调用核心服务；不得在回调中复制一套
 
 - ROS2 Humble 环境与状态/轨迹/位姿回放桥已完成。
 - Gazebo Fortress 最小 World 与 ROS-Gazebo `/clock` 冒烟已完成。
-- 标准传感器、Nav2、动作取消、状态反馈和 `/cmd_vel` 安全约束待实现。
+- Gazebo 差速清扫车、`/cmd_vel` 安全看门狗、`/odom` 和基础 TF 已完成。
+- 标准传感器、完整 TF、Nav2、动作取消和状态反馈待实现。
 
 ### 阶段 D：国产边缘适配
 
