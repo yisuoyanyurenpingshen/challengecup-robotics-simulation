@@ -17,7 +17,7 @@
     <light name="sun" type="directional">
       <cast_shadows>true</cast_shadows>
       <pose>0 0 12 0 0 0</pose>
-      <diffuse>0.9 0.9 0.85 1</diffuse>
+      <diffuse>0.75 0.75 0.72 1</diffuse>
       <specular>0.2 0.2 0.2 1</specular>
       <attenuation>
         <range>1000</range>
@@ -119,27 +119,27 @@
     <include>
       <uri>model://trash_plastic_bottle</uri>
       <name>trash_plastic_bottle</name>
-      <pose>3.0 0.8 0.0 0 0 0.0</pose>
+      <pose>2.0 0.0 0.0 0 0 0.0</pose>
     </include>
     <include>
       <uri>model://trash_paper_cup</uri>
       <name>trash_paper_cup</name>
-      <pose>2.6 -1.2 0.0 0 0 0.0</pose>
+      <pose>2.6 -0.9 0.0 0 0 0.0</pose>
     </include>
     <include>
       <uri>model://trash_aluminum_can</uri>
       <name>trash_aluminum_can</name>
-      <pose>4.2 1.5 0.0 0 0 0.0</pose>
+      <pose>2.6 0.9 0.0 0 0 0.0</pose>
     </include>
     <include>
       <uri>model://trash_fallen_leaves</uri>
       <name>trash_fallen_leaves</name>
-      <pose>2.0 1.6 0.0 0 0 0.0</pose>
+      <pose>1.7 -0.35 0.0 0 0 0.0</pose>
     </include>
     <include>
       <uri>model://trash_paper_scrap</uri>
       <name>trash_paper_scrap</name>
-      <pose>3.8 -0.6 0.0 0 0 0.6</pose>
+      <pose>3.2 0.3 0.0 0 0 0.6</pose>
     </include>
 
     <include>

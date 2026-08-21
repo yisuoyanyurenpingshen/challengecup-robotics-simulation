@@ -58,6 +58,12 @@ def _launch_gazebo(context):
     server_config_path = Path(
         LaunchConfiguration("server_config_path").perform(context)
     )
+    # 相机等传感器需要 Sensors 系统，而 Sensors 系统会初始化渲染引擎；
+    # headless 差速验证（无 GLX 显示）必须继续使用不含 Sensors 的基础配置。
+    if _as_bool(LaunchConfiguration("camera").perform(context), "camera"):
+        server_config_path = Path(
+            LaunchConfiguration("sensors_config_path").perform(context)
+        )
     if not server_config_path.is_absolute() or not server_config_path.is_file():
         raise RuntimeError(
             "server_config_path 必须是存在的绝对文件：{}".format(
@@ -132,6 +138,9 @@ def generate_launch_description() -> LaunchDescription:
     default_server_config = PathJoinSubstitution(
         [package_share, "config", "server.config"]
     )
+    default_sensors_config = PathJoinSubstitution(
+        [package_share, "config", "server_sensors.config"]
+    )
     default_models = PathJoinSubstitution([package_share, "models"])
     default_urdf = PathJoinSubstitution(
         [package_share, "urdf", "smartclean_drive.urdf"]
@@ -186,6 +195,29 @@ def generate_launch_description() -> LaunchDescription:
         ],
         output="screen",
         on_exit=Shutdown(reason="cmd_vel safety guard exited"),
+    )
+
+    camera_bridge = Node(
+        package="ros_gz_bridge",
+        executable="parameter_bridge",
+        name="smartclean_camera_bridge",
+        arguments=[
+            (
+                "/smartclean/camera/image@sensor_msgs/msg/Image["
+                "ignition.msgs.Image"
+            ),
+            (
+                "/smartclean/camera/camera_info@"
+                "sensor_msgs/msg/CameraInfo[ignition.msgs.CameraInfo"
+            ),
+        ],
+        remappings=[
+            ("/smartclean/camera/image", "/camera/image_raw"),
+            ("/smartclean/camera/camera_info", "/camera/camera_info"),
+        ],
+        condition=IfCondition(LaunchConfiguration("camera")),
+        output="screen",
+        on_exit=Shutdown(reason="ROS-Gazebo camera bridge exited"),
     )
 
     # Publishes base_footprint -> base_link and every attached child frame.
@@ -245,6 +277,11 @@ def generate_launch_description() -> LaunchDescription:
                 description="Absolute Gazebo server configuration path.",
             ),
             DeclareLaunchArgument(
+                "sensors_config_path",
+                default_value=default_sensors_config,
+                description="Sensors-enabled server config used when camera:=true.",
+            ),
+            DeclareLaunchArgument(
                 "models_path",
                 default_value=default_models,
                 description="Absolute local model search directory.",
@@ -268,6 +305,11 @@ def generate_launch_description() -> LaunchDescription:
                 "rviz",
                 default_value="false",
                 description="Start RViz2 when true.",
+            ),
+            DeclareLaunchArgument(
+                "camera",
+                default_value="false",
+                description="Bridge the RGB camera to /camera when true.",
             ),
             DeclareLaunchArgument(
                 "record",
@@ -295,6 +337,7 @@ def generate_launch_description() -> LaunchDescription:
             OpaqueFunction(function=_launch_gazebo),
             bridge,
             command_guard,
+            camera_bridge,
             robot_state_publisher,
             gazebo_gui_client,
             rviz_node,

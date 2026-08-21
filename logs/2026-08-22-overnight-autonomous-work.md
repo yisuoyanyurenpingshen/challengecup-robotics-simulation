@@ -130,3 +130,20 @@ git push --dry-run origin main  # Everything up-to-date, exit=0
 - 新增 `trash-verify`（`scripts/verify_trash_scene.sh` + `scripts/trash_scene_probe.py`）：真实启动 World，断言 control 服务与全部 6 个实体在场。
 - 踩坑：`ign model --list` 行首带 `- ` 前缀，探针解析后已修正；`ign sdf -k` 无法解析 `model://` include（服务器资源路径才能解析），改为真实启动验证。
 - 验证：`bash scripts/ros2.sh trash-verify` exit=0（机器人 + 5 个垃圾模型全部在场）；6 项场景契约测试通过；所有模型 `ign sdf -k` Valid。
+
+### Phase 7 RGB 相机（已验证，渲染通路已打通）
+
+- 已落地：`camera_link`（pose 0.45 0 0.45 0 -0.15 0）+ `camera_optical_frame` + RGB camera 传感器（640×480、10Hz、HFOV 60°、R8G8B8、topic /smartclean/camera/image + camera_info）写入 `model.sdf`；`drive.launch.py` 增加可关闭 `camera:=true` 桥接（/camera/image_raw、/camera/camera_info）；`trash-verify`、`camera-verify` 入口。
+- 关键修复一（headless 回归保护）：Sensors 系统会初始化 OGRE2 渲染，无 GLX 时 `ign gazebo -s` 直接 SIGABRT(-6)。因此把基础 `config/server.config` 保持不含 Sensors，新增 `config/server_sensors.config`（仅 camera:=true 时使用）。测试 `test_server_configs_split_sensors_from_headless_baseline` 固化此不变量，drive-verify 不回归。
+- 关键修复二（Xvfb GLX）：conda-forge `xorg-x11-server-xvfb-conda-x86_64` 是 cos7 构建、无 GLX 扩展（OGRE2 拒绝初始化）。改为 `scripts/fetch_xvfb.sh`：`apt-get download xvfb`（focal 2:1.20.13-1ubuntu1~20.04.20）→ `dpkg-deb -x` 提取宿主 Xvfb 到 `.tools/xvfb-bin/Xvfb`（Git 忽略目录，不修改系统）。该 Xvfb 带 GLX（`xdpyinfo | grep '^    GLX'` 确认）。宿主的 Xvfb 是双重 fork 包装，`xvfb_stop` 需进程组杀 + 按“二进制路径+显示号”pkill 补杀，防孤儿 X。
+- 关键修复三（pipefail 陷阱）：`xdpyinfo | grep -q GLX` 在 `set -o pipefail` 下因 grep -q 提前退出触发 SIGPIPE 被误判失败；改为先捕获完整输出再 `grep -q ... <<<`。
+- 关键修复四（QoS）：`/tf_static` 必须用 TRANSIENT_LOCAL durable QoS 订阅，volatile 拿不到 RSP 静态 TF。
+- 关键修复五（假渲染防御）：camera_probe 不止比对帧首部 4096 字节，还让车经 /cmd_vel→watchdog→DiffDrive 原地旋转 4 秒（0.6 rad/s），断言整帧数据变化——证明相机真实渲染世界而非静态帧。
+- 验证结果（全部 exit=0）：
+  - `bash scripts/ros2.sh camera-verify`：PASS。图像 640×480 rgb8、平均像素约 196/255、17+ 帧时间戳推进、原地旋转画面变化、CameraInfo fx≈554.3、TF base_footprint→camera_optical_frame 连通、动态 /tf 仍含 odom→base_link。
+  - `bash scripts/ros2.sh test`：65 tests 通过（新增 5 项相机契约测试）。
+  - `bash scripts/ros2.sh run python -m pytest -q tests`：41 passed。
+  - `bash scripts/ros2.sh verify` / `gazebo-verify` / `drive-verify` / `trash-verify`：exit=0。
+- 踩坑补充：`ign topic -l` 输出在 setsid launch 下正常；`ign topic -p --req` 必须与 `--timeout` 同时给出。
+- 视觉标定（后续感知用）：实测相机画面为上下镜像（垂直翻转）。用 5 个紫色标记柱（0.12×0.12×0.7、z=0.35，hue 140-160）验证像素↔世界映射：把行坐标 y 映射为 480-y 后与 trash 世界坐标吻合。不修改 SDF/CameraInfo（fx=554.3 已标定），感知侧统一做一次 `flip(image, 0)` 修正，并如实记录为“Gazebo 渲染特性”。
+- 中断实验记录：删除 trash_plastic_bottle 后验证蓝色 blob 消失的因果实验在 launch 完成后被会话截断（进程已清理，结果未取得）；相机真实性已由原地旋转帧变化证明，后续 Phase 8 空场景测试会重新覆盖该因果链。

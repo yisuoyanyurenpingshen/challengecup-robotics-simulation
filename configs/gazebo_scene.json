@@ -4,8 +4,16 @@
   "scenario_id": "gazebo_trash_arena",
   "world_name": "smartclean_trash",
   "robot": {
-    "start_pose": {"x": 0.0, "y": 0.0, "yaw": 0.0},
-    "dock_pose": {"x": 0.0, "y": 0.0, "yaw": 0.0},
+    "start_pose": {
+      "x": 0.0,
+      "y": 0.0,
+      "yaw": 0.0
+    },
+    "dock_pose": {
+      "x": 0.0,
+      "y": 0.0,
+      "yaw": 0.0
+    },
     "cleaning_radius_m": 0.45
   },
   "trash": [
@@ -13,35 +21,55 @@
       "object_id": "trash_bottle_01",
       "class_name": "plastic_bottle",
       "model_name": "trash_plastic_bottle",
-      "position": {"x": 3.0, "y": 0.8, "z": 0.0},
+      "position": {
+        "x": 2.0,
+        "y": 0.0,
+        "z": 0.0
+      },
       "yaw": 0.0
     },
     {
       "object_id": "trash_cup_01",
       "class_name": "paper_cup",
       "model_name": "trash_paper_cup",
-      "position": {"x": 2.6, "y": -1.2, "z": 0.0},
+      "position": {
+        "x": 2.6,
+        "y": -0.9,
+        "z": 0.0
+      },
       "yaw": 0.0
     },
     {
       "object_id": "trash_can_01",
       "class_name": "aluminum_can",
       "model_name": "trash_aluminum_can",
-      "position": {"x": 4.2, "y": 1.5, "z": 0.0},
+      "position": {
+        "x": 2.6,
+        "y": 0.9,
+        "z": 0.0
+      },
       "yaw": 0.0
     },
     {
       "object_id": "trash_leaves_01",
       "class_name": "fallen_leaves",
       "model_name": "trash_fallen_leaves",
-      "position": {"x": 2.0, "y": 1.6, "z": 0.0},
+      "position": {
+        "x": 1.7,
+        "y": -0.35,
+        "z": 0.0
+      },
       "yaw": 0.0
     },
     {
       "object_id": "trash_paper_01",
       "class_name": "paper_scrap",
       "model_name": "trash_paper_scrap",
-      "position": {"x": 3.8, "y": -0.6, "z": 0.0},
+      "position": {
+        "x": 3.2,
+        "y": 0.3,
+        "z": 0.0
+      },
       "yaw": 0.6
     }
   ]
