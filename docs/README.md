@@ -14,6 +14,7 @@
 - `07_implementation_roadmap.md`：后续里程碑、交付物和验收门槛。
 - `08_ros2_environment_and_bridge.md`：Humble/Fortress 环境决策、Docker/Pixi 复现路径、ROS2 回放桥和验证边界。
 - `09_rdk_tros_deployment.md`：RDK X5/X3 的 OS 3.x/TROS-Humble 部署、PC—板端分工和实机验收标准。
+- `README0821.md`：2026-08-21 当日完整成果、路径说明、启动方法、验证结果与下一步。
 
 ## 维护要求
 

@@ -79,3 +79,9 @@ bash scripts/ros2.sh run python -m pytest -q tests
 尚未完成：LiDAR `/scan`、传感器 frame、`map -> odom`、Nav2、动态障碍导航、任务 Action、YOLO、Web、LLM 和 RDK 实机验证。
 
 下一主线里程碑为 **P4-M2：LiDAR + 完整 TF + Nav2 最小导航**。并行实验线仍可推进 P2 的五个固定环卫场景与批量 CSV 汇总。
+
+## 关键节点交付
+
+- 差速闭环代码、测试、技术文档和本日志已提交为 `6e75784`。
+- `6e75784` 已通过普通快进推送到 GitHub `main`，没有使用强制推送。
+- 当日全部成果、路径说明、启动方法和下一步已经汇总到 `docs/README0821.md`。
