@@ -187,4 +187,4 @@ git push --dry-run origin main  # Everything up-to-date, exit=0
 - `d342ad2` feat(gui): add Gazebo and RViz drive view —— 已推送。
 - `06b5283` feat(gazebo): add local trash scene —— 已推送。
 - `7d7fe2b` feat(gazebo): add verified RGB camera bridge and headless Xvfb rendering —— 已推送。
-- Phase 8 提交（哈希以最终 git log 为准）—— 已推送。
+- `dfa3b29` feat(perception): add image-based trash detector —— 已推送。
