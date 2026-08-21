@@ -1,6 +1,10 @@
 # Python 缓存
 __pycache__/
 *.pyc
+.pytest_cache/
+*.egg-info/
+build/
+dist/
 
 # 虚拟环境 / Conda 环境
 .env
@@ -9,16 +13,22 @@ venv/
 env/
 envs/*
 !envs/README.md
+!envs/*.md
+!envs/*.txt
+!envs/*.yml
+!envs/*.yaml
 conda_env/
 
 # 数据集：只保留 README，不上传大数据
 data/
 datasets/*
 !datasets/README.md
+!datasets/*.md
 
 # 模型权重：只保留 README，不上传大权重
 weights/*
 !weights/README.md
+!weights/*.md
 
 # 训练输出 / 临时文件
 runs/
@@ -33,6 +43,11 @@ results/*
 !results/*.png
 !results/*.jpg
 !results/*.jpeg
+!results/*.json
+
+# ROS2 / colcon 构建产物（不要忽略公共 logs/）
+install/
+log/
 
 # 模型文件
 *.pt

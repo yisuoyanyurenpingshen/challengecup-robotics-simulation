@@ -1,4 +1,8 @@
-1. 回到服务器主目录
+# 服务器端 Git 项目搭建历史
+
+> 本文记录仓库最初建立时的操作与当时状态；当前项目结构和命令以根 `README.md` 为准。
+
+## 1. 回到服务器主目录
 由于原来的 wangxin 文件夹已经删除，终端曾经停留在一个不存在的旧目录里，导致出现：
 fatal: 不能获取当前工作目录：没有那个文件或目录
 因此先回到真实存在的目录：
@@ -6,23 +10,23 @@ cd /home/bktx
 pwd
 确认当前位置为：
 /home/bktx
-2. 新建 projects 目录
+## 2. 新建 projects 目录
 为了不再依赖已经删除的 wangxin 目录，重新建立统一项目目录：
 mkdir -p /home/bktx/projects
 cd /home/bktx/projects
-3. 新建挑战杯项目文件夹
+## 3. 新建挑战杯项目文件夹
 mkdir challengecup-robotics-simulation
 cd challengecup-robotics-simulation
 此时项目路径为：
 /home/bktx/projects/challengecup-robotics-simulation
-4. 初始化 Git 仓库
+## 4. 初始化 Git 仓库
 执行：
 git init
 这一步是整个项目“拥有 Git”的关键步骤。
 git init 会在当前目录生成隐藏文件夹：
 .git/
 从这一刻开始，当前目录就成为了 Git 仓库。
-5. 设置 main 分支
+## 5. 设置 main 分支
 一开始执行：
 git branch -M main
 曾经报错：
@@ -37,7 +41,7 @@ git status
 On branch main
 No commits yet
 说明分支设置成功。
-6. 连接 GitHub 远程仓库
+## 6. 连接 GitHub 远程仓库
 执行：
 git remote add origin https://github.com/yisuoyanyurenpingshen/challengecup-robotics-simulation.git
 这一步把本地 Git 仓库和 GitHub 仓库连接起来。
@@ -46,7 +50,7 @@ git remote -v
 可以看到：
 origin  https://github.com/yisuoyanyurenpingshen/challengecup-robotics-simulation.git (fetch)
 origin  https://github.com/yisuoyanyurenpingshen/challengecup-robotics-simulation.git (push)
-四、当前项目目录结构
+## 7. 初始项目目录结构
 当前项目结构为：
 challengecup-robotics-simulation/
 ├── README.md
@@ -67,7 +71,7 @@ challengecup-robotics-simulation/
 │   └── README.md
 └── envs/
     └── README.md
-五、各目录作用
+## 8. 各目录作用
 目录	作用
 docs/	技术笔记、方案分析、学习总结
 logs/	每日工程日志
@@ -77,7 +81,7 @@ results/	轻量级实验结果、表格、截图说明
 datasets/	数据集说明，不存放大型原始数据集
 weights/	模型权重说明，不存放大型权重文件
 envs/	环境说明，不存放完整虚拟环境
-六、为什么每个文件夹都要有 README.md
+## 9. 为什么每个文件夹都要有 README.md
 
 Git 默认不会记录空文件夹。
 所以如果一个目录是空的，即使它在 VS Code 中存在，GitHub 上也不会显示。
@@ -85,7 +89,7 @@ Git 默认不会记录空文件夹。
 让 Git 能记录这个目录。
 让 GitHub 能显示这个目录。
 说明这个目录应该放什么、不应该放什么。
-七、.gitignore 的作用
+## 10. `.gitignore` 的作用
 
 .gitignore 用于告诉 Git 哪些文件不要记录、不要上传。
 
@@ -105,7 +109,7 @@ Token
 
 这样可以避免把大文件、敏感文件或无意义文件上传到 GitHub。
 
-八、当前 Git 状态说明
+## 11. 初始化时的 Git 状态说明
 
 VS Code 左侧文件旁边出现的 U 表示：
 
@@ -120,7 +124,7 @@ git commit -m "init: 重建挑战杯项目结构"
 
 之后，这些文件才会成为 Git 历史的一部分。
 
-九、后续标准 Git 工作流
+## 12. 标准 Git 工作流
 查看当前状态
 git status
 添加修改
@@ -135,7 +139,7 @@ git log --oneline
 git restore .
 撤销某一次已提交修改
 git revert <commit_id>
-十、当前阶段结论
+## 13. 初始化阶段结论
 
 本次已经完成：
 
@@ -150,36 +154,9 @@ git revert <commit_id>
 为各子目录补充中文 README.md。
 明确本项目不再使用 wangxin/ 作为仓库根目录。
 
-当前项目已经具备长期 Git 版本管理基础。
-
-下一步是执行：
-
-git status
-git add .
-git commit -m "init: 重建挑战杯项目结构"
-
-然后根据情况推送到 GitHub。
-EOF
-
-
----
-
-## 检查是否写入成功
-
-执行：
+当前项目已经具备长期 Git 版本管理基础。以上“尚无提交”等描述仅对应初始化当天；仓库现状请使用以下命令查看：
 
 ```bash
-ls docs
-
-你应该看到：
-
-01_git_project_setup_summary.md
-README.md
-
-再执行：
-
-head docs/01_git_project_setup_summary.md
-
-应该能看到：
-
-# 服务器端 Git 项目搭建总结
+git status --short --branch
+git log --oneline
+```

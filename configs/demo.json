@@ -1,0 +1,66 @@
+{
+  "schema_version": 1,
+  "scenario": {
+    "name": "teaching-building-gate",
+    "width": 12,
+    "height": 8,
+    "start": [1, 1],
+    "dock": [1, 1],
+    "static_obstacles": [
+      [0, 0], [1, 0], [2, 0], [3, 0], [4, 0], [5, 0],
+      [6, 0], [7, 0], [8, 0], [9, 0], [10, 0], [11, 0],
+      [0, 1], [11, 1], [0, 2], [5, 2], [11, 2],
+      [0, 3], [5, 3], [11, 3], [0, 4], [5, 4], [11, 4],
+      [0, 5], [11, 5], [0, 6], [11, 6],
+      [0, 7], [1, 7], [2, 7], [3, 7], [4, 7], [5, 7],
+      [6, 7], [7, 7], [8, 7], [9, 7], [10, 7], [11, 7]
+    ],
+    "hazards": {
+      "water": [[7, 3], [8, 3], [7, 4], [8, 4]]
+    },
+    "trash": [
+      {
+        "id": "leaf-01",
+        "kind": "fallen_leaves",
+        "position": [3, 2],
+        "area": "teaching_building_gate"
+      },
+      {
+        "id": "bottle-01",
+        "kind": "plastic_bottle",
+        "position": [9, 2],
+        "area": "teaching_building_gate"
+      },
+      {
+        "id": "paper-01",
+        "kind": "paper_scrap",
+        "position": [9, 5],
+        "area": "teaching_building_gate"
+      },
+      {
+        "id": "leaf-02",
+        "kind": "fallen_leaves",
+        "position": [3, 5],
+        "area": "teaching_building_gate"
+      }
+    ],
+    "dynamic_obstacles": [
+      {
+        "id": "pedestrian-01",
+        "kind": "pedestrian",
+        "path": [
+          [3, 6], [4, 6], [5, 6], [6, 6], [7, 6],
+          [6, 6], [6, 6], [5, 6], [5, 5], [5, 6]
+        ],
+        "start_step": 0,
+        "loop": true
+      }
+    ]
+  },
+  "task": {
+    "instruction": "清扫教学楼门口，优先处理落叶和塑料瓶，绕开积水和行人，完成后返航。"
+  },
+  "simulation": {
+    "max_steps": 300
+  }
+}
