@@ -79,6 +79,12 @@ bash scripts/ros2.sh gazebo
 bash scripts/ros2.sh drive
 ```
 
+验证带本地垃圾模型的 Gazebo 场景（塑料瓶、纸杯、易拉罐、落叶、纸屑）：
+
+```bash
+bash scripts/ros2.sh trash-verify
+```
+
 在有桌面的机器上弹出 Gazebo GUI 与 RViz2（首次会同时构建工作空间）：
 
 ```bash

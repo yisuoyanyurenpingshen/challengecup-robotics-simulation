@@ -3,13 +3,15 @@
 from typing import Dict, Optional, Sequence, Set
 
 from smartclean_sim.grid import GridWorld
-from smartclean_sim.models import GridPosition
+from smartclean_sim.models import GridPosition, TRASH_CLASSES
 
 
 TRASH_SYMBOLS: Dict[str, str] = {
     "fallen_leaves": "L",
     "plastic_bottle": "B",
     "paper_scrap": "P",
+    "paper_cup": "C",
+    "aluminum_can": "A",
 }
 
 

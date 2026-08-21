@@ -121,3 +121,12 @@ git push --dry-run origin main  # Everything up-to-date, exit=0
   - 新增 9 项 GUI 契约测试，包测试 16 项全部通过。
   - `drive-gui` 无 DISPLAY：中文提示，exit=2。
   - RViz2 在 QT_QPA_PLATFORM=offscreen 下仍要求 GLX X 显示（OGRE RenderingAPIException），本会话无法做窗口级验证，如实记录。
+
+### Phase 6 Gazebo 本地垃圾场景
+
+- 分类收敛到 2D 核心单一来源：`smartclean_sim.models.TRASH_CLASSES`（兼容扩展 paper_cup、aluminum_can），tasking 中文别名、终端符号与 HTML 动画同步扩展，41 项核心测试不回归。
+- 新增 5 个本地垃圾模型（models/trash_*）：塑料瓶(蓝/圆柱0.08×0.28)、纸杯(白/0.084×0.15)、易拉罐(红/0.066×0.13)、落叶(绿/扁圆0.26×0.016)、纸屑(白/扁盒0.14×0.11×0.012)，static、有碰撞、无 mesh/http/Fuel。
+- 新增 `worlds/smartclean_trash.sdf`（同一清扫车 + 5 垃圾实例）；真值 `configs/gazebo_scene.json`（稳定 object_id、class_name、model_name、世界坐标；仅用于评估与任务编排，不作为感知输入）。
+- 新增 `trash-verify`（`scripts/verify_trash_scene.sh` + `scripts/trash_scene_probe.py`）：真实启动 World，断言 control 服务与全部 6 个实体在场。
+- 踩坑：`ign model --list` 行首带 `- ` 前缀，探针解析后已修正；`ign sdf -k` 无法解析 `model://` include（服务器资源路径才能解析），改为真实启动验证。
+- 验证：`bash scripts/ros2.sh trash-verify` exit=0（机器人 + 5 个垃圾模型全部在场）；6 项场景契约测试通过；所有模型 `ign sdf -k` Valid。

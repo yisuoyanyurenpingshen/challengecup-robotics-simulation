@@ -8,6 +8,18 @@ from dataclasses import dataclass
 from typing import Mapping, Sequence, Tuple
 
 
+# Canonical trash classes shared by the 2D core, the Gazebo scene ground truth,
+# the image-based perception baseline, and the mission orchestrator. Adding a
+# class here is a compatible extension; renaming or removing one is not.
+TRASH_CLASSES = (
+    "fallen_leaves",
+    "plastic_bottle",
+    "paper_scrap",
+    "paper_cup",
+    "aluminum_can",
+)
+
+
 @dataclass(frozen=True, order=True)
 class GridPosition:
     """An immutable integer coordinate in the simulation grid."""

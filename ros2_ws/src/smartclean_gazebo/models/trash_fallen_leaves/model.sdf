@@ -1,0 +1,47 @@
+<?xml version="1.0"?>
+<sdf version="1.8">
+  <model name="trash_fallen_leaves">
+    <static>true</static>
+    <link name="trash_fallen_leaves_link">
+      <inertial>
+        <mass>0.05</mass>
+        <inertia>
+          <ixx>0.0002</ixx>
+          <ixy>0.0</ixy>
+          <ixz>0.0</ixz>
+          <iyy>0.0002</iyy>
+          <iyz>0.0</iyz>
+          <izz>0.0002</izz>
+        </inertia>
+      </inertial>
+      <collision name="trash_fallen_leaves_collision">
+        <pose>0 0 0.008 0 0 0</pose>
+        <geometry>
+<cylinder><radius>0.14</radius><length>0.016</length></cylinder>
+        </geometry>
+      </collision>
+    <visual name="leaf_patch_1">
+      <pose>0 0 0.008 0 0 0</pose>
+      <geometry>
+<cylinder><radius>0.13</radius><length>0.016</length></cylinder>
+      </geometry>
+      <material>
+        <ambient>0.25 0.45 0.12 1</ambient>
+        <diffuse>0.25 0.45 0.12 1</diffuse>
+        <specular>0.1 0.1 0.1 1</specular>
+      </material>
+    </visual>
+    <visual name="leaf_patch_2">
+      <pose>0.06 0.05 0.007 0 0 0</pose>
+      <geometry>
+<cylinder><radius>0.09</radius><length>0.014</length></cylinder>
+      </geometry>
+      <material>
+        <ambient>0.45 0.55 0.20 1</ambient>
+        <diffuse>0.45 0.55 0.20 1</diffuse>
+        <specular>0.1 0.1 0.1 1</specular>
+      </material>
+    </visual>
+    </link>
+  </model>
+</sdf>

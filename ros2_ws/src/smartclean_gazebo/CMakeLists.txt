@@ -18,6 +18,10 @@ if(BUILD_TESTING)
     test_gui_contract
     test/test_gui_contract.py
   )
+  ament_add_pytest_test(
+    test_trash_scene_contract
+    test/test_trash_scene_contract.py
+  )
 endif()
 
 ament_package()

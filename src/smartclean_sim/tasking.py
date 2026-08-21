@@ -2,7 +2,7 @@
 
 from typing import Any, Dict, Iterable, List, Tuple
 
-from smartclean_sim.models import CleaningTask
+from smartclean_sim.models import CleaningTask, TRASH_CLASSES
 
 
 class TaskParseError(ValueError):
@@ -29,6 +29,9 @@ class RuleBasedTaskParser:
         ("塑料瓶", "plastic_bottle"),
         ("瓶子", "plastic_bottle"),
         ("纸屑", "paper_scrap"),
+        ("纸杯", "paper_cup"),
+        ("易拉罐", "aluminum_can"),
+        ("罐子", "aluminum_can"),
     )
     AVOID_ALIASES = (
         ("积水", "water"),

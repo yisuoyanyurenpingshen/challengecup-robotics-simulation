@@ -27,6 +27,7 @@
 | Gazebo 最小 World | 已验证 | 本地 SDF 可解析；headless 启动并收到推进中的 ROS `/clock` |
 | Gazebo 差速清扫车 | 已验证 | 前进、原地转向、`/odom`、基础 TF 与命令断流停车全部通过 |
 | Gazebo GUI + RViz 启动入口 | 已实现、待桌面会话目视确认 | `drive-gui` 参数化启动 GUI 客户端与 RViz2；本会话无可用 DISPLAY，仅验证 launch 契约、URDF TF 与进程结构 |
+| Gazebo 本地垃圾场景 | 已实现、已验证 | `smartclean_trash.sdf` 内 5 个本地垃圾模型全部在场；真值在 `configs/gazebo_scene.json`，仅用于评估与任务编排 |
 
 ## 2.1 GUI 与 RViz 启动入口（2026-08-22 新增）
 

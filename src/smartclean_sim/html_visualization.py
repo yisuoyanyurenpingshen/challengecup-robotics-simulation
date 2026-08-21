@@ -584,7 +584,9 @@ _DOCUMENT = Template(
       const symbols = {
         fallen_leaves: "L",
         plastic_bottle: "B",
-        paper_scrap: "P"
+        paper_scrap: "P",
+        paper_cup: "C",
+        aluminum_can: "A"
       };
       return symbols[kind] || "T";
     }
