@@ -147,12 +147,14 @@ docker compose -f compose.ros2.yaml run --rm ros2 bash scripts/verify_ros2.sh
 launch 只建立 Gazebo 到 ROS 的 `/clock` 桥。Gazebo 的录制数据库与控制台
 日志在 `record:=true` 时写入唯一的 `.gazebo/log/run-<PID>/`；默认关闭全状态录制，
 避免长时间运行持续增长 `state.tlog`。ROS launch 日志固定在 `.ros/log/`，
-这些仓库内运行目录均由 Git 忽略。RoboStack 的录制功能需要显式的
-`IGN_TRANSPORT_LOG_SQL_PATH`，该路径已经由 `pixi.toml` 激活配置提供。
+Gazebo / Ignition 的默认控制台日志通过 `IGN_LOG_PATH` 固定在
+`.gazebo/ignition/`；这些仓库内运行目录均由 Git 忽略。RoboStack 的录制功能
+需要显式的 `IGN_TRANSPORT_LOG_SQL_PATH`，两个变量都由 `pixi.toml` 的激活配置
+提供。
 Physics、User Commands 和 Scene Broadcaster 的 server 配置也随包安装并由
-launch 显式指定，不依赖用户目录里已有的 Gazebo 配置。Gazebo 上游仍可能
-在 `~/.ignition/gazebo/log/` 建立默认控制台日志；完整状态录制才使用项目内
-`.gazebo/`，二进制、依赖、模型和项目配置均留在仓库内。
+launch 显式指定，不依赖用户目录里已有的 Gazebo 配置。默认控制台日志、完整
+状态录制、二进制、依赖、模型和项目配置因此都留在仓库范围内；不要覆盖或取消
+`IGN_LOG_PATH`，否则 Gazebo 上游会回退到 `~/.ignition/`。
 
 ## 5. ROS2 回放桥
 

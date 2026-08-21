@@ -27,6 +27,7 @@ vcstool = "*"
 PYTHONPATH = "$PIXI_PROJECT_ROOT/src"
 ROS_DOMAIN_ID = "42"
 ROS_LOG_DIR = "$PIXI_PROJECT_ROOT/.ros/log"
+IGN_LOG_PATH = "$PIXI_PROJECT_ROOT/.gazebo/ignition"
 IGN_TRANSPORT_LOG_SQL_PATH = "$CONDA_PREFIX/share/ignition/ignition-transport11/sql"
 RCUTILS_COLORIZED_OUTPUT = "1"
 
