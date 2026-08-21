@@ -26,6 +26,25 @@
 | Docker/Compose 配置 | 已生成、未运行验证 | Docker 客户端 28.1.1、Compose 2.35.1；当前代理会话无 daemon 权限 |
 | Gazebo 最小 World | 已验证 | 本地 SDF 可解析；headless 启动并收到推进中的 ROS `/clock` |
 | Gazebo 差速清扫车 | 已验证 | 前进、原地转向、`/odom`、基础 TF 与命令断流停车全部通过 |
+| Gazebo GUI + RViz 启动入口 | 已实现、待桌面会话目视确认 | `drive-gui` 参数化启动 GUI 客户端与 RViz2；本会话无可用 DISPLAY，仅验证 launch 契约、URDF TF 与进程结构 |
+
+## 2.1 GUI 与 RViz 启动入口（2026-08-22 新增）
+
+```bash
+bash scripts/ros2.sh drive-gui   # Gazebo GUI + RViz2，需要桌面 DISPLAY
+```
+
+- `drive.launch.py` 新增 `gui`、`rviz` 两个可关闭参数，默认均为 `false`，
+  headless 的 `drive` / `drive-verify` 行为不变。
+- `robot_state_publisher` 加载本地 `urdf/smartclean_drive.urdf`，只发布
+  `base_footprint` 以下的固定结构；`odom -> base_link` 仍由 Gazebo
+  DiffDrive 独占发布，URDF 中禁止出现 `odom`/`map` link。
+- URDF 使用本地 box/cylinder/sphere 原语复刻 SDF 外观，无 mesh、无在线资源。
+- RViz 配置位于 `rviz/smartclean_drive.rviz`，固定 frame 为 `odom`，默认显示
+  Grid、TF、RobotModel、`/odom`，并预留 `/scan`、`/camera/image_raw` 与
+  `/smartclean/debug/detection_image`。
+- 当前服务器会话没有可用 X 显示（无 Xvfb、无 Xauthority），RViz2 的
+  OGRE 渲染需要 GLX，因此窗口级目视确认仍需在有桌面的机器上执行。
 
 ## 2. 为什么选择 Humble + Fortress
 

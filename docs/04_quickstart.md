@@ -109,6 +109,23 @@ bash scripts/ros2.sh gazebo
 bash scripts/ros2.sh drive
 ```
 
+在有桌面会话的机器上弹出 Gazebo GUI 和 RViz2：
+
+```bash
+bash scripts/ros2.sh drive-gui
+```
+
+RViz 使用 `ros2_ws/src/smartclean_gazebo/rviz/smartclean_drive.rviz`，固定
+frame 为 `odom`，默认打开 Grid、TF、RobotModel、`/odom`，并预留 `/scan`、
+`/camera/image_raw` 与垃圾检测调试图。没有 `DISPLAY` 时脚本会输出中文提示
+并退出，此时改用 headless 的 `drive` 或 `drive-verify`。需要关闭某一部分时
+直接使用 launch 参数：
+
+```bash
+bash scripts/ros2.sh run ros2 launch smartclean_gazebo drive.launch.py \
+  gui:=false rviz:=false
+```
+
 一次只输入一个命令。误把两条命令粘成
 `bash scripts/ros2.sh drivebash scripts/ros2.sh drive` 时会看到用法提示；
 正确写法就是单独的 `bash scripts/ros2.sh drive`。

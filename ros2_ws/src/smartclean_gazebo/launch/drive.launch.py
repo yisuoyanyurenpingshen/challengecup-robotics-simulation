@@ -1,4 +1,8 @@
-"""Launch the SmartClean differential-drive robot and ROS 2 bridges."""
+"""Launch the SmartClean differential-drive robot, bridges, GUI and RViz.
+
+Headless default keeps the verified P4-M1 behavior. ``gui:=true`` adds the
+Gazebo GUI client, ``rviz:=true`` adds RViz2 with the local robot model.
+"""
 
 import os
 from pathlib import Path
@@ -9,7 +13,9 @@ from launch.actions import (
     ExecuteProcess,
     OpaqueFunction,
     Shutdown,
+    TimerAction,
 )
+from launch.conditions import IfCondition
 from launch.substitutions import (
     EnvironmentVariable,
     LaunchConfiguration,
@@ -41,7 +47,7 @@ def _prepend_resource_path(path: Path, current: str) -> str:
 
 
 def _launch_gazebo(context):
-    """Resolve local paths, then execute Gazebo without a shell."""
+    """Resolve local paths, then execute the Gazebo server without a shell."""
 
     world_path = Path(LaunchConfiguration("world_path").perform(context))
     if not world_path.is_absolute() or not world_path.is_file():
@@ -98,8 +104,26 @@ def _launch_gazebo(context):
     ]
 
 
+def _launch_gazebo_gui(context):
+    """Launch the Gazebo GUI client that attaches to the running server."""
+
+    return [
+        ExecuteProcess(
+            cmd=["ign", "gazebo", "-g", "-v", "2", "--force-version", "6"],
+            output="screen",
+            shell=False,
+            on_exit=Shutdown(reason="Gazebo GUI client exited"),
+        )
+    ]
+
+
 def generate_launch_description() -> LaunchDescription:
-    """Build the headless differential-drive launch description."""
+    """Build the differential-drive launch description.
+
+    Headless (default): Gazebo server + bridges + safety guard.
+    gui:=true: additionally starts the Gazebo GUI client.
+    rviz:=true: additionally starts RViz2 with the local RViz configuration.
+    """
 
     package_share = FindPackageShare("smartclean_gazebo")
     default_world = PathJoinSubstitution(
@@ -109,6 +133,12 @@ def generate_launch_description() -> LaunchDescription:
         [package_share, "config", "server.config"]
     )
     default_models = PathJoinSubstitution([package_share, "models"])
+    default_urdf = PathJoinSubstitution(
+        [package_share, "urdf", "smartclean_drive.urdf"]
+    )
+    default_rviz = PathJoinSubstitution(
+        [package_share, "rviz", "smartclean_drive.rviz"]
+    )
 
     bridge = Node(
         package="ros_gz_bridge",
@@ -158,6 +188,50 @@ def generate_launch_description() -> LaunchDescription:
         on_exit=Shutdown(reason="cmd_vel safety guard exited"),
     )
 
+    # Publishes base_footprint -> base_link and every attached child frame.
+    # Gazebo DiffDrive already owns odom -> base_link, so this publisher
+    # intentionally never declares an odom link or odom -> base transform.
+    robot_state_publisher = Node(
+        package="robot_state_publisher",
+        executable="robot_state_publisher",
+        name="robot_state_publisher",
+        arguments=[LaunchConfiguration("urdf")],
+        parameters=[{"use_sim_time": True}],
+        output="screen",
+        on_exit=Shutdown(reason="robot_state_publisher exited"),
+    )
+
+    gazebo_gui_client = TimerAction(
+        period=1.5,
+        actions=[
+            OpaqueFunction(
+                function=_launch_gazebo_gui,
+                condition=IfCondition(LaunchConfiguration("gui")),
+            ),
+        ],
+    )
+
+    rviz_node = TimerAction(
+        period=2.5,
+        actions=[
+            Node(
+                package="rviz2",
+                executable="rviz2",
+                name="rviz2",
+                arguments=[
+                    "-d",
+                    LaunchConfiguration("rviz_config"),
+                    "-f",
+                    "odom",
+                ],
+                parameters=[{"use_sim_time": True}],
+                output="screen",
+                condition=IfCondition(LaunchConfiguration("rviz")),
+                on_exit=Shutdown(reason="RViz2 exited"),
+            )
+        ],
+    )
+
     return LaunchDescription(
         [
             DeclareLaunchArgument(
@@ -174,6 +248,26 @@ def generate_launch_description() -> LaunchDescription:
                 "models_path",
                 default_value=default_models,
                 description="Absolute local model search directory.",
+            ),
+            DeclareLaunchArgument(
+                "urdf",
+                default_value=default_urdf,
+                description="Absolute local URDF description of the robot.",
+            ),
+            DeclareLaunchArgument(
+                "rviz_config",
+                default_value=default_rviz,
+                description="Absolute RViz2 configuration file.",
+            ),
+            DeclareLaunchArgument(
+                "gui",
+                default_value="false",
+                description="Start the Gazebo GUI client when true.",
+            ),
+            DeclareLaunchArgument(
+                "rviz",
+                default_value="false",
+                description="Start RViz2 when true.",
             ),
             DeclareLaunchArgument(
                 "record",
@@ -201,5 +295,8 @@ def generate_launch_description() -> LaunchDescription:
             OpaqueFunction(function=_launch_gazebo),
             bridge,
             command_guard,
+            robot_state_publisher,
+            gazebo_gui_client,
+            rviz_node,
         ]
     )

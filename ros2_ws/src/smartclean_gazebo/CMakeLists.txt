@@ -4,7 +4,7 @@ project(smartclean_gazebo)
 find_package(ament_cmake REQUIRED)
 
 install(
-  DIRECTORY config launch models worlds
+  DIRECTORY config launch models worlds urdf rviz
   DESTINATION share/${PROJECT_NAME}
 )
 
@@ -13,6 +13,10 @@ if(BUILD_TESTING)
   ament_add_pytest_test(
     test_model_contract
     test/test_model_contract.py
+  )
+  ament_add_pytest_test(
+    test_gui_contract
+    test/test_gui_contract.py
   )
 endif()
 

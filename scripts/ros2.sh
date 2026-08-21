@@ -41,12 +41,18 @@ case "${1:-shell}" in
   gazebo-verify)
     exec "${pixi_bin}" run gazebo-verify
     ;;
+  trash-verify)
+    exec "${pixi_bin}" run gazebo-trash-verify
+    ;;
   drive)
     shift
     exec "${pixi_bin}" run gazebo-drive -- "$@"
     ;;
   drive-verify)
     exec "${pixi_bin}" run gazebo-drive-verify
+    ;;
+  drive-gui)
+    exec "${pixi_bin}" run gazebo-drive-gui
     ;;
   doctor)
     exec "${pixi_bin}" run ros-doctor
@@ -61,11 +67,13 @@ case "${1:-shell}" in
     ;;
   *)
     cat >&2 <<'USAGE'
-用法：bash scripts/ros2.sh {install|shell|build|test|demo|verify|gazebo|gazebo-verify|drive|drive-verify|doctor|run}
+用法：bash scripts/ros2.sh {install|shell|build|test|demo|verify|gazebo|gazebo-verify|trash-verify|drive|drive-verify|drive-gui|doctor|run}
 
 示例：
   bash scripts/ros2.sh drive          # 启动 Gazebo 差速清扫车（Ctrl+C 停止）
   bash scripts/ros2.sh drive-verify   # 自动验证差速闭环
+  bash scripts/ros2.sh drive-gui      # Gazebo GUI + RViz2（需要桌面 DISPLAY）
+
 注意：一次只输入一个命令。不要把两条命令粘贴成一行，
 例如 "bash scripts/ros2.sh drivebash scripts/ros2.sh drive"
 是误粘贴，正确命令只有 "bash scripts/ros2.sh drive"。

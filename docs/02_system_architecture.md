@@ -29,6 +29,7 @@
 | Gazebo Fortress 最小 World 与 `/clock` | 已实现、已验证 | `smartclean_gazebo`；headless 启动和 ROS-Gazebo 时钟桥通过 |
 | Gazebo 差速车、`/cmd_vel`、`/odom` 与 TF | 已实现、已验证 | `drive.launch.py`；前进、转向、里程计与 `odom -> base_link` 探针通过 |
 | 速度命令安全看门狗 | 已实现、已验证 | 0.5 秒断流停车；拒绝 NaN/Inf；使用单调时钟 |
+| Gazebo GUI + RViz 启动入口 | 已实现、待桌面会话目视确认 | `drive-gui`、本地 URDF、`robot_state_publisher` 与 RViz 配置；无 DISPLAY 时给出 headless 提示 |
 | Nav2、SLAM Toolbox | 包已安装、未形成闭环 | 不等同于定位、规划或控制已经接入 |
 | 固定 `dt`、感知与控制器分层 | 设计中 | 尚未实现 |
 | LiDAR、完整 TF、Nav2、YOLO、LLM、Web、RDK | 适配规划 | 尚未集成或硬件验证 |

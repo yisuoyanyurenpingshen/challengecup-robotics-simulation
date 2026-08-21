@@ -41,4 +41,6 @@ gazebo-smoke = "bash scripts/gazebo_smoke.sh"
 gazebo-verify = "bash scripts/verify_gazebo.sh"
 gazebo-drive = { cmd = "bash scripts/gazebo_drive.sh", depends-on = ["ros-build"] }
 gazebo-drive-verify = { cmd = "bash scripts/verify_gazebo_drive.sh", depends-on = ["ros-build"] }
+gazebo-drive-gui = { cmd = "bash scripts/gazebo_drive_gui.sh", depends-on = ["ros-build"] }
+gazebo-trash-verify = { cmd = "bash scripts/verify_trash_scene.sh", depends-on = ["ros-build"] }
 ros-doctor = "ros2 doctor --report"

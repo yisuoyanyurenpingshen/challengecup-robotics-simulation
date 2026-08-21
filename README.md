@@ -79,6 +79,17 @@ bash scripts/ros2.sh gazebo
 bash scripts/ros2.sh drive
 ```
 
+在有桌面的机器上弹出 Gazebo GUI 与 RViz2（首次会同时构建工作空间）：
+
+```bash
+bash scripts/ros2.sh drive-gui
+```
+
+RViz 默认显示 Grid、TF、RobotModel、`/odom`，并为后续 `/scan`、相机图像和
+垃圾检测调试图预留了显示项。没有 `DISPLAY` 时会输出中文提示并建议使用
+headless 的 `drive` / `drive-verify`。GUI 与 RViz 可通过
+`gui:=false rviz:=false` 单独关闭。
+
 > 注意：一次只输入一个命令。若把两条命令误粘贴成一行（例如
 > `bash scripts/ros2.sh drivebash scripts/ros2.sh drive`），只会得到用法提示，
 > 正确命令是单独的 `bash scripts/ros2.sh drive`。

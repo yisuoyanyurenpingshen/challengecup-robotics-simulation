@@ -101,3 +101,23 @@ git push --dry-run origin main  # Everything up-to-date, exit=0
   - `bash -n` 全部脚本；
   - 用 `PATH=/usr/bin:/bin` 实际运行 grep -Fxq 断言（最小 PATH 回归）。
 - 问题二：`scripts/ros2.sh` 用法提示加入正确命令示例与 `drivebash ...` 误粘贴警示；README.md 与 docs/04_quickstart.md 同步说明。
+
+### 2026-08-22 00:05 Phase 4 提交与推送
+
+- 提交 `1227134` `fix(scripts): make Gazebo verification portable`。
+- `git fetch origin main` 无新提交；普通推送成功：`6c5d718..1227134 main -> main`。
+- `git rev-parse HEAD` == `git ls-remote origin refs/heads/main` == `1227134ffb32a5652b352e2ece4d84796a39febd`。
+
+### Phase 5 drive-gui（进行中）
+
+- 新增 `ros2_ws/src/smartclean_gazebo/urdf/smartclean_drive.urdf`：base_footprint → base_link（z+0.25）→ 双轮/caster/camera_link/camera_optical_frame/lidar_link；纯本地几何，无 mesh、无 http。
+- 新增 `ros2_ws/src/smartclean_gazebo/rviz/smartclean_drive.rviz`：Grid/TF/RobotModel//odom//scan//camera/image_raw/调试图，fixed frame=odom。
+- `drive.launch.py` 新增 `gui`、`rviz` 参数（默认 false，headless 不回归）；TimerAction 延迟启动 GUI 客户端（`ign gazebo -g`）与 RViz2。
+- `scripts/gazebo_drive_gui.sh`：无 DISPLAY 时输出中文提示并 exit 2；否则 launch `gui:=true rviz:=true`。
+- `scripts/ros2.sh` 增加 `drive-gui`；`pixi.toml` 增加 `gazebo-drive-gui` task（不改变锁文件）。
+- 验证：
+  - `ros2 launch smartclean_gazebo drive.launch.py --print-description` 成功列出 server/bridge/guard/rsp/两个 TimerAction。
+  - RSP+URDF 实测 TF：base_footprint→base_link→camera_link→camera_optical_frame、base_link→lidar_link；无 odom 帧。
+  - 新增 9 项 GUI 契约测试，包测试 16 项全部通过。
+  - `drive-gui` 无 DISPLAY：中文提示，exit=2。
+  - RViz2 在 QT_QPA_PLATFORM=offscreen 下仍要求 GLX X 显示（OGRE RenderingAPIException），本会话无法做窗口级验证，如实记录。
