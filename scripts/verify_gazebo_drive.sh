@@ -44,15 +44,15 @@ if ! kill -0 "${launch_pid}" 2>/dev/null; then
   echo "Gazebo 差速验证失败：本轮 launch 已提前退出" >&2
   exit 1
 fi
-if ! ign service -l | rg -Fxq "/world/smartclean_drive/control"; then
+if ! ign service -l | grep -Fxq "/world/smartclean_drive/control"; then
   echo "Gazebo 差速验证失败：未发现 smartclean_drive World 控制服务" >&2
   exit 1
 fi
-if ! ign topic -l | rg -Fxq "/smartclean/odom"; then
+if ! ign topic -l | grep -Fxq "/smartclean/odom"; then
   echo "Gazebo 差速验证失败：未发现 /smartclean/odom" >&2
   exit 1
 fi
-if ! ign topic -l | rg -Fxq "/smartclean/tf"; then
+if ! ign topic -l | grep -Fxq "/smartclean/tf"; then
   echo "Gazebo 差速验证失败：未发现 /smartclean/tf" >&2
   exit 1
 fi

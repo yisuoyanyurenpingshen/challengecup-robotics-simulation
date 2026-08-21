@@ -54,13 +54,22 @@ case "${1:-shell}" in
   run)
     shift
     if [[ "$#" -eq 0 ]]; then
-      echo "用法：scripts/ros2.sh run <命令> [参数...]" >&2
+      echo "用法：bash scripts/ros2.sh run <命令> [参数...]" >&2
       exit 2
     fi
     exec "${pixi_bin}" run -- "$@"
     ;;
   *)
-    echo "用法：scripts/ros2.sh {install|shell|build|test|demo|verify|gazebo|gazebo-verify|drive|drive-verify|doctor|run}" >&2
+    cat >&2 <<'USAGE'
+用法：bash scripts/ros2.sh {install|shell|build|test|demo|verify|gazebo|gazebo-verify|drive|drive-verify|doctor|run}
+
+示例：
+  bash scripts/ros2.sh drive          # 启动 Gazebo 差速清扫车（Ctrl+C 停止）
+  bash scripts/ros2.sh drive-verify   # 自动验证差速闭环
+注意：一次只输入一个命令。不要把两条命令粘贴成一行，
+例如 "bash scripts/ros2.sh drivebash scripts/ros2.sh drive"
+是误粘贴，正确命令只有 "bash scripts/ros2.sh drive"。
+USAGE
     exit 2
     ;;
 esac

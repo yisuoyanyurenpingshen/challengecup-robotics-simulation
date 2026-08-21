@@ -79,6 +79,10 @@ bash scripts/ros2.sh gazebo
 bash scripts/ros2.sh drive
 ```
 
+> 注意：一次只输入一个命令。若把两条命令误粘贴成一行（例如
+> `bash scripts/ros2.sh drivebash scripts/ros2.sh drive`），只会得到用法提示，
+> 正确命令是单独的 `bash scripts/ros2.sh drive`。
+
 在另一个新终端持续发送前进命令：
 
 ```bash

@@ -109,6 +109,10 @@ bash scripts/ros2.sh gazebo
 bash scripts/ros2.sh drive
 ```
 
+一次只输入一个命令。误把两条命令粘成
+`bash scripts/ros2.sh drivebash scripts/ros2.sh drive` 时会看到用法提示；
+正确写法就是单独的 `bash scripts/ros2.sh drive`。
+
 另开一个新终端发送前进速度；按 `Ctrl+C` 停止发布后，底盘会在默认
 0.5 秒内自动置零：
 
