@@ -2,7 +2,7 @@
 
 本目录保存经过筛选、可由 Git 跟踪的实验摘要和演示结果。
 
-允许保存 Markdown、TXT、CSV、JSON，以及少量 PNG/JPG/JPEG 图片。不保存大型视频、原始图片集、训练输出目录或模型权重。
+允许保存 Markdown、TXT、CSV、JSON、自包含 HTML，以及少量 PNG/JPG/JPEG 图片。不保存大型视频、原始图片集、训练输出目录或模型权重。
 
 建议每份结果记录：
 
@@ -18,4 +18,5 @@
 
 ```bash
 python3 scripts/run_demo.py --output results/demo_result.json
+python3 scripts/run_demo.py --animate results/demo_animation.html
 ```

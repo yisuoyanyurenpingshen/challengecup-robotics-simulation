@@ -44,6 +44,7 @@ results/*
 !results/*.jpg
 !results/*.jpeg
 !results/*.json
+!results/*.html
 
 # ROS2 / colcon 构建产物（不要忽略公共 logs/）
 install/

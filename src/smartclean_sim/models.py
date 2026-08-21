@@ -65,11 +65,16 @@ class CleaningTask:
     priority_classes: Tuple[str, ...] = ()
     avoid_types: Tuple[str, ...] = ()
     return_to_dock: bool = True
+    mode: str = "clean_spots"
 
     def __post_init__(self) -> None:
         # Accept lists from configuration loaders while preserving immutable values.
         object.__setattr__(self, "priority_classes", tuple(self.priority_classes))
         object.__setattr__(self, "avoid_types", tuple(self.avoid_types))
+        if self.mode not in ("clean_spots", "clean_area"):
+            raise ValueError(
+                "CleaningTask.mode must be 'clean_spots' or 'clean_area'"
+            )
 
 
 @dataclass

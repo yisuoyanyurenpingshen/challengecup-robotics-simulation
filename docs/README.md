@@ -9,6 +9,9 @@
 - `02_system_architecture.md`：系统分层、数据流、状态机和适配边界。
 - `03_module_interfaces.md`：核心数据契约与外部集成接口。
 - `04_quickstart.md`：运行、测试和结果解释。
+- `05_open_source_research.md`：GitHub 候选方案、许可证和引入决策。
+- `06_p1_coverage_and_animation.md`：全覆盖算法、逐帧数据和离线动画设计。
+- `07_implementation_roadmap.md`：后续里程碑、交付物和验收门槛。
 
 ## 维护要求
 

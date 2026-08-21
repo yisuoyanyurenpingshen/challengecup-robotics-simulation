@@ -13,8 +13,9 @@
 - 中文清扫指令转结构化任务
 - 垃圾、静态障碍、积水禁行区和动态行人的场景模型
 - 确定性四邻域 A* 路径规划
-- 按优先级清扫、动态障碍预测、重规划和返航
+- 按优先级清扫、指定区域全覆盖、动态障碍预测、重规划和返航
 - 完成率、覆盖率、路径长度、重规划次数、碰撞次数等指标
+- 可离线打开、可播放和逐帧检查的自包含 HTML 动画
 - 面向 ROS2、Gazebo、YOLO、LLM 和 RDK 的稳定适配边界
 
 当前实现是算法与接口基线，不代表 ROS2、RDK 或实车能力已经完成验证。状态边界见 [项目章程](docs/00_project_charter.md)。
@@ -24,13 +25,16 @@
 环境要求：Python 3.8 或更高版本。默认演示仅使用标准库。
 
 ```bash
-python3 scripts/run_demo.py --show-map
+python3 scripts/run_demo.py \
+  --show-map \
+  --output results/demo_result.json \
+  --animate results/demo_animation.html
 ```
 
-保存完整运行结果：
+终端会输出指标和路线图。动画生成后，用浏览器打开：
 
 ```bash
-python3 scripts/run_demo.py --output results/demo_result.json
+firefox results/demo_animation.html
 ```
 
 运行测试：
@@ -48,11 +52,11 @@ pytest -q
           ↓
 任务解析与安全校验
           ↓
-垃圾目标排序 → A* 路径规划 → 动态避障 / 重规划
-          ↓                          ↑
-        二维世界 ──────────────── 动态行人
+垃圾目标排序 → A* → 区域蛇形覆盖 → 动态避障 / 重规划
+          ↓                              ↑
+        二维世界 ──────────────────── 动态行人
           ↓
-清扫、返航、指标与轨迹
+清扫、返航、指标、逐帧轨迹与离线动画
 
 后续适配：Gazebo / ROS2 / Nav2 / YOLO / Web / LLM / RDK BPU
 ```
@@ -61,6 +65,8 @@ pytest -q
 
 - [系统架构](docs/02_system_architecture.md)
 - [模块接口约定](docs/03_module_interfaces.md)
+- [P1 覆盖与动画设计](docs/06_p1_coverage_and_animation.md)
+- [后续实施路线](docs/07_implementation_roadmap.md)
 
 ## 目录结构
 
@@ -70,7 +76,7 @@ datasets/      数据集卡与存放说明，不保存大型原始数据
 docs/          项目章程、架构、接口和技术笔记
 envs/          环境安装与版本说明，不保存虚拟环境
 logs/          每次公共目录变更的工程日志
-results/       轻量实验摘要、表格、图片和 JSON 结果
+results/       轻量实验摘要、JSON、图片和自包含 HTML 动画
 scripts/       演示、实验和维护入口
 src/           SmartClean-Sim Python 源码
 tests/         自动化测试

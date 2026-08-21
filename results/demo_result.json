@@ -1,0 +1,3824 @@
+{
+  "status": "COMPLETED",
+  "final_position": [
+    1,
+    1
+  ],
+  "trajectory": [
+    [
+      1,
+      1
+    ],
+    [
+      2,
+      1
+    ],
+    [
+      3,
+      1
+    ],
+    [
+      3,
+      2
+    ],
+    [
+      3,
+      3
+    ],
+    [
+      3,
+      4
+    ],
+    [
+      3,
+      5
+    ],
+    [
+      4,
+      5
+    ],
+    [
+      4,
+      4
+    ],
+    [
+      4,
+      3
+    ],
+    [
+      4,
+      2
+    ],
+    [
+      4,
+      1
+    ],
+    [
+      5,
+      1
+    ],
+    [
+      6,
+      1
+    ],
+    [
+      7,
+      1
+    ],
+    [
+      8,
+      1
+    ],
+    [
+      9,
+      1
+    ],
+    [
+      9,
+      2
+    ],
+    [
+      9,
+      3
+    ],
+    [
+      9,
+      4
+    ],
+    [
+      9,
+      5
+    ],
+    [
+      8,
+      5
+    ],
+    [
+      7,
+      5
+    ],
+    [
+      6,
+      5
+    ],
+    [
+      5,
+      5
+    ],
+    [
+      4,
+      5
+    ],
+    [
+      3,
+      5
+    ],
+    [
+      2,
+      5
+    ],
+    [
+      1,
+      5
+    ],
+    [
+      1,
+      4
+    ],
+    [
+      1,
+      3
+    ],
+    [
+      1,
+      2
+    ],
+    [
+      1,
+      1
+    ],
+    [
+      2,
+      1
+    ],
+    [
+      3,
+      1
+    ],
+    [
+      4,
+      1
+    ],
+    [
+      5,
+      1
+    ],
+    [
+      6,
+      1
+    ],
+    [
+      7,
+      1
+    ],
+    [
+      8,
+      1
+    ],
+    [
+      9,
+      1
+    ],
+    [
+      10,
+      1
+    ],
+    [
+      10,
+      2
+    ],
+    [
+      9,
+      2
+    ],
+    [
+      8,
+      2
+    ],
+    [
+      7,
+      2
+    ],
+    [
+      6,
+      2
+    ],
+    [
+      6,
+      1
+    ],
+    [
+      5,
+      1
+    ],
+    [
+      4,
+      1
+    ],
+    [
+      4,
+      2
+    ],
+    [
+      3,
+      2
+    ],
+    [
+      2,
+      2
+    ],
+    [
+      2,
+      3
+    ],
+    [
+      3,
+      3
+    ],
+    [
+      4,
+      3
+    ],
+    [
+      4,
+      4
+    ],
+    [
+      4,
+      5
+    ],
+    [
+      5,
+      5
+    ],
+    [
+      6,
+      5
+    ],
+    [
+      6,
+      4
+    ],
+    [
+      6,
+      3
+    ],
+    [
+      6,
+      2
+    ],
+    [
+      7,
+      2
+    ],
+    [
+      8,
+      2
+    ],
+    [
+      9,
+      2
+    ],
+    [
+      9,
+      3
+    ],
+    [
+      10,
+      3
+    ],
+    [
+      10,
+      4
+    ],
+    [
+      9,
+      4
+    ],
+    [
+      9,
+      5
+    ],
+    [
+      8,
+      5
+    ],
+    [
+      7,
+      5
+    ],
+    [
+      6,
+      5
+    ],
+    [
+      5,
+      5
+    ],
+    [
+      4,
+      5
+    ],
+    [
+      3,
+      5
+    ],
+    [
+      3,
+      4
+    ],
+    [
+      2,
+      4
+    ],
+    [
+      3,
+      4
+    ],
+    [
+      4,
+      4
+    ],
+    [
+      4,
+      5
+    ],
+    [
+      5,
+      5
+    ],
+    [
+      6,
+      5
+    ],
+    [
+      7,
+      5
+    ],
+    [
+      8,
+      5
+    ],
+    [
+      9,
+      5
+    ],
+    [
+      10,
+      5
+    ],
+    [
+      10,
+      6
+    ],
+    [
+      9,
+      6
+    ],
+    [
+      8,
+      6
+    ],
+    [
+      7,
+      6
+    ],
+    [
+      6,
+      6
+    ],
+    [
+      5,
+      6
+    ],
+    [
+      4,
+      6
+    ],
+    [
+      3,
+      6
+    ],
+    [
+      2,
+      6
+    ],
+    [
+      1,
+      6
+    ],
+    [
+      1,
+      5
+    ],
+    [
+      1,
+      4
+    ],
+    [
+      1,
+      3
+    ],
+    [
+      1,
+      2
+    ],
+    [
+      1,
+      1
+    ]
+  ],
+  "cleaned_ids": [
+    "leaf-01",
+    "leaf-02",
+    "bottle-01",
+    "paper-01"
+  ],
+  "events": [
+    "IDLE -> PLANNING",
+    "PLANNING -> NAVIGATING (4 targets)",
+    "NAVIGATING -> CLEANING (leaf-01)",
+    "CLEANING -> NAVIGATING",
+    "NAVIGATING -> CLEANING (leaf-02)",
+    "CLEANING -> NAVIGATING",
+    "AVOIDING -> REPLANNING",
+    "NAVIGATING -> CLEANING (bottle-01)",
+    "CLEANING -> NAVIGATING",
+    "NAVIGATING -> CLEANING (paper-01)",
+    "CLEANING -> NAVIGATING",
+    "NAVIGATING -> COVERAGE_PLANNING",
+    "COVERAGE_PLANNING -> NAVIGATING (53 cells)",
+    "AVOIDING -> REPLANNING",
+    "NAVIGATING -> RETURNING",
+    "RETURNING -> COMPLETED"
+  ],
+  "metrics": {
+    "total_targets": 4,
+    "cleaned_targets": 4,
+    "path_length_cells": 102,
+    "unique_visited_cells": 53,
+    "navigable_cells": 53,
+    "replans": 2,
+    "collisions": 0,
+    "returned_to_dock": true,
+    "completed": true
+  },
+  "rates": {
+    "completion_rate": 1.0,
+    "coverage_rate": 1.0
+  },
+  "trace": {
+    "schema_version": 1,
+    "frames": [
+      {
+        "frame_index": 0,
+        "sim_step": 0,
+        "state": "PLANNING",
+        "action": "initial",
+        "robot_position": [
+          1,
+          1
+        ],
+        "dynamic_obstacles": [
+          {
+            "id": "pedestrian-01",
+            "kind": "pedestrian",
+            "position": [
+              3,
+              6
+            ]
+          }
+        ],
+        "remaining_trash_ids": [
+          "bottle-01",
+          "leaf-01",
+          "leaf-02",
+          "paper-01"
+        ],
+        "cleaned_ids": [],
+        "cleaned_this_frame": [],
+        "events": [
+          "IDLE -> PLANNING"
+        ]
+      },
+      {
+        "frame_index": 1,
+        "sim_step": 0,
+        "state": "NAVIGATING",
+        "action": "transition",
+        "robot_position": [
+          1,
+          1
+        ],
+        "dynamic_obstacles": [
+          {
+            "id": "pedestrian-01",
+            "kind": "pedestrian",
+            "position": [
+              3,
+              6
+            ]
+          }
+        ],
+        "remaining_trash_ids": [
+          "bottle-01",
+          "leaf-01",
+          "leaf-02",
+          "paper-01"
+        ],
+        "cleaned_ids": [],
+        "cleaned_this_frame": [],
+        "events": [
+          "PLANNING -> NAVIGATING (4 targets)"
+        ]
+      },
+      {
+        "frame_index": 2,
+        "sim_step": 1,
+        "state": "NAVIGATING",
+        "action": "move",
+        "robot_position": [
+          2,
+          1
+        ],
+        "dynamic_obstacles": [
+          {
+            "id": "pedestrian-01",
+            "kind": "pedestrian",
+            "position": [
+              4,
+              6
+            ]
+          }
+        ],
+        "remaining_trash_ids": [
+          "bottle-01",
+          "leaf-01",
+          "leaf-02",
+          "paper-01"
+        ],
+        "cleaned_ids": [],
+        "cleaned_this_frame": [],
+        "events": []
+      },
+      {
+        "frame_index": 3,
+        "sim_step": 2,
+        "state": "NAVIGATING",
+        "action": "move",
+        "robot_position": [
+          3,
+          1
+        ],
+        "dynamic_obstacles": [
+          {
+            "id": "pedestrian-01",
+            "kind": "pedestrian",
+            "position": [
+              5,
+              6
+            ]
+          }
+        ],
+        "remaining_trash_ids": [
+          "bottle-01",
+          "leaf-01",
+          "leaf-02",
+          "paper-01"
+        ],
+        "cleaned_ids": [],
+        "cleaned_this_frame": [],
+        "events": []
+      },
+      {
+        "frame_index": 4,
+        "sim_step": 3,
+        "state": "NAVIGATING",
+        "action": "move",
+        "robot_position": [
+          3,
+          2
+        ],
+        "dynamic_obstacles": [
+          {
+            "id": "pedestrian-01",
+            "kind": "pedestrian",
+            "position": [
+              6,
+              6
+            ]
+          }
+        ],
+        "remaining_trash_ids": [
+          "bottle-01",
+          "leaf-01",
+          "leaf-02",
+          "paper-01"
+        ],
+        "cleaned_ids": [],
+        "cleaned_this_frame": [],
+        "events": []
+      },
+      {
+        "frame_index": 5,
+        "sim_step": 3,
+        "state": "CLEANING",
+        "action": "clean",
+        "robot_position": [
+          3,
+          2
+        ],
+        "dynamic_obstacles": [
+          {
+            "id": "pedestrian-01",
+            "kind": "pedestrian",
+            "position": [
+              6,
+              6
+            ]
+          }
+        ],
+        "remaining_trash_ids": [
+          "bottle-01",
+          "leaf-02",
+          "paper-01"
+        ],
+        "cleaned_ids": [
+          "leaf-01"
+        ],
+        "cleaned_this_frame": [
+          "leaf-01"
+        ],
+        "events": [
+          "NAVIGATING -> CLEANING (leaf-01)"
+        ]
+      },
+      {
+        "frame_index": 6,
+        "sim_step": 4,
+        "state": "NAVIGATING",
+        "action": "move",
+        "robot_position": [
+          3,
+          3
+        ],
+        "dynamic_obstacles": [
+          {
+            "id": "pedestrian-01",
+            "kind": "pedestrian",
+            "position": [
+              7,
+              6
+            ]
+          }
+        ],
+        "remaining_trash_ids": [
+          "bottle-01",
+          "leaf-02",
+          "paper-01"
+        ],
+        "cleaned_ids": [
+          "leaf-01"
+        ],
+        "cleaned_this_frame": [],
+        "events": []
+      },
+      {
+        "frame_index": 7,
+        "sim_step": 5,
+        "state": "NAVIGATING",
+        "action": "move",
+        "robot_position": [
+          3,
+          4
+        ],
+        "dynamic_obstacles": [
+          {
+            "id": "pedestrian-01",
+            "kind": "pedestrian",
+            "position": [
+              6,
+              6
+            ]
+          }
+        ],
+        "remaining_trash_ids": [
+          "bottle-01",
+          "leaf-02",
+          "paper-01"
+        ],
+        "cleaned_ids": [
+          "leaf-01"
+        ],
+        "cleaned_this_frame": [],
+        "events": []
+      },
+      {
+        "frame_index": 8,
+        "sim_step": 6,
+        "state": "NAVIGATING",
+        "action": "move",
+        "robot_position": [
+          3,
+          5
+        ],
+        "dynamic_obstacles": [
+          {
+            "id": "pedestrian-01",
+            "kind": "pedestrian",
+            "position": [
+              6,
+              6
+            ]
+          }
+        ],
+        "remaining_trash_ids": [
+          "bottle-01",
+          "leaf-02",
+          "paper-01"
+        ],
+        "cleaned_ids": [
+          "leaf-01"
+        ],
+        "cleaned_this_frame": [],
+        "events": []
+      },
+      {
+        "frame_index": 9,
+        "sim_step": 6,
+        "state": "CLEANING",
+        "action": "clean",
+        "robot_position": [
+          3,
+          5
+        ],
+        "dynamic_obstacles": [
+          {
+            "id": "pedestrian-01",
+            "kind": "pedestrian",
+            "position": [
+              6,
+              6
+            ]
+          }
+        ],
+        "remaining_trash_ids": [
+          "bottle-01",
+          "paper-01"
+        ],
+        "cleaned_ids": [
+          "leaf-01",
+          "leaf-02"
+        ],
+        "cleaned_this_frame": [
+          "leaf-02"
+        ],
+        "events": [
+          "NAVIGATING -> CLEANING (leaf-02)"
+        ]
+      },
+      {
+        "frame_index": 10,
+        "sim_step": 7,
+        "state": "NAVIGATING",
+        "action": "move",
+        "robot_position": [
+          4,
+          5
+        ],
+        "dynamic_obstacles": [
+          {
+            "id": "pedestrian-01",
+            "kind": "pedestrian",
+            "position": [
+              5,
+              6
+            ]
+          }
+        ],
+        "remaining_trash_ids": [
+          "bottle-01",
+          "paper-01"
+        ],
+        "cleaned_ids": [
+          "leaf-01",
+          "leaf-02"
+        ],
+        "cleaned_this_frame": [],
+        "events": []
+      },
+      {
+        "frame_index": 11,
+        "sim_step": 8,
+        "state": "REPLANNING",
+        "action": "wait",
+        "robot_position": [
+          4,
+          5
+        ],
+        "dynamic_obstacles": [
+          {
+            "id": "pedestrian-01",
+            "kind": "pedestrian",
+            "position": [
+              5,
+              5
+            ]
+          }
+        ],
+        "remaining_trash_ids": [
+          "bottle-01",
+          "paper-01"
+        ],
+        "cleaned_ids": [
+          "leaf-01",
+          "leaf-02"
+        ],
+        "cleaned_this_frame": [],
+        "events": [
+          "AVOIDING -> REPLANNING"
+        ]
+      },
+      {
+        "frame_index": 12,
+        "sim_step": 9,
+        "state": "NAVIGATING",
+        "action": "move",
+        "robot_position": [
+          4,
+          4
+        ],
+        "dynamic_obstacles": [
+          {
+            "id": "pedestrian-01",
+            "kind": "pedestrian",
+            "position": [
+              5,
+              6
+            ]
+          }
+        ],
+        "remaining_trash_ids": [
+          "bottle-01",
+          "paper-01"
+        ],
+        "cleaned_ids": [
+          "leaf-01",
+          "leaf-02"
+        ],
+        "cleaned_this_frame": [],
+        "events": []
+      },
+      {
+        "frame_index": 13,
+        "sim_step": 10,
+        "state": "NAVIGATING",
+        "action": "move",
+        "robot_position": [
+          4,
+          3
+        ],
+        "dynamic_obstacles": [
+          {
+            "id": "pedestrian-01",
+            "kind": "pedestrian",
+            "position": [
+              3,
+              6
+            ]
+          }
+        ],
+        "remaining_trash_ids": [
+          "bottle-01",
+          "paper-01"
+        ],
+        "cleaned_ids": [
+          "leaf-01",
+          "leaf-02"
+        ],
+        "cleaned_this_frame": [],
+        "events": []
+      },
+      {
+        "frame_index": 14,
+        "sim_step": 11,
+        "state": "NAVIGATING",
+        "action": "move",
+        "robot_position": [
+          4,
+          2
+        ],
+        "dynamic_obstacles": [
+          {
+            "id": "pedestrian-01",
+            "kind": "pedestrian",
+            "position": [
+              4,
+              6
+            ]
+          }
+        ],
+        "remaining_trash_ids": [
+          "bottle-01",
+          "paper-01"
+        ],
+        "cleaned_ids": [
+          "leaf-01",
+          "leaf-02"
+        ],
+        "cleaned_this_frame": [],
+        "events": []
+      },
+      {
+        "frame_index": 15,
+        "sim_step": 12,
+        "state": "NAVIGATING",
+        "action": "move",
+        "robot_position": [
+          4,
+          1
+        ],
+        "dynamic_obstacles": [
+          {
+            "id": "pedestrian-01",
+            "kind": "pedestrian",
+            "position": [
+              5,
+              6
+            ]
+          }
+        ],
+        "remaining_trash_ids": [
+          "bottle-01",
+          "paper-01"
+        ],
+        "cleaned_ids": [
+          "leaf-01",
+          "leaf-02"
+        ],
+        "cleaned_this_frame": [],
+        "events": []
+      },
+      {
+        "frame_index": 16,
+        "sim_step": 13,
+        "state": "NAVIGATING",
+        "action": "move",
+        "robot_position": [
+          5,
+          1
+        ],
+        "dynamic_obstacles": [
+          {
+            "id": "pedestrian-01",
+            "kind": "pedestrian",
+            "position": [
+              6,
+              6
+            ]
+          }
+        ],
+        "remaining_trash_ids": [
+          "bottle-01",
+          "paper-01"
+        ],
+        "cleaned_ids": [
+          "leaf-01",
+          "leaf-02"
+        ],
+        "cleaned_this_frame": [],
+        "events": []
+      },
+      {
+        "frame_index": 17,
+        "sim_step": 14,
+        "state": "NAVIGATING",
+        "action": "move",
+        "robot_position": [
+          6,
+          1
+        ],
+        "dynamic_obstacles": [
+          {
+            "id": "pedestrian-01",
+            "kind": "pedestrian",
+            "position": [
+              7,
+              6
+            ]
+          }
+        ],
+        "remaining_trash_ids": [
+          "bottle-01",
+          "paper-01"
+        ],
+        "cleaned_ids": [
+          "leaf-01",
+          "leaf-02"
+        ],
+        "cleaned_this_frame": [],
+        "events": []
+      },
+      {
+        "frame_index": 18,
+        "sim_step": 15,
+        "state": "NAVIGATING",
+        "action": "move",
+        "robot_position": [
+          7,
+          1
+        ],
+        "dynamic_obstacles": [
+          {
+            "id": "pedestrian-01",
+            "kind": "pedestrian",
+            "position": [
+              6,
+              6
+            ]
+          }
+        ],
+        "remaining_trash_ids": [
+          "bottle-01",
+          "paper-01"
+        ],
+        "cleaned_ids": [
+          "leaf-01",
+          "leaf-02"
+        ],
+        "cleaned_this_frame": [],
+        "events": []
+      },
+      {
+        "frame_index": 19,
+        "sim_step": 16,
+        "state": "NAVIGATING",
+        "action": "move",
+        "robot_position": [
+          8,
+          1
+        ],
+        "dynamic_obstacles": [
+          {
+            "id": "pedestrian-01",
+            "kind": "pedestrian",
+            "position": [
+              6,
+              6
+            ]
+          }
+        ],
+        "remaining_trash_ids": [
+          "bottle-01",
+          "paper-01"
+        ],
+        "cleaned_ids": [
+          "leaf-01",
+          "leaf-02"
+        ],
+        "cleaned_this_frame": [],
+        "events": []
+      },
+      {
+        "frame_index": 20,
+        "sim_step": 17,
+        "state": "NAVIGATING",
+        "action": "move",
+        "robot_position": [
+          9,
+          1
+        ],
+        "dynamic_obstacles": [
+          {
+            "id": "pedestrian-01",
+            "kind": "pedestrian",
+            "position": [
+              5,
+              6
+            ]
+          }
+        ],
+        "remaining_trash_ids": [
+          "bottle-01",
+          "paper-01"
+        ],
+        "cleaned_ids": [
+          "leaf-01",
+          "leaf-02"
+        ],
+        "cleaned_this_frame": [],
+        "events": []
+      },
+      {
+        "frame_index": 21,
+        "sim_step": 18,
+        "state": "NAVIGATING",
+        "action": "move",
+        "robot_position": [
+          9,
+          2
+        ],
+        "dynamic_obstacles": [
+          {
+            "id": "pedestrian-01",
+            "kind": "pedestrian",
+            "position": [
+              5,
+              5
+            ]
+          }
+        ],
+        "remaining_trash_ids": [
+          "bottle-01",
+          "paper-01"
+        ],
+        "cleaned_ids": [
+          "leaf-01",
+          "leaf-02"
+        ],
+        "cleaned_this_frame": [],
+        "events": []
+      },
+      {
+        "frame_index": 22,
+        "sim_step": 18,
+        "state": "CLEANING",
+        "action": "clean",
+        "robot_position": [
+          9,
+          2
+        ],
+        "dynamic_obstacles": [
+          {
+            "id": "pedestrian-01",
+            "kind": "pedestrian",
+            "position": [
+              5,
+              5
+            ]
+          }
+        ],
+        "remaining_trash_ids": [
+          "paper-01"
+        ],
+        "cleaned_ids": [
+          "leaf-01",
+          "leaf-02",
+          "bottle-01"
+        ],
+        "cleaned_this_frame": [
+          "bottle-01"
+        ],
+        "events": [
+          "NAVIGATING -> CLEANING (bottle-01)"
+        ]
+      },
+      {
+        "frame_index": 23,
+        "sim_step": 19,
+        "state": "NAVIGATING",
+        "action": "move",
+        "robot_position": [
+          9,
+          3
+        ],
+        "dynamic_obstacles": [
+          {
+            "id": "pedestrian-01",
+            "kind": "pedestrian",
+            "position": [
+              5,
+              6
+            ]
+          }
+        ],
+        "remaining_trash_ids": [
+          "paper-01"
+        ],
+        "cleaned_ids": [
+          "leaf-01",
+          "leaf-02",
+          "bottle-01"
+        ],
+        "cleaned_this_frame": [],
+        "events": []
+      },
+      {
+        "frame_index": 24,
+        "sim_step": 20,
+        "state": "NAVIGATING",
+        "action": "move",
+        "robot_position": [
+          9,
+          4
+        ],
+        "dynamic_obstacles": [
+          {
+            "id": "pedestrian-01",
+            "kind": "pedestrian",
+            "position": [
+              3,
+              6
+            ]
+          }
+        ],
+        "remaining_trash_ids": [
+          "paper-01"
+        ],
+        "cleaned_ids": [
+          "leaf-01",
+          "leaf-02",
+          "bottle-01"
+        ],
+        "cleaned_this_frame": [],
+        "events": []
+      },
+      {
+        "frame_index": 25,
+        "sim_step": 21,
+        "state": "NAVIGATING",
+        "action": "move",
+        "robot_position": [
+          9,
+          5
+        ],
+        "dynamic_obstacles": [
+          {
+            "id": "pedestrian-01",
+            "kind": "pedestrian",
+            "position": [
+              4,
+              6
+            ]
+          }
+        ],
+        "remaining_trash_ids": [
+          "paper-01"
+        ],
+        "cleaned_ids": [
+          "leaf-01",
+          "leaf-02",
+          "bottle-01"
+        ],
+        "cleaned_this_frame": [],
+        "events": []
+      },
+      {
+        "frame_index": 26,
+        "sim_step": 21,
+        "state": "CLEANING",
+        "action": "clean",
+        "robot_position": [
+          9,
+          5
+        ],
+        "dynamic_obstacles": [
+          {
+            "id": "pedestrian-01",
+            "kind": "pedestrian",
+            "position": [
+              4,
+              6
+            ]
+          }
+        ],
+        "remaining_trash_ids": [],
+        "cleaned_ids": [
+          "leaf-01",
+          "leaf-02",
+          "bottle-01",
+          "paper-01"
+        ],
+        "cleaned_this_frame": [
+          "paper-01"
+        ],
+        "events": [
+          "NAVIGATING -> CLEANING (paper-01)"
+        ]
+      },
+      {
+        "frame_index": 27,
+        "sim_step": 21,
+        "state": "PLANNING",
+        "action": "transition",
+        "robot_position": [
+          9,
+          5
+        ],
+        "dynamic_obstacles": [
+          {
+            "id": "pedestrian-01",
+            "kind": "pedestrian",
+            "position": [
+              4,
+              6
+            ]
+          }
+        ],
+        "remaining_trash_ids": [],
+        "cleaned_ids": [
+          "leaf-01",
+          "leaf-02",
+          "bottle-01",
+          "paper-01"
+        ],
+        "cleaned_this_frame": [],
+        "events": [
+          "NAVIGATING -> COVERAGE_PLANNING"
+        ]
+      },
+      {
+        "frame_index": 28,
+        "sim_step": 21,
+        "state": "NAVIGATING",
+        "action": "transition",
+        "robot_position": [
+          9,
+          5
+        ],
+        "dynamic_obstacles": [
+          {
+            "id": "pedestrian-01",
+            "kind": "pedestrian",
+            "position": [
+              4,
+              6
+            ]
+          }
+        ],
+        "remaining_trash_ids": [],
+        "cleaned_ids": [
+          "leaf-01",
+          "leaf-02",
+          "bottle-01",
+          "paper-01"
+        ],
+        "cleaned_this_frame": [],
+        "events": [
+          "COVERAGE_PLANNING -> NAVIGATING (53 cells)"
+        ]
+      },
+      {
+        "frame_index": 29,
+        "sim_step": 22,
+        "state": "NAVIGATING",
+        "action": "move",
+        "robot_position": [
+          8,
+          5
+        ],
+        "dynamic_obstacles": [
+          {
+            "id": "pedestrian-01",
+            "kind": "pedestrian",
+            "position": [
+              5,
+              6
+            ]
+          }
+        ],
+        "remaining_trash_ids": [],
+        "cleaned_ids": [
+          "leaf-01",
+          "leaf-02",
+          "bottle-01",
+          "paper-01"
+        ],
+        "cleaned_this_frame": [],
+        "events": []
+      },
+      {
+        "frame_index": 30,
+        "sim_step": 23,
+        "state": "NAVIGATING",
+        "action": "move",
+        "robot_position": [
+          7,
+          5
+        ],
+        "dynamic_obstacles": [
+          {
+            "id": "pedestrian-01",
+            "kind": "pedestrian",
+            "position": [
+              6,
+              6
+            ]
+          }
+        ],
+        "remaining_trash_ids": [],
+        "cleaned_ids": [
+          "leaf-01",
+          "leaf-02",
+          "bottle-01",
+          "paper-01"
+        ],
+        "cleaned_this_frame": [],
+        "events": []
+      },
+      {
+        "frame_index": 31,
+        "sim_step": 24,
+        "state": "NAVIGATING",
+        "action": "move",
+        "robot_position": [
+          6,
+          5
+        ],
+        "dynamic_obstacles": [
+          {
+            "id": "pedestrian-01",
+            "kind": "pedestrian",
+            "position": [
+              7,
+              6
+            ]
+          }
+        ],
+        "remaining_trash_ids": [],
+        "cleaned_ids": [
+          "leaf-01",
+          "leaf-02",
+          "bottle-01",
+          "paper-01"
+        ],
+        "cleaned_this_frame": [],
+        "events": []
+      },
+      {
+        "frame_index": 32,
+        "sim_step": 25,
+        "state": "NAVIGATING",
+        "action": "move",
+        "robot_position": [
+          5,
+          5
+        ],
+        "dynamic_obstacles": [
+          {
+            "id": "pedestrian-01",
+            "kind": "pedestrian",
+            "position": [
+              6,
+              6
+            ]
+          }
+        ],
+        "remaining_trash_ids": [],
+        "cleaned_ids": [
+          "leaf-01",
+          "leaf-02",
+          "bottle-01",
+          "paper-01"
+        ],
+        "cleaned_this_frame": [],
+        "events": []
+      },
+      {
+        "frame_index": 33,
+        "sim_step": 26,
+        "state": "NAVIGATING",
+        "action": "move",
+        "robot_position": [
+          4,
+          5
+        ],
+        "dynamic_obstacles": [
+          {
+            "id": "pedestrian-01",
+            "kind": "pedestrian",
+            "position": [
+              6,
+              6
+            ]
+          }
+        ],
+        "remaining_trash_ids": [],
+        "cleaned_ids": [
+          "leaf-01",
+          "leaf-02",
+          "bottle-01",
+          "paper-01"
+        ],
+        "cleaned_this_frame": [],
+        "events": []
+      },
+      {
+        "frame_index": 34,
+        "sim_step": 27,
+        "state": "NAVIGATING",
+        "action": "move",
+        "robot_position": [
+          3,
+          5
+        ],
+        "dynamic_obstacles": [
+          {
+            "id": "pedestrian-01",
+            "kind": "pedestrian",
+            "position": [
+              5,
+              6
+            ]
+          }
+        ],
+        "remaining_trash_ids": [],
+        "cleaned_ids": [
+          "leaf-01",
+          "leaf-02",
+          "bottle-01",
+          "paper-01"
+        ],
+        "cleaned_this_frame": [],
+        "events": []
+      },
+      {
+        "frame_index": 35,
+        "sim_step": 28,
+        "state": "NAVIGATING",
+        "action": "move",
+        "robot_position": [
+          2,
+          5
+        ],
+        "dynamic_obstacles": [
+          {
+            "id": "pedestrian-01",
+            "kind": "pedestrian",
+            "position": [
+              5,
+              5
+            ]
+          }
+        ],
+        "remaining_trash_ids": [],
+        "cleaned_ids": [
+          "leaf-01",
+          "leaf-02",
+          "bottle-01",
+          "paper-01"
+        ],
+        "cleaned_this_frame": [],
+        "events": []
+      },
+      {
+        "frame_index": 36,
+        "sim_step": 29,
+        "state": "NAVIGATING",
+        "action": "move",
+        "robot_position": [
+          1,
+          5
+        ],
+        "dynamic_obstacles": [
+          {
+            "id": "pedestrian-01",
+            "kind": "pedestrian",
+            "position": [
+              5,
+              6
+            ]
+          }
+        ],
+        "remaining_trash_ids": [],
+        "cleaned_ids": [
+          "leaf-01",
+          "leaf-02",
+          "bottle-01",
+          "paper-01"
+        ],
+        "cleaned_this_frame": [],
+        "events": []
+      },
+      {
+        "frame_index": 37,
+        "sim_step": 30,
+        "state": "NAVIGATING",
+        "action": "move",
+        "robot_position": [
+          1,
+          4
+        ],
+        "dynamic_obstacles": [
+          {
+            "id": "pedestrian-01",
+            "kind": "pedestrian",
+            "position": [
+              3,
+              6
+            ]
+          }
+        ],
+        "remaining_trash_ids": [],
+        "cleaned_ids": [
+          "leaf-01",
+          "leaf-02",
+          "bottle-01",
+          "paper-01"
+        ],
+        "cleaned_this_frame": [],
+        "events": []
+      },
+      {
+        "frame_index": 38,
+        "sim_step": 31,
+        "state": "NAVIGATING",
+        "action": "move",
+        "robot_position": [
+          1,
+          3
+        ],
+        "dynamic_obstacles": [
+          {
+            "id": "pedestrian-01",
+            "kind": "pedestrian",
+            "position": [
+              4,
+              6
+            ]
+          }
+        ],
+        "remaining_trash_ids": [],
+        "cleaned_ids": [
+          "leaf-01",
+          "leaf-02",
+          "bottle-01",
+          "paper-01"
+        ],
+        "cleaned_this_frame": [],
+        "events": []
+      },
+      {
+        "frame_index": 39,
+        "sim_step": 32,
+        "state": "NAVIGATING",
+        "action": "move",
+        "robot_position": [
+          1,
+          2
+        ],
+        "dynamic_obstacles": [
+          {
+            "id": "pedestrian-01",
+            "kind": "pedestrian",
+            "position": [
+              5,
+              6
+            ]
+          }
+        ],
+        "remaining_trash_ids": [],
+        "cleaned_ids": [
+          "leaf-01",
+          "leaf-02",
+          "bottle-01",
+          "paper-01"
+        ],
+        "cleaned_this_frame": [],
+        "events": []
+      },
+      {
+        "frame_index": 40,
+        "sim_step": 33,
+        "state": "NAVIGATING",
+        "action": "move",
+        "robot_position": [
+          1,
+          1
+        ],
+        "dynamic_obstacles": [
+          {
+            "id": "pedestrian-01",
+            "kind": "pedestrian",
+            "position": [
+              6,
+              6
+            ]
+          }
+        ],
+        "remaining_trash_ids": [],
+        "cleaned_ids": [
+          "leaf-01",
+          "leaf-02",
+          "bottle-01",
+          "paper-01"
+        ],
+        "cleaned_this_frame": [],
+        "events": []
+      },
+      {
+        "frame_index": 41,
+        "sim_step": 34,
+        "state": "NAVIGATING",
+        "action": "move",
+        "robot_position": [
+          2,
+          1
+        ],
+        "dynamic_obstacles": [
+          {
+            "id": "pedestrian-01",
+            "kind": "pedestrian",
+            "position": [
+              7,
+              6
+            ]
+          }
+        ],
+        "remaining_trash_ids": [],
+        "cleaned_ids": [
+          "leaf-01",
+          "leaf-02",
+          "bottle-01",
+          "paper-01"
+        ],
+        "cleaned_this_frame": [],
+        "events": []
+      },
+      {
+        "frame_index": 42,
+        "sim_step": 35,
+        "state": "NAVIGATING",
+        "action": "move",
+        "robot_position": [
+          3,
+          1
+        ],
+        "dynamic_obstacles": [
+          {
+            "id": "pedestrian-01",
+            "kind": "pedestrian",
+            "position": [
+              6,
+              6
+            ]
+          }
+        ],
+        "remaining_trash_ids": [],
+        "cleaned_ids": [
+          "leaf-01",
+          "leaf-02",
+          "bottle-01",
+          "paper-01"
+        ],
+        "cleaned_this_frame": [],
+        "events": []
+      },
+      {
+        "frame_index": 43,
+        "sim_step": 36,
+        "state": "NAVIGATING",
+        "action": "move",
+        "robot_position": [
+          4,
+          1
+        ],
+        "dynamic_obstacles": [
+          {
+            "id": "pedestrian-01",
+            "kind": "pedestrian",
+            "position": [
+              6,
+              6
+            ]
+          }
+        ],
+        "remaining_trash_ids": [],
+        "cleaned_ids": [
+          "leaf-01",
+          "leaf-02",
+          "bottle-01",
+          "paper-01"
+        ],
+        "cleaned_this_frame": [],
+        "events": []
+      },
+      {
+        "frame_index": 44,
+        "sim_step": 37,
+        "state": "NAVIGATING",
+        "action": "move",
+        "robot_position": [
+          5,
+          1
+        ],
+        "dynamic_obstacles": [
+          {
+            "id": "pedestrian-01",
+            "kind": "pedestrian",
+            "position": [
+              5,
+              6
+            ]
+          }
+        ],
+        "remaining_trash_ids": [],
+        "cleaned_ids": [
+          "leaf-01",
+          "leaf-02",
+          "bottle-01",
+          "paper-01"
+        ],
+        "cleaned_this_frame": [],
+        "events": []
+      },
+      {
+        "frame_index": 45,
+        "sim_step": 38,
+        "state": "NAVIGATING",
+        "action": "move",
+        "robot_position": [
+          6,
+          1
+        ],
+        "dynamic_obstacles": [
+          {
+            "id": "pedestrian-01",
+            "kind": "pedestrian",
+            "position": [
+              5,
+              5
+            ]
+          }
+        ],
+        "remaining_trash_ids": [],
+        "cleaned_ids": [
+          "leaf-01",
+          "leaf-02",
+          "bottle-01",
+          "paper-01"
+        ],
+        "cleaned_this_frame": [],
+        "events": []
+      },
+      {
+        "frame_index": 46,
+        "sim_step": 39,
+        "state": "NAVIGATING",
+        "action": "move",
+        "robot_position": [
+          7,
+          1
+        ],
+        "dynamic_obstacles": [
+          {
+            "id": "pedestrian-01",
+            "kind": "pedestrian",
+            "position": [
+              5,
+              6
+            ]
+          }
+        ],
+        "remaining_trash_ids": [],
+        "cleaned_ids": [
+          "leaf-01",
+          "leaf-02",
+          "bottle-01",
+          "paper-01"
+        ],
+        "cleaned_this_frame": [],
+        "events": []
+      },
+      {
+        "frame_index": 47,
+        "sim_step": 40,
+        "state": "NAVIGATING",
+        "action": "move",
+        "robot_position": [
+          8,
+          1
+        ],
+        "dynamic_obstacles": [
+          {
+            "id": "pedestrian-01",
+            "kind": "pedestrian",
+            "position": [
+              3,
+              6
+            ]
+          }
+        ],
+        "remaining_trash_ids": [],
+        "cleaned_ids": [
+          "leaf-01",
+          "leaf-02",
+          "bottle-01",
+          "paper-01"
+        ],
+        "cleaned_this_frame": [],
+        "events": []
+      },
+      {
+        "frame_index": 48,
+        "sim_step": 41,
+        "state": "NAVIGATING",
+        "action": "move",
+        "robot_position": [
+          9,
+          1
+        ],
+        "dynamic_obstacles": [
+          {
+            "id": "pedestrian-01",
+            "kind": "pedestrian",
+            "position": [
+              4,
+              6
+            ]
+          }
+        ],
+        "remaining_trash_ids": [],
+        "cleaned_ids": [
+          "leaf-01",
+          "leaf-02",
+          "bottle-01",
+          "paper-01"
+        ],
+        "cleaned_this_frame": [],
+        "events": []
+      },
+      {
+        "frame_index": 49,
+        "sim_step": 42,
+        "state": "NAVIGATING",
+        "action": "move",
+        "robot_position": [
+          10,
+          1
+        ],
+        "dynamic_obstacles": [
+          {
+            "id": "pedestrian-01",
+            "kind": "pedestrian",
+            "position": [
+              5,
+              6
+            ]
+          }
+        ],
+        "remaining_trash_ids": [],
+        "cleaned_ids": [
+          "leaf-01",
+          "leaf-02",
+          "bottle-01",
+          "paper-01"
+        ],
+        "cleaned_this_frame": [],
+        "events": []
+      },
+      {
+        "frame_index": 50,
+        "sim_step": 43,
+        "state": "NAVIGATING",
+        "action": "move",
+        "robot_position": [
+          10,
+          2
+        ],
+        "dynamic_obstacles": [
+          {
+            "id": "pedestrian-01",
+            "kind": "pedestrian",
+            "position": [
+              6,
+              6
+            ]
+          }
+        ],
+        "remaining_trash_ids": [],
+        "cleaned_ids": [
+          "leaf-01",
+          "leaf-02",
+          "bottle-01",
+          "paper-01"
+        ],
+        "cleaned_this_frame": [],
+        "events": []
+      },
+      {
+        "frame_index": 51,
+        "sim_step": 44,
+        "state": "NAVIGATING",
+        "action": "move",
+        "robot_position": [
+          9,
+          2
+        ],
+        "dynamic_obstacles": [
+          {
+            "id": "pedestrian-01",
+            "kind": "pedestrian",
+            "position": [
+              7,
+              6
+            ]
+          }
+        ],
+        "remaining_trash_ids": [],
+        "cleaned_ids": [
+          "leaf-01",
+          "leaf-02",
+          "bottle-01",
+          "paper-01"
+        ],
+        "cleaned_this_frame": [],
+        "events": []
+      },
+      {
+        "frame_index": 52,
+        "sim_step": 45,
+        "state": "NAVIGATING",
+        "action": "move",
+        "robot_position": [
+          8,
+          2
+        ],
+        "dynamic_obstacles": [
+          {
+            "id": "pedestrian-01",
+            "kind": "pedestrian",
+            "position": [
+              6,
+              6
+            ]
+          }
+        ],
+        "remaining_trash_ids": [],
+        "cleaned_ids": [
+          "leaf-01",
+          "leaf-02",
+          "bottle-01",
+          "paper-01"
+        ],
+        "cleaned_this_frame": [],
+        "events": []
+      },
+      {
+        "frame_index": 53,
+        "sim_step": 46,
+        "state": "NAVIGATING",
+        "action": "move",
+        "robot_position": [
+          7,
+          2
+        ],
+        "dynamic_obstacles": [
+          {
+            "id": "pedestrian-01",
+            "kind": "pedestrian",
+            "position": [
+              6,
+              6
+            ]
+          }
+        ],
+        "remaining_trash_ids": [],
+        "cleaned_ids": [
+          "leaf-01",
+          "leaf-02",
+          "bottle-01",
+          "paper-01"
+        ],
+        "cleaned_this_frame": [],
+        "events": []
+      },
+      {
+        "frame_index": 54,
+        "sim_step": 47,
+        "state": "NAVIGATING",
+        "action": "move",
+        "robot_position": [
+          6,
+          2
+        ],
+        "dynamic_obstacles": [
+          {
+            "id": "pedestrian-01",
+            "kind": "pedestrian",
+            "position": [
+              5,
+              6
+            ]
+          }
+        ],
+        "remaining_trash_ids": [],
+        "cleaned_ids": [
+          "leaf-01",
+          "leaf-02",
+          "bottle-01",
+          "paper-01"
+        ],
+        "cleaned_this_frame": [],
+        "events": []
+      },
+      {
+        "frame_index": 55,
+        "sim_step": 48,
+        "state": "NAVIGATING",
+        "action": "move",
+        "robot_position": [
+          6,
+          1
+        ],
+        "dynamic_obstacles": [
+          {
+            "id": "pedestrian-01",
+            "kind": "pedestrian",
+            "position": [
+              5,
+              5
+            ]
+          }
+        ],
+        "remaining_trash_ids": [],
+        "cleaned_ids": [
+          "leaf-01",
+          "leaf-02",
+          "bottle-01",
+          "paper-01"
+        ],
+        "cleaned_this_frame": [],
+        "events": []
+      },
+      {
+        "frame_index": 56,
+        "sim_step": 49,
+        "state": "NAVIGATING",
+        "action": "move",
+        "robot_position": [
+          5,
+          1
+        ],
+        "dynamic_obstacles": [
+          {
+            "id": "pedestrian-01",
+            "kind": "pedestrian",
+            "position": [
+              5,
+              6
+            ]
+          }
+        ],
+        "remaining_trash_ids": [],
+        "cleaned_ids": [
+          "leaf-01",
+          "leaf-02",
+          "bottle-01",
+          "paper-01"
+        ],
+        "cleaned_this_frame": [],
+        "events": []
+      },
+      {
+        "frame_index": 57,
+        "sim_step": 50,
+        "state": "NAVIGATING",
+        "action": "move",
+        "robot_position": [
+          4,
+          1
+        ],
+        "dynamic_obstacles": [
+          {
+            "id": "pedestrian-01",
+            "kind": "pedestrian",
+            "position": [
+              3,
+              6
+            ]
+          }
+        ],
+        "remaining_trash_ids": [],
+        "cleaned_ids": [
+          "leaf-01",
+          "leaf-02",
+          "bottle-01",
+          "paper-01"
+        ],
+        "cleaned_this_frame": [],
+        "events": []
+      },
+      {
+        "frame_index": 58,
+        "sim_step": 51,
+        "state": "NAVIGATING",
+        "action": "move",
+        "robot_position": [
+          4,
+          2
+        ],
+        "dynamic_obstacles": [
+          {
+            "id": "pedestrian-01",
+            "kind": "pedestrian",
+            "position": [
+              4,
+              6
+            ]
+          }
+        ],
+        "remaining_trash_ids": [],
+        "cleaned_ids": [
+          "leaf-01",
+          "leaf-02",
+          "bottle-01",
+          "paper-01"
+        ],
+        "cleaned_this_frame": [],
+        "events": []
+      },
+      {
+        "frame_index": 59,
+        "sim_step": 52,
+        "state": "NAVIGATING",
+        "action": "move",
+        "robot_position": [
+          3,
+          2
+        ],
+        "dynamic_obstacles": [
+          {
+            "id": "pedestrian-01",
+            "kind": "pedestrian",
+            "position": [
+              5,
+              6
+            ]
+          }
+        ],
+        "remaining_trash_ids": [],
+        "cleaned_ids": [
+          "leaf-01",
+          "leaf-02",
+          "bottle-01",
+          "paper-01"
+        ],
+        "cleaned_this_frame": [],
+        "events": []
+      },
+      {
+        "frame_index": 60,
+        "sim_step": 53,
+        "state": "NAVIGATING",
+        "action": "move",
+        "robot_position": [
+          2,
+          2
+        ],
+        "dynamic_obstacles": [
+          {
+            "id": "pedestrian-01",
+            "kind": "pedestrian",
+            "position": [
+              6,
+              6
+            ]
+          }
+        ],
+        "remaining_trash_ids": [],
+        "cleaned_ids": [
+          "leaf-01",
+          "leaf-02",
+          "bottle-01",
+          "paper-01"
+        ],
+        "cleaned_this_frame": [],
+        "events": []
+      },
+      {
+        "frame_index": 61,
+        "sim_step": 54,
+        "state": "NAVIGATING",
+        "action": "move",
+        "robot_position": [
+          2,
+          3
+        ],
+        "dynamic_obstacles": [
+          {
+            "id": "pedestrian-01",
+            "kind": "pedestrian",
+            "position": [
+              7,
+              6
+            ]
+          }
+        ],
+        "remaining_trash_ids": [],
+        "cleaned_ids": [
+          "leaf-01",
+          "leaf-02",
+          "bottle-01",
+          "paper-01"
+        ],
+        "cleaned_this_frame": [],
+        "events": []
+      },
+      {
+        "frame_index": 62,
+        "sim_step": 55,
+        "state": "NAVIGATING",
+        "action": "move",
+        "robot_position": [
+          3,
+          3
+        ],
+        "dynamic_obstacles": [
+          {
+            "id": "pedestrian-01",
+            "kind": "pedestrian",
+            "position": [
+              6,
+              6
+            ]
+          }
+        ],
+        "remaining_trash_ids": [],
+        "cleaned_ids": [
+          "leaf-01",
+          "leaf-02",
+          "bottle-01",
+          "paper-01"
+        ],
+        "cleaned_this_frame": [],
+        "events": []
+      },
+      {
+        "frame_index": 63,
+        "sim_step": 56,
+        "state": "NAVIGATING",
+        "action": "move",
+        "robot_position": [
+          4,
+          3
+        ],
+        "dynamic_obstacles": [
+          {
+            "id": "pedestrian-01",
+            "kind": "pedestrian",
+            "position": [
+              6,
+              6
+            ]
+          }
+        ],
+        "remaining_trash_ids": [],
+        "cleaned_ids": [
+          "leaf-01",
+          "leaf-02",
+          "bottle-01",
+          "paper-01"
+        ],
+        "cleaned_this_frame": [],
+        "events": []
+      },
+      {
+        "frame_index": 64,
+        "sim_step": 57,
+        "state": "NAVIGATING",
+        "action": "move",
+        "robot_position": [
+          4,
+          4
+        ],
+        "dynamic_obstacles": [
+          {
+            "id": "pedestrian-01",
+            "kind": "pedestrian",
+            "position": [
+              5,
+              6
+            ]
+          }
+        ],
+        "remaining_trash_ids": [],
+        "cleaned_ids": [
+          "leaf-01",
+          "leaf-02",
+          "bottle-01",
+          "paper-01"
+        ],
+        "cleaned_this_frame": [],
+        "events": []
+      },
+      {
+        "frame_index": 65,
+        "sim_step": 58,
+        "state": "NAVIGATING",
+        "action": "move",
+        "robot_position": [
+          4,
+          5
+        ],
+        "dynamic_obstacles": [
+          {
+            "id": "pedestrian-01",
+            "kind": "pedestrian",
+            "position": [
+              5,
+              5
+            ]
+          }
+        ],
+        "remaining_trash_ids": [],
+        "cleaned_ids": [
+          "leaf-01",
+          "leaf-02",
+          "bottle-01",
+          "paper-01"
+        ],
+        "cleaned_this_frame": [],
+        "events": []
+      },
+      {
+        "frame_index": 66,
+        "sim_step": 59,
+        "state": "NAVIGATING",
+        "action": "move",
+        "robot_position": [
+          5,
+          5
+        ],
+        "dynamic_obstacles": [
+          {
+            "id": "pedestrian-01",
+            "kind": "pedestrian",
+            "position": [
+              5,
+              6
+            ]
+          }
+        ],
+        "remaining_trash_ids": [],
+        "cleaned_ids": [
+          "leaf-01",
+          "leaf-02",
+          "bottle-01",
+          "paper-01"
+        ],
+        "cleaned_this_frame": [],
+        "events": []
+      },
+      {
+        "frame_index": 67,
+        "sim_step": 60,
+        "state": "NAVIGATING",
+        "action": "move",
+        "robot_position": [
+          6,
+          5
+        ],
+        "dynamic_obstacles": [
+          {
+            "id": "pedestrian-01",
+            "kind": "pedestrian",
+            "position": [
+              3,
+              6
+            ]
+          }
+        ],
+        "remaining_trash_ids": [],
+        "cleaned_ids": [
+          "leaf-01",
+          "leaf-02",
+          "bottle-01",
+          "paper-01"
+        ],
+        "cleaned_this_frame": [],
+        "events": []
+      },
+      {
+        "frame_index": 68,
+        "sim_step": 61,
+        "state": "NAVIGATING",
+        "action": "move",
+        "robot_position": [
+          6,
+          4
+        ],
+        "dynamic_obstacles": [
+          {
+            "id": "pedestrian-01",
+            "kind": "pedestrian",
+            "position": [
+              4,
+              6
+            ]
+          }
+        ],
+        "remaining_trash_ids": [],
+        "cleaned_ids": [
+          "leaf-01",
+          "leaf-02",
+          "bottle-01",
+          "paper-01"
+        ],
+        "cleaned_this_frame": [],
+        "events": []
+      },
+      {
+        "frame_index": 69,
+        "sim_step": 62,
+        "state": "NAVIGATING",
+        "action": "move",
+        "robot_position": [
+          6,
+          3
+        ],
+        "dynamic_obstacles": [
+          {
+            "id": "pedestrian-01",
+            "kind": "pedestrian",
+            "position": [
+              5,
+              6
+            ]
+          }
+        ],
+        "remaining_trash_ids": [],
+        "cleaned_ids": [
+          "leaf-01",
+          "leaf-02",
+          "bottle-01",
+          "paper-01"
+        ],
+        "cleaned_this_frame": [],
+        "events": []
+      },
+      {
+        "frame_index": 70,
+        "sim_step": 63,
+        "state": "NAVIGATING",
+        "action": "move",
+        "robot_position": [
+          6,
+          2
+        ],
+        "dynamic_obstacles": [
+          {
+            "id": "pedestrian-01",
+            "kind": "pedestrian",
+            "position": [
+              6,
+              6
+            ]
+          }
+        ],
+        "remaining_trash_ids": [],
+        "cleaned_ids": [
+          "leaf-01",
+          "leaf-02",
+          "bottle-01",
+          "paper-01"
+        ],
+        "cleaned_this_frame": [],
+        "events": []
+      },
+      {
+        "frame_index": 71,
+        "sim_step": 64,
+        "state": "NAVIGATING",
+        "action": "move",
+        "robot_position": [
+          7,
+          2
+        ],
+        "dynamic_obstacles": [
+          {
+            "id": "pedestrian-01",
+            "kind": "pedestrian",
+            "position": [
+              7,
+              6
+            ]
+          }
+        ],
+        "remaining_trash_ids": [],
+        "cleaned_ids": [
+          "leaf-01",
+          "leaf-02",
+          "bottle-01",
+          "paper-01"
+        ],
+        "cleaned_this_frame": [],
+        "events": []
+      },
+      {
+        "frame_index": 72,
+        "sim_step": 65,
+        "state": "NAVIGATING",
+        "action": "move",
+        "robot_position": [
+          8,
+          2
+        ],
+        "dynamic_obstacles": [
+          {
+            "id": "pedestrian-01",
+            "kind": "pedestrian",
+            "position": [
+              6,
+              6
+            ]
+          }
+        ],
+        "remaining_trash_ids": [],
+        "cleaned_ids": [
+          "leaf-01",
+          "leaf-02",
+          "bottle-01",
+          "paper-01"
+        ],
+        "cleaned_this_frame": [],
+        "events": []
+      },
+      {
+        "frame_index": 73,
+        "sim_step": 66,
+        "state": "NAVIGATING",
+        "action": "move",
+        "robot_position": [
+          9,
+          2
+        ],
+        "dynamic_obstacles": [
+          {
+            "id": "pedestrian-01",
+            "kind": "pedestrian",
+            "position": [
+              6,
+              6
+            ]
+          }
+        ],
+        "remaining_trash_ids": [],
+        "cleaned_ids": [
+          "leaf-01",
+          "leaf-02",
+          "bottle-01",
+          "paper-01"
+        ],
+        "cleaned_this_frame": [],
+        "events": []
+      },
+      {
+        "frame_index": 74,
+        "sim_step": 67,
+        "state": "NAVIGATING",
+        "action": "move",
+        "robot_position": [
+          9,
+          3
+        ],
+        "dynamic_obstacles": [
+          {
+            "id": "pedestrian-01",
+            "kind": "pedestrian",
+            "position": [
+              5,
+              6
+            ]
+          }
+        ],
+        "remaining_trash_ids": [],
+        "cleaned_ids": [
+          "leaf-01",
+          "leaf-02",
+          "bottle-01",
+          "paper-01"
+        ],
+        "cleaned_this_frame": [],
+        "events": []
+      },
+      {
+        "frame_index": 75,
+        "sim_step": 68,
+        "state": "NAVIGATING",
+        "action": "move",
+        "robot_position": [
+          10,
+          3
+        ],
+        "dynamic_obstacles": [
+          {
+            "id": "pedestrian-01",
+            "kind": "pedestrian",
+            "position": [
+              5,
+              5
+            ]
+          }
+        ],
+        "remaining_trash_ids": [],
+        "cleaned_ids": [
+          "leaf-01",
+          "leaf-02",
+          "bottle-01",
+          "paper-01"
+        ],
+        "cleaned_this_frame": [],
+        "events": []
+      },
+      {
+        "frame_index": 76,
+        "sim_step": 69,
+        "state": "NAVIGATING",
+        "action": "move",
+        "robot_position": [
+          10,
+          4
+        ],
+        "dynamic_obstacles": [
+          {
+            "id": "pedestrian-01",
+            "kind": "pedestrian",
+            "position": [
+              5,
+              6
+            ]
+          }
+        ],
+        "remaining_trash_ids": [],
+        "cleaned_ids": [
+          "leaf-01",
+          "leaf-02",
+          "bottle-01",
+          "paper-01"
+        ],
+        "cleaned_this_frame": [],
+        "events": []
+      },
+      {
+        "frame_index": 77,
+        "sim_step": 70,
+        "state": "NAVIGATING",
+        "action": "move",
+        "robot_position": [
+          9,
+          4
+        ],
+        "dynamic_obstacles": [
+          {
+            "id": "pedestrian-01",
+            "kind": "pedestrian",
+            "position": [
+              3,
+              6
+            ]
+          }
+        ],
+        "remaining_trash_ids": [],
+        "cleaned_ids": [
+          "leaf-01",
+          "leaf-02",
+          "bottle-01",
+          "paper-01"
+        ],
+        "cleaned_this_frame": [],
+        "events": []
+      },
+      {
+        "frame_index": 78,
+        "sim_step": 71,
+        "state": "NAVIGATING",
+        "action": "move",
+        "robot_position": [
+          9,
+          5
+        ],
+        "dynamic_obstacles": [
+          {
+            "id": "pedestrian-01",
+            "kind": "pedestrian",
+            "position": [
+              4,
+              6
+            ]
+          }
+        ],
+        "remaining_trash_ids": [],
+        "cleaned_ids": [
+          "leaf-01",
+          "leaf-02",
+          "bottle-01",
+          "paper-01"
+        ],
+        "cleaned_this_frame": [],
+        "events": []
+      },
+      {
+        "frame_index": 79,
+        "sim_step": 72,
+        "state": "NAVIGATING",
+        "action": "move",
+        "robot_position": [
+          8,
+          5
+        ],
+        "dynamic_obstacles": [
+          {
+            "id": "pedestrian-01",
+            "kind": "pedestrian",
+            "position": [
+              5,
+              6
+            ]
+          }
+        ],
+        "remaining_trash_ids": [],
+        "cleaned_ids": [
+          "leaf-01",
+          "leaf-02",
+          "bottle-01",
+          "paper-01"
+        ],
+        "cleaned_this_frame": [],
+        "events": []
+      },
+      {
+        "frame_index": 80,
+        "sim_step": 73,
+        "state": "NAVIGATING",
+        "action": "move",
+        "robot_position": [
+          7,
+          5
+        ],
+        "dynamic_obstacles": [
+          {
+            "id": "pedestrian-01",
+            "kind": "pedestrian",
+            "position": [
+              6,
+              6
+            ]
+          }
+        ],
+        "remaining_trash_ids": [],
+        "cleaned_ids": [
+          "leaf-01",
+          "leaf-02",
+          "bottle-01",
+          "paper-01"
+        ],
+        "cleaned_this_frame": [],
+        "events": []
+      },
+      {
+        "frame_index": 81,
+        "sim_step": 74,
+        "state": "NAVIGATING",
+        "action": "move",
+        "robot_position": [
+          6,
+          5
+        ],
+        "dynamic_obstacles": [
+          {
+            "id": "pedestrian-01",
+            "kind": "pedestrian",
+            "position": [
+              7,
+              6
+            ]
+          }
+        ],
+        "remaining_trash_ids": [],
+        "cleaned_ids": [
+          "leaf-01",
+          "leaf-02",
+          "bottle-01",
+          "paper-01"
+        ],
+        "cleaned_this_frame": [],
+        "events": []
+      },
+      {
+        "frame_index": 82,
+        "sim_step": 75,
+        "state": "NAVIGATING",
+        "action": "move",
+        "robot_position": [
+          5,
+          5
+        ],
+        "dynamic_obstacles": [
+          {
+            "id": "pedestrian-01",
+            "kind": "pedestrian",
+            "position": [
+              6,
+              6
+            ]
+          }
+        ],
+        "remaining_trash_ids": [],
+        "cleaned_ids": [
+          "leaf-01",
+          "leaf-02",
+          "bottle-01",
+          "paper-01"
+        ],
+        "cleaned_this_frame": [],
+        "events": []
+      },
+      {
+        "frame_index": 83,
+        "sim_step": 76,
+        "state": "NAVIGATING",
+        "action": "move",
+        "robot_position": [
+          4,
+          5
+        ],
+        "dynamic_obstacles": [
+          {
+            "id": "pedestrian-01",
+            "kind": "pedestrian",
+            "position": [
+              6,
+              6
+            ]
+          }
+        ],
+        "remaining_trash_ids": [],
+        "cleaned_ids": [
+          "leaf-01",
+          "leaf-02",
+          "bottle-01",
+          "paper-01"
+        ],
+        "cleaned_this_frame": [],
+        "events": []
+      },
+      {
+        "frame_index": 84,
+        "sim_step": 77,
+        "state": "NAVIGATING",
+        "action": "move",
+        "robot_position": [
+          3,
+          5
+        ],
+        "dynamic_obstacles": [
+          {
+            "id": "pedestrian-01",
+            "kind": "pedestrian",
+            "position": [
+              5,
+              6
+            ]
+          }
+        ],
+        "remaining_trash_ids": [],
+        "cleaned_ids": [
+          "leaf-01",
+          "leaf-02",
+          "bottle-01",
+          "paper-01"
+        ],
+        "cleaned_this_frame": [],
+        "events": []
+      },
+      {
+        "frame_index": 85,
+        "sim_step": 78,
+        "state": "NAVIGATING",
+        "action": "move",
+        "robot_position": [
+          3,
+          4
+        ],
+        "dynamic_obstacles": [
+          {
+            "id": "pedestrian-01",
+            "kind": "pedestrian",
+            "position": [
+              5,
+              5
+            ]
+          }
+        ],
+        "remaining_trash_ids": [],
+        "cleaned_ids": [
+          "leaf-01",
+          "leaf-02",
+          "bottle-01",
+          "paper-01"
+        ],
+        "cleaned_this_frame": [],
+        "events": []
+      },
+      {
+        "frame_index": 86,
+        "sim_step": 79,
+        "state": "NAVIGATING",
+        "action": "move",
+        "robot_position": [
+          2,
+          4
+        ],
+        "dynamic_obstacles": [
+          {
+            "id": "pedestrian-01",
+            "kind": "pedestrian",
+            "position": [
+              5,
+              6
+            ]
+          }
+        ],
+        "remaining_trash_ids": [],
+        "cleaned_ids": [
+          "leaf-01",
+          "leaf-02",
+          "bottle-01",
+          "paper-01"
+        ],
+        "cleaned_this_frame": [],
+        "events": []
+      },
+      {
+        "frame_index": 87,
+        "sim_step": 80,
+        "state": "NAVIGATING",
+        "action": "move",
+        "robot_position": [
+          3,
+          4
+        ],
+        "dynamic_obstacles": [
+          {
+            "id": "pedestrian-01",
+            "kind": "pedestrian",
+            "position": [
+              3,
+              6
+            ]
+          }
+        ],
+        "remaining_trash_ids": [],
+        "cleaned_ids": [
+          "leaf-01",
+          "leaf-02",
+          "bottle-01",
+          "paper-01"
+        ],
+        "cleaned_this_frame": [],
+        "events": []
+      },
+      {
+        "frame_index": 88,
+        "sim_step": 81,
+        "state": "NAVIGATING",
+        "action": "move",
+        "robot_position": [
+          4,
+          4
+        ],
+        "dynamic_obstacles": [
+          {
+            "id": "pedestrian-01",
+            "kind": "pedestrian",
+            "position": [
+              4,
+              6
+            ]
+          }
+        ],
+        "remaining_trash_ids": [],
+        "cleaned_ids": [
+          "leaf-01",
+          "leaf-02",
+          "bottle-01",
+          "paper-01"
+        ],
+        "cleaned_this_frame": [],
+        "events": []
+      },
+      {
+        "frame_index": 89,
+        "sim_step": 82,
+        "state": "NAVIGATING",
+        "action": "move",
+        "robot_position": [
+          4,
+          5
+        ],
+        "dynamic_obstacles": [
+          {
+            "id": "pedestrian-01",
+            "kind": "pedestrian",
+            "position": [
+              5,
+              6
+            ]
+          }
+        ],
+        "remaining_trash_ids": [],
+        "cleaned_ids": [
+          "leaf-01",
+          "leaf-02",
+          "bottle-01",
+          "paper-01"
+        ],
+        "cleaned_this_frame": [],
+        "events": []
+      },
+      {
+        "frame_index": 90,
+        "sim_step": 83,
+        "state": "NAVIGATING",
+        "action": "move",
+        "robot_position": [
+          5,
+          5
+        ],
+        "dynamic_obstacles": [
+          {
+            "id": "pedestrian-01",
+            "kind": "pedestrian",
+            "position": [
+              6,
+              6
+            ]
+          }
+        ],
+        "remaining_trash_ids": [],
+        "cleaned_ids": [
+          "leaf-01",
+          "leaf-02",
+          "bottle-01",
+          "paper-01"
+        ],
+        "cleaned_this_frame": [],
+        "events": []
+      },
+      {
+        "frame_index": 91,
+        "sim_step": 84,
+        "state": "NAVIGATING",
+        "action": "move",
+        "robot_position": [
+          6,
+          5
+        ],
+        "dynamic_obstacles": [
+          {
+            "id": "pedestrian-01",
+            "kind": "pedestrian",
+            "position": [
+              7,
+              6
+            ]
+          }
+        ],
+        "remaining_trash_ids": [],
+        "cleaned_ids": [
+          "leaf-01",
+          "leaf-02",
+          "bottle-01",
+          "paper-01"
+        ],
+        "cleaned_this_frame": [],
+        "events": []
+      },
+      {
+        "frame_index": 92,
+        "sim_step": 85,
+        "state": "NAVIGATING",
+        "action": "move",
+        "robot_position": [
+          7,
+          5
+        ],
+        "dynamic_obstacles": [
+          {
+            "id": "pedestrian-01",
+            "kind": "pedestrian",
+            "position": [
+              6,
+              6
+            ]
+          }
+        ],
+        "remaining_trash_ids": [],
+        "cleaned_ids": [
+          "leaf-01",
+          "leaf-02",
+          "bottle-01",
+          "paper-01"
+        ],
+        "cleaned_this_frame": [],
+        "events": []
+      },
+      {
+        "frame_index": 93,
+        "sim_step": 86,
+        "state": "NAVIGATING",
+        "action": "move",
+        "robot_position": [
+          8,
+          5
+        ],
+        "dynamic_obstacles": [
+          {
+            "id": "pedestrian-01",
+            "kind": "pedestrian",
+            "position": [
+              6,
+              6
+            ]
+          }
+        ],
+        "remaining_trash_ids": [],
+        "cleaned_ids": [
+          "leaf-01",
+          "leaf-02",
+          "bottle-01",
+          "paper-01"
+        ],
+        "cleaned_this_frame": [],
+        "events": []
+      },
+      {
+        "frame_index": 94,
+        "sim_step": 87,
+        "state": "NAVIGATING",
+        "action": "move",
+        "robot_position": [
+          9,
+          5
+        ],
+        "dynamic_obstacles": [
+          {
+            "id": "pedestrian-01",
+            "kind": "pedestrian",
+            "position": [
+              5,
+              6
+            ]
+          }
+        ],
+        "remaining_trash_ids": [],
+        "cleaned_ids": [
+          "leaf-01",
+          "leaf-02",
+          "bottle-01",
+          "paper-01"
+        ],
+        "cleaned_this_frame": [],
+        "events": []
+      },
+      {
+        "frame_index": 95,
+        "sim_step": 88,
+        "state": "NAVIGATING",
+        "action": "move",
+        "robot_position": [
+          10,
+          5
+        ],
+        "dynamic_obstacles": [
+          {
+            "id": "pedestrian-01",
+            "kind": "pedestrian",
+            "position": [
+              5,
+              5
+            ]
+          }
+        ],
+        "remaining_trash_ids": [],
+        "cleaned_ids": [
+          "leaf-01",
+          "leaf-02",
+          "bottle-01",
+          "paper-01"
+        ],
+        "cleaned_this_frame": [],
+        "events": []
+      },
+      {
+        "frame_index": 96,
+        "sim_step": 89,
+        "state": "NAVIGATING",
+        "action": "move",
+        "robot_position": [
+          10,
+          6
+        ],
+        "dynamic_obstacles": [
+          {
+            "id": "pedestrian-01",
+            "kind": "pedestrian",
+            "position": [
+              5,
+              6
+            ]
+          }
+        ],
+        "remaining_trash_ids": [],
+        "cleaned_ids": [
+          "leaf-01",
+          "leaf-02",
+          "bottle-01",
+          "paper-01"
+        ],
+        "cleaned_this_frame": [],
+        "events": []
+      },
+      {
+        "frame_index": 97,
+        "sim_step": 90,
+        "state": "NAVIGATING",
+        "action": "move",
+        "robot_position": [
+          9,
+          6
+        ],
+        "dynamic_obstacles": [
+          {
+            "id": "pedestrian-01",
+            "kind": "pedestrian",
+            "position": [
+              3,
+              6
+            ]
+          }
+        ],
+        "remaining_trash_ids": [],
+        "cleaned_ids": [
+          "leaf-01",
+          "leaf-02",
+          "bottle-01",
+          "paper-01"
+        ],
+        "cleaned_this_frame": [],
+        "events": []
+      },
+      {
+        "frame_index": 98,
+        "sim_step": 91,
+        "state": "NAVIGATING",
+        "action": "move",
+        "robot_position": [
+          8,
+          6
+        ],
+        "dynamic_obstacles": [
+          {
+            "id": "pedestrian-01",
+            "kind": "pedestrian",
+            "position": [
+              4,
+              6
+            ]
+          }
+        ],
+        "remaining_trash_ids": [],
+        "cleaned_ids": [
+          "leaf-01",
+          "leaf-02",
+          "bottle-01",
+          "paper-01"
+        ],
+        "cleaned_this_frame": [],
+        "events": []
+      },
+      {
+        "frame_index": 99,
+        "sim_step": 92,
+        "state": "NAVIGATING",
+        "action": "move",
+        "robot_position": [
+          7,
+          6
+        ],
+        "dynamic_obstacles": [
+          {
+            "id": "pedestrian-01",
+            "kind": "pedestrian",
+            "position": [
+              5,
+              6
+            ]
+          }
+        ],
+        "remaining_trash_ids": [],
+        "cleaned_ids": [
+          "leaf-01",
+          "leaf-02",
+          "bottle-01",
+          "paper-01"
+        ],
+        "cleaned_this_frame": [],
+        "events": []
+      },
+      {
+        "frame_index": 100,
+        "sim_step": 93,
+        "state": "REPLANNING",
+        "action": "wait",
+        "robot_position": [
+          7,
+          6
+        ],
+        "dynamic_obstacles": [
+          {
+            "id": "pedestrian-01",
+            "kind": "pedestrian",
+            "position": [
+              6,
+              6
+            ]
+          }
+        ],
+        "remaining_trash_ids": [],
+        "cleaned_ids": [
+          "leaf-01",
+          "leaf-02",
+          "bottle-01",
+          "paper-01"
+        ],
+        "cleaned_this_frame": [],
+        "events": [
+          "AVOIDING -> REPLANNING"
+        ]
+      },
+      {
+        "frame_index": 101,
+        "sim_step": 94,
+        "state": "NAVIGATING",
+        "action": "move",
+        "robot_position": [
+          6,
+          6
+        ],
+        "dynamic_obstacles": [
+          {
+            "id": "pedestrian-01",
+            "kind": "pedestrian",
+            "position": [
+              7,
+              6
+            ]
+          }
+        ],
+        "remaining_trash_ids": [],
+        "cleaned_ids": [
+          "leaf-01",
+          "leaf-02",
+          "bottle-01",
+          "paper-01"
+        ],
+        "cleaned_this_frame": [],
+        "events": []
+      },
+      {
+        "frame_index": 102,
+        "sim_step": 95,
+        "state": "NAVIGATING",
+        "action": "move",
+        "robot_position": [
+          5,
+          6
+        ],
+        "dynamic_obstacles": [
+          {
+            "id": "pedestrian-01",
+            "kind": "pedestrian",
+            "position": [
+              6,
+              6
+            ]
+          }
+        ],
+        "remaining_trash_ids": [],
+        "cleaned_ids": [
+          "leaf-01",
+          "leaf-02",
+          "bottle-01",
+          "paper-01"
+        ],
+        "cleaned_this_frame": [],
+        "events": []
+      },
+      {
+        "frame_index": 103,
+        "sim_step": 96,
+        "state": "NAVIGATING",
+        "action": "move",
+        "robot_position": [
+          4,
+          6
+        ],
+        "dynamic_obstacles": [
+          {
+            "id": "pedestrian-01",
+            "kind": "pedestrian",
+            "position": [
+              6,
+              6
+            ]
+          }
+        ],
+        "remaining_trash_ids": [],
+        "cleaned_ids": [
+          "leaf-01",
+          "leaf-02",
+          "bottle-01",
+          "paper-01"
+        ],
+        "cleaned_this_frame": [],
+        "events": []
+      },
+      {
+        "frame_index": 104,
+        "sim_step": 97,
+        "state": "NAVIGATING",
+        "action": "move",
+        "robot_position": [
+          3,
+          6
+        ],
+        "dynamic_obstacles": [
+          {
+            "id": "pedestrian-01",
+            "kind": "pedestrian",
+            "position": [
+              5,
+              6
+            ]
+          }
+        ],
+        "remaining_trash_ids": [],
+        "cleaned_ids": [
+          "leaf-01",
+          "leaf-02",
+          "bottle-01",
+          "paper-01"
+        ],
+        "cleaned_this_frame": [],
+        "events": []
+      },
+      {
+        "frame_index": 105,
+        "sim_step": 98,
+        "state": "NAVIGATING",
+        "action": "move",
+        "robot_position": [
+          2,
+          6
+        ],
+        "dynamic_obstacles": [
+          {
+            "id": "pedestrian-01",
+            "kind": "pedestrian",
+            "position": [
+              5,
+              5
+            ]
+          }
+        ],
+        "remaining_trash_ids": [],
+        "cleaned_ids": [
+          "leaf-01",
+          "leaf-02",
+          "bottle-01",
+          "paper-01"
+        ],
+        "cleaned_this_frame": [],
+        "events": []
+      },
+      {
+        "frame_index": 106,
+        "sim_step": 99,
+        "state": "NAVIGATING",
+        "action": "move",
+        "robot_position": [
+          1,
+          6
+        ],
+        "dynamic_obstacles": [
+          {
+            "id": "pedestrian-01",
+            "kind": "pedestrian",
+            "position": [
+              5,
+              6
+            ]
+          }
+        ],
+        "remaining_trash_ids": [],
+        "cleaned_ids": [
+          "leaf-01",
+          "leaf-02",
+          "bottle-01",
+          "paper-01"
+        ],
+        "cleaned_this_frame": [],
+        "events": []
+      },
+      {
+        "frame_index": 107,
+        "sim_step": 99,
+        "state": "RETURNING",
+        "action": "transition",
+        "robot_position": [
+          1,
+          6
+        ],
+        "dynamic_obstacles": [
+          {
+            "id": "pedestrian-01",
+            "kind": "pedestrian",
+            "position": [
+              5,
+              6
+            ]
+          }
+        ],
+        "remaining_trash_ids": [],
+        "cleaned_ids": [
+          "leaf-01",
+          "leaf-02",
+          "bottle-01",
+          "paper-01"
+        ],
+        "cleaned_this_frame": [],
+        "events": [
+          "NAVIGATING -> RETURNING"
+        ]
+      },
+      {
+        "frame_index": 108,
+        "sim_step": 100,
+        "state": "RETURNING",
+        "action": "move",
+        "robot_position": [
+          1,
+          5
+        ],
+        "dynamic_obstacles": [
+          {
+            "id": "pedestrian-01",
+            "kind": "pedestrian",
+            "position": [
+              3,
+              6
+            ]
+          }
+        ],
+        "remaining_trash_ids": [],
+        "cleaned_ids": [
+          "leaf-01",
+          "leaf-02",
+          "bottle-01",
+          "paper-01"
+        ],
+        "cleaned_this_frame": [],
+        "events": []
+      },
+      {
+        "frame_index": 109,
+        "sim_step": 101,
+        "state": "RETURNING",
+        "action": "move",
+        "robot_position": [
+          1,
+          4
+        ],
+        "dynamic_obstacles": [
+          {
+            "id": "pedestrian-01",
+            "kind": "pedestrian",
+            "position": [
+              4,
+              6
+            ]
+          }
+        ],
+        "remaining_trash_ids": [],
+        "cleaned_ids": [
+          "leaf-01",
+          "leaf-02",
+          "bottle-01",
+          "paper-01"
+        ],
+        "cleaned_this_frame": [],
+        "events": []
+      },
+      {
+        "frame_index": 110,
+        "sim_step": 102,
+        "state": "RETURNING",
+        "action": "move",
+        "robot_position": [
+          1,
+          3
+        ],
+        "dynamic_obstacles": [
+          {
+            "id": "pedestrian-01",
+            "kind": "pedestrian",
+            "position": [
+              5,
+              6
+            ]
+          }
+        ],
+        "remaining_trash_ids": [],
+        "cleaned_ids": [
+          "leaf-01",
+          "leaf-02",
+          "bottle-01",
+          "paper-01"
+        ],
+        "cleaned_this_frame": [],
+        "events": []
+      },
+      {
+        "frame_index": 111,
+        "sim_step": 103,
+        "state": "RETURNING",
+        "action": "move",
+        "robot_position": [
+          1,
+          2
+        ],
+        "dynamic_obstacles": [
+          {
+            "id": "pedestrian-01",
+            "kind": "pedestrian",
+            "position": [
+              6,
+              6
+            ]
+          }
+        ],
+        "remaining_trash_ids": [],
+        "cleaned_ids": [
+          "leaf-01",
+          "leaf-02",
+          "bottle-01",
+          "paper-01"
+        ],
+        "cleaned_this_frame": [],
+        "events": []
+      },
+      {
+        "frame_index": 112,
+        "sim_step": 104,
+        "state": "RETURNING",
+        "action": "move",
+        "robot_position": [
+          1,
+          1
+        ],
+        "dynamic_obstacles": [
+          {
+            "id": "pedestrian-01",
+            "kind": "pedestrian",
+            "position": [
+              7,
+              6
+            ]
+          }
+        ],
+        "remaining_trash_ids": [],
+        "cleaned_ids": [
+          "leaf-01",
+          "leaf-02",
+          "bottle-01",
+          "paper-01"
+        ],
+        "cleaned_this_frame": [],
+        "events": []
+      },
+      {
+        "frame_index": 113,
+        "sim_step": 104,
+        "state": "COMPLETED",
+        "action": "terminal",
+        "robot_position": [
+          1,
+          1
+        ],
+        "dynamic_obstacles": [
+          {
+            "id": "pedestrian-01",
+            "kind": "pedestrian",
+            "position": [
+              7,
+              6
+            ]
+          }
+        ],
+        "remaining_trash_ids": [],
+        "cleaned_ids": [
+          "leaf-01",
+          "leaf-02",
+          "bottle-01",
+          "paper-01"
+        ],
+        "cleaned_this_frame": [],
+        "events": [
+          "RETURNING -> COMPLETED"
+        ]
+      }
+    ]
+  }
+}

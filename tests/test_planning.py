@@ -2,7 +2,7 @@ import unittest
 
 from smartclean_sim.grid import GridWorld
 from smartclean_sim.models import GridPosition
-from smartclean_sim.planning import AStarPlanner, NoPathError
+from smartclean_sim.planning import AStarPlanner, CoveragePlanner, NoPathError
 
 
 class AStarPlannerTests(unittest.TestCase):
@@ -85,6 +85,115 @@ class AStarPlannerTests(unittest.TestCase):
 
         self.assertNotIn(GridPosition(1, 0), path)
         self.assertEqual(len(path), 5)
+
+
+class CoveragePlannerTests(unittest.TestCase):
+    def setUp(self):
+        self.planner = CoveragePlanner()
+
+    def test_open_grid_uses_deterministic_horizontal_tie_break(self):
+        world = GridWorld(
+            width=4,
+            height=3,
+            start=GridPosition(0, 0),
+            dock=GridPosition(0, 0),
+        )
+
+        path = self.planner.plan(world, world.start)
+
+        self.assertEqual(
+            path,
+            [
+                GridPosition(0, 0),
+                GridPosition(1, 0),
+                GridPosition(2, 0),
+                GridPosition(3, 0),
+                GridPosition(3, 1),
+                GridPosition(2, 1),
+                GridPosition(1, 1),
+                GridPosition(0, 1),
+                GridPosition(0, 2),
+                GridPosition(1, 2),
+                GridPosition(2, 2),
+                GridPosition(3, 2),
+            ],
+        )
+
+    def test_shorter_vertical_serpentine_candidate_is_selected(self):
+        world = GridWorld(
+            width=5,
+            height=2,
+            start=GridPosition(0, 0),
+            dock=GridPosition(0, 0),
+            areas={
+                "corners": {
+                    GridPosition(0, 0),
+                    GridPosition(4, 0),
+                    GridPosition(0, 1),
+                    GridPosition(4, 1),
+                }
+            },
+        )
+
+        path = self.planner.plan(world, world.start, "corners")
+
+        self.assertEqual(len(path), 7)
+        self.assertEqual(path[0], world.start)
+        self.assertTrue(set(world.areas["corners"]).issubset(path))
+        for current, following in zip(path, path[1:]):
+            self.assertEqual(current.manhattan_distance(following), 1)
+
+    def test_coverage_avoids_obstacles_and_requested_hazards(self):
+        obstacle = GridPosition(2, 1)
+        water = GridPosition(2, 0)
+        world = GridWorld(
+            width=5,
+            height=3,
+            start=GridPosition(0, 1),
+            dock=GridPosition(0, 1),
+            static_obstacles={obstacle},
+            hazards={"water": {water}},
+            areas={
+                "gate": {
+                    GridPosition(0, 1),
+                    obstacle,
+                    water,
+                    GridPosition(4, 1),
+                }
+            },
+        )
+
+        path = self.planner.plan(
+            world,
+            world.start,
+            "gate",
+            avoid_types=("water",),
+        )
+
+        targets = set(world.traversable_area_cells("gate", ("water",)))
+        self.assertTrue(targets.issubset(path))
+        self.assertNotIn(obstacle, path)
+        self.assertNotIn(water, path)
+        for current, following in zip(path, path[1:]):
+            self.assertEqual(current.manhattan_distance(following), 1)
+
+    def test_unreachable_area_raises_no_path(self):
+        wall = {
+            GridPosition(1, 0),
+            GridPosition(1, 1),
+            GridPosition(1, 2),
+        }
+        world = GridWorld(
+            width=3,
+            height=3,
+            start=GridPosition(0, 1),
+            dock=GridPosition(0, 1),
+            static_obstacles=wall,
+            areas={"far_side": {GridPosition(2, 1)}},
+        )
+
+        with self.assertRaisesRegex(NoPathError, "no coverage path"):
+            self.planner.plan(world, world.start, "far_side")
 
 
 if __name__ == "__main__":

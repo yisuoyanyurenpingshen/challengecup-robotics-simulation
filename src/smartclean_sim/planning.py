@@ -91,3 +91,114 @@ class AStarPlanner:
             path.append(current)
         path.reverse()
         return path
+
+
+class CoveragePlanner:
+    """Build a deterministic full-coverage route over a named grid area.
+
+    Horizontal and vertical serpentine orders are connected with A*.  The shorter
+    feasible route is selected, with horizontal order winning deterministic ties.
+    """
+
+    def __init__(self, connector: Optional[AStarPlanner] = None) -> None:
+        self.connector = connector or AStarPlanner()
+
+    def plan(
+        self,
+        world: GridWorld,
+        start: GridPosition,
+        target_area: str = "all",
+        avoid_types: Iterable[str] = (),
+    ) -> List[GridPosition]:
+        avoided = tuple(avoid_types)
+        targets = world.traversable_area_cells(target_area, avoided)
+        if not targets:
+            raise NoPathError(
+                "target area has no traversable cells: {}".format(target_area)
+            )
+        if world.is_blocked(start, avoided):
+            raise NoPathError("start position is blocked: {}".format(start))
+
+        orders = (
+            self._horizontal_serpentine(targets),
+            self._vertical_serpentine(targets),
+        )
+        candidates: List[Tuple[int, List[GridPosition]]] = []
+        failures: List[NoPathError] = []
+        for preference, order in enumerate(orders):
+            try:
+                route = self._connect_order(world, start, order, avoided)
+            except NoPathError as exc:
+                failures.append(exc)
+                continue
+            candidates.append((preference, route))
+
+        if not candidates:
+            message = "no coverage path from {} through area {}".format(
+                start, target_area
+            )
+            if failures:
+                raise NoPathError(message) from failures[0]
+            raise NoPathError(message)
+
+        _, route = min(candidates, key=lambda item: (len(item[1]), item[0]))
+        return route
+
+    def _connect_order(
+        self,
+        world: GridWorld,
+        start: GridPosition,
+        order: Tuple[GridPosition, ...],
+        avoid_types: Tuple[str, ...],
+    ) -> List[GridPosition]:
+        targets = set(order)
+        covered: Set[GridPosition] = {start} & targets
+        route = [start]
+        current = start
+
+        for goal in order:
+            if goal in covered:
+                continue
+            connector = self.connector.plan(
+                world,
+                current,
+                goal,
+                avoid_types=avoid_types,
+            )
+            route.extend(connector[1:])
+            covered.update(position for position in connector if position in targets)
+            current = goal
+
+        return route
+
+    @staticmethod
+    def _horizontal_serpentine(
+        targets: Tuple[GridPosition, ...],
+    ) -> Tuple[GridPosition, ...]:
+        rows: Dict[int, List[GridPosition]] = {}
+        for position in targets:
+            rows.setdefault(position.y, []).append(position)
+
+        ordered: List[GridPosition] = []
+        for row_index, y in enumerate(sorted(rows)):
+            row = sorted(rows[y], key=lambda position: position.x)
+            if row_index % 2:
+                row.reverse()
+            ordered.extend(row)
+        return tuple(ordered)
+
+    @staticmethod
+    def _vertical_serpentine(
+        targets: Tuple[GridPosition, ...],
+    ) -> Tuple[GridPosition, ...]:
+        columns: Dict[int, List[GridPosition]] = {}
+        for position in targets:
+            columns.setdefault(position.x, []).append(position)
+
+        ordered: List[GridPosition] = []
+        for column_index, x in enumerate(sorted(columns)):
+            column = sorted(columns[x], key=lambda position: position.y)
+            if column_index % 2:
+                column.reverse()
+            ordered.extend(column)
+        return tuple(ordered)

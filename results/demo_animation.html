@@ -1,0 +1,749 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>SmartClean-Sim · teaching-building-gate</title>
+  <style>
+    :root {
+      color-scheme: dark;
+      --page: #071018;
+      --panel: #101d28;
+      --panel-soft: #152634;
+      --line: #284154;
+      --text: #ecf7ff;
+      --muted: #9eb2c1;
+      --accent: #50e3a4;
+      --accent-strong: #20bb7c;
+      --danger: #ff6b6b;
+      --water: #37a9d6;
+      --obstacle: #334a5c;
+      --route: #f7c85d;
+    }
+
+    * { box-sizing: border-box; }
+
+    body {
+      margin: 0;
+      min-height: 100vh;
+      background:
+        radial-gradient(circle at 12% 5%, #183245 0, transparent 34rem),
+        var(--page);
+      color: var(--text);
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+    }
+
+    .app {
+      width: min(1180px, calc(100% - 28px));
+      margin: 0 auto;
+      padding: 28px 0 40px;
+    }
+
+    header {
+      display: flex;
+      align-items: flex-end;
+      justify-content: space-between;
+      gap: 20px;
+      margin-bottom: 18px;
+    }
+
+    h1 {
+      margin: 0;
+      font-size: clamp(1.35rem, 3vw, 2.15rem);
+      letter-spacing: .015em;
+    }
+
+    .subtitle {
+      margin: 7px 0 0;
+      color: var(--muted);
+      font-size: .93rem;
+    }
+
+    .status-pill {
+      flex: 0 0 auto;
+      border: 1px solid color-mix(in srgb, var(--accent) 52%, transparent);
+      border-radius: 999px;
+      padding: 7px 12px;
+      background: color-mix(in srgb, var(--accent) 12%, transparent);
+      color: var(--accent);
+      font-size: .82rem;
+      font-weight: 700;
+    }
+
+    .layout {
+      display: grid;
+      grid-template-columns: minmax(0, 1fr) 290px;
+      gap: 16px;
+      align-items: start;
+    }
+
+    .panel {
+      border: 1px solid var(--line);
+      border-radius: 16px;
+      background: color-mix(in srgb, var(--panel) 94%, transparent);
+      box-shadow: 0 18px 54px rgba(0, 0, 0, .24);
+    }
+
+    .canvas-panel { padding: 14px; }
+
+    .canvas-shell {
+      overflow: hidden;
+      width: 100%;
+      border: 1px solid var(--line);
+      border-radius: 11px;
+      background: #0a151e;
+    }
+
+    canvas {
+      display: block;
+      width: 100%;
+      min-height: 220px;
+      touch-action: none;
+    }
+
+    .controls {
+      display: grid;
+      grid-template-columns: auto auto auto auto minmax(110px, 1fr) auto;
+      gap: 8px;
+      align-items: center;
+      margin-top: 13px;
+    }
+
+    button, select {
+      min-height: 36px;
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      background: var(--panel-soft);
+      color: var(--text);
+      font: inherit;
+    }
+
+    button {
+      min-width: 42px;
+      padding: 7px 11px;
+      cursor: pointer;
+    }
+
+    button:hover:not(:disabled), button:focus-visible, select:focus-visible {
+      border-color: var(--accent);
+      outline: none;
+    }
+
+    button:disabled { cursor: default; opacity: .38; }
+
+    #playButton {
+      border-color: var(--accent-strong);
+      background: var(--accent-strong);
+      color: #04150e;
+      font-weight: 800;
+    }
+
+    input[type="range"] {
+      width: 100%;
+      accent-color: var(--accent);
+    }
+
+    select { padding: 6px 8px; }
+
+    .frame-info {
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 8px;
+      margin-top: 11px;
+      color: var(--muted);
+      font-size: .82rem;
+    }
+
+    .event-box {
+      min-height: 43px;
+      margin-top: 10px;
+      padding: 10px 12px;
+      border-radius: 9px;
+      background: #0b1822;
+      color: #c7d9e5;
+      font-size: .86rem;
+      line-height: 1.45;
+    }
+
+    aside { padding: 15px; }
+
+    aside h2 {
+      margin: 0 0 11px;
+      font-size: .95rem;
+      letter-spacing: .04em;
+      color: var(--muted);
+      text-transform: uppercase;
+    }
+
+    .metrics {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 8px;
+    }
+
+    .metric {
+      min-height: 72px;
+      padding: 10px;
+      border: 1px solid var(--line);
+      border-radius: 10px;
+      background: #0c1923;
+    }
+
+    .metric span {
+      display: block;
+      color: var(--muted);
+      font-size: .73rem;
+    }
+
+    .metric strong {
+      display: block;
+      margin-top: 6px;
+      overflow-wrap: anywhere;
+      font-size: 1rem;
+    }
+
+    .legend {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 9px 12px;
+      margin-top: 9px;
+      color: #c3d3de;
+      font-size: .8rem;
+    }
+
+    .legend div { display: flex; align-items: center; gap: 7px; }
+
+    .swatch {
+      width: 13px;
+      height: 13px;
+      flex: 0 0 auto;
+      border: 2px solid transparent;
+      border-radius: 3px;
+      background: var(--obstacle);
+    }
+
+    .swatch.water { background: color-mix(in srgb, var(--water) 70%, #071018); }
+    .swatch.route { height: 4px; border: 0; border-radius: 5px; background: var(--route); }
+    .swatch.trash { border-radius: 50%; background: #f39b4a; }
+    .swatch.dock { border-color: #7da9ff; background: transparent; transform: rotate(45deg); }
+    .swatch.dynamic { border-radius: 50%; background: var(--danger); }
+    .swatch.robot { border-radius: 50%; background: var(--accent); }
+
+    .shortcut {
+      margin: 17px 0 0;
+      color: var(--muted);
+      font-size: .76rem;
+      line-height: 1.55;
+    }
+
+    @media (max-width: 820px) {
+      .layout { grid-template-columns: 1fr; }
+      .controls { grid-template-columns: auto auto auto auto 1fr; }
+      .controls select { grid-column: 1 / -1; width: 100%; }
+    }
+
+    @media (max-width: 520px) {
+      .app { width: min(100% - 16px, 1180px); padding-top: 16px; }
+      header { align-items: flex-start; flex-direction: column; }
+      .controls { grid-template-columns: repeat(4, 1fr); }
+      .controls input { grid-column: 1 / -1; grid-row: 2; }
+      .frame-info { grid-template-columns: 1fr; }
+    }
+  </style>
+</head>
+<body>
+  <main class="app">
+    <header>
+      <div>
+        <h1>SmartClean-Sim · teaching-building-gate</h1>
+        <p class="subtitle">离线二维清扫过程回放 · 栅格坐标原点位于左上角</p>
+      </div>
+      <div class="status-pill" id="statePill">准备中</div>
+    </header>
+
+    <div class="layout">
+      <section class="panel canvas-panel" aria-label="仿真动画">
+        <div class="canvas-shell">
+          <canvas id="worldCanvas" role="img" aria-label="清扫机器人栅格动画"></canvas>
+        </div>
+
+        <div class="controls" aria-label="回放控制">
+          <button id="resetButton" type="button" title="回到第一帧">重置</button>
+          <button id="previousButton" type="button" title="上一帧">后退</button>
+          <button id="playButton" type="button" aria-pressed="false">播放</button>
+          <button id="nextButton" type="button" title="下一帧">前进</button>
+          <input id="timeline" type="range" min="0" max="0" value="0" step="1" aria-label="动画时间轴">
+          <select id="speedSelect" aria-label="播放速度">
+            <option value="0.5">0.5×</option>
+            <option value="1" selected>1×</option>
+            <option value="2">2×</option>
+            <option value="4">4×</option>
+          </select>
+        </div>
+
+        <div class="frame-info">
+          <span id="frameLabel">帧 0 / 0</span>
+          <span id="stepLabel">仿真步 0</span>
+          <span id="actionLabel">动作 —</span>
+        </div>
+        <div class="event-box" id="eventText" aria-live="polite">等待轨迹数据</div>
+      </section>
+
+      <aside class="panel">
+        <h2>运行状态</h2>
+        <div class="metrics">
+          <div class="metric"><span>当前阶段</span><strong id="stateMetric">—</strong></div>
+          <div class="metric"><span>清扫进度</span><strong id="cleanedMetric">0 / 0</strong></div>
+          <div class="metric"><span>路径长度</span><strong id="pathMetric">0 格</strong></div>
+          <div class="metric"><span>重规划</span><strong id="replanMetric">0 次</strong></div>
+          <div class="metric"><span>碰撞</span><strong id="collisionMetric">0 次</strong></div>
+          <div class="metric"><span>最终结果</span><strong id="resultMetric">—</strong></div>
+        </div>
+
+        <h2 style="margin-top: 20px">图例</h2>
+        <div class="legend">
+          <div><i class="swatch"></i>静态障碍</div>
+          <div><i class="swatch water"></i>危险区域</div>
+          <div><i class="swatch route"></i>已行轨迹</div>
+          <div><i class="swatch trash"></i>待清垃圾</div>
+          <div><i class="swatch dock"></i>充电点</div>
+          <div><i class="swatch dynamic"></i>动态障碍</div>
+          <div><i class="swatch robot"></i>清扫机器人</div>
+        </div>
+        <p class="shortcut">快捷键：空格播放或暂停，左右方向键逐帧查看。所有场景和轨迹数据均已嵌入本文件。</p>
+      </aside>
+    </div>
+  </main>
+
+  <script id="simulation-data" type="application/json">{"result":{"cleaned_ids":["leaf-01","leaf-02","bottle-01","paper-01"],"events":["IDLE -\u003e PLANNING","PLANNING -\u003e NAVIGATING (4 targets)","NAVIGATING -\u003e CLEANING (leaf-01)","CLEANING -\u003e NAVIGATING","NAVIGATING -\u003e CLEANING (leaf-02)","CLEANING -\u003e NAVIGATING","AVOIDING -\u003e REPLANNING","NAVIGATING -\u003e CLEANING (bottle-01)","CLEANING -\u003e NAVIGATING","NAVIGATING -\u003e CLEANING (paper-01)","CLEANING -\u003e NAVIGATING","NAVIGATING -\u003e COVERAGE_PLANNING","COVERAGE_PLANNING -\u003e NAVIGATING (53 cells)","AVOIDING -\u003e REPLANNING","NAVIGATING -\u003e RETURNING","RETURNING -\u003e COMPLETED"],"final_position":[1,1],"metrics":{"cleaned_targets":4,"collisions":0,"completed":true,"navigable_cells":53,"path_length_cells":102,"replans":2,"returned_to_dock":true,"total_targets":4,"unique_visited_cells":53},"rates":{"completion_rate":1.0,"coverage_rate":1.0},"status":"COMPLETED","trace":{"frames":[{"action":"initial","cleaned_ids":[],"cleaned_this_frame":[],"dynamic_obstacles":[{"id":"pedestrian-01","kind":"pedestrian","position":[3,6]}],"events":["IDLE -\u003e PLANNING"],"frame_index":0,"remaining_trash_ids":["bottle-01","leaf-01","leaf-02","paper-01"],"robot_position":[1,1],"sim_step":0,"state":"PLANNING"},{"action":"transition","cleaned_ids":[],"cleaned_this_frame":[],"dynamic_obstacles":[{"id":"pedestrian-01","kind":"pedestrian","position":[3,6]}],"events":["PLANNING -\u003e NAVIGATING (4 targets)"],"frame_index":1,"remaining_trash_ids":["bottle-01","leaf-01","leaf-02","paper-01"],"robot_position":[1,1],"sim_step":0,"state":"NAVIGATING"},{"action":"move","cleaned_ids":[],"cleaned_this_frame":[],"dynamic_obstacles":[{"id":"pedestrian-01","kind":"pedestrian","position":[4,6]}],"events":[],"frame_index":2,"remaining_trash_ids":["bottle-01","leaf-01","leaf-02","paper-01"],"robot_position":[2,1],"sim_step":1,"state":"NAVIGATING"},{"action":"move","cleaned_ids":[],"cleaned_this_frame":[],"dynamic_obstacles":[{"id":"pedestrian-01","kind":"pedestrian","position":[5,6]}],"events":[],"frame_index":3,"remaining_trash_ids":["bottle-01","leaf-01","leaf-02","paper-01"],"robot_position":[3,1],"sim_step":2,"state":"NAVIGATING"},{"action":"move","cleaned_ids":[],"cleaned_this_frame":[],"dynamic_obstacles":[{"id":"pedestrian-01","kind":"pedestrian","position":[6,6]}],"events":[],"frame_index":4,"remaining_trash_ids":["bottle-01","leaf-01","leaf-02","paper-01"],"robot_position":[3,2],"sim_step":3,"state":"NAVIGATING"},{"action":"clean","cleaned_ids":["leaf-01"],"cleaned_this_frame":["leaf-01"],"dynamic_obstacles":[{"id":"pedestrian-01","kind":"pedestrian","position":[6,6]}],"events":["NAVIGATING -\u003e CLEANING (leaf-01)"],"frame_index":5,"remaining_trash_ids":["bottle-01","leaf-02","paper-01"],"robot_position":[3,2],"sim_step":3,"state":"CLEANING"},{"action":"move","cleaned_ids":["leaf-01"],"cleaned_this_frame":[],"dynamic_obstacles":[{"id":"pedestrian-01","kind":"pedestrian","position":[7,6]}],"events":[],"frame_index":6,"remaining_trash_ids":["bottle-01","leaf-02","paper-01"],"robot_position":[3,3],"sim_step":4,"state":"NAVIGATING"},{"action":"move","cleaned_ids":["leaf-01"],"cleaned_this_frame":[],"dynamic_obstacles":[{"id":"pedestrian-01","kind":"pedestrian","position":[6,6]}],"events":[],"frame_index":7,"remaining_trash_ids":["bottle-01","leaf-02","paper-01"],"robot_position":[3,4],"sim_step":5,"state":"NAVIGATING"},{"action":"move","cleaned_ids":["leaf-01"],"cleaned_this_frame":[],"dynamic_obstacles":[{"id":"pedestrian-01","kind":"pedestrian","position":[6,6]}],"events":[],"frame_index":8,"remaining_trash_ids":["bottle-01","leaf-02","paper-01"],"robot_position":[3,5],"sim_step":6,"state":"NAVIGATING"},{"action":"clean","cleaned_ids":["leaf-01","leaf-02"],"cleaned_this_frame":["leaf-02"],"dynamic_obstacles":[{"id":"pedestrian-01","kind":"pedestrian","position":[6,6]}],"events":["NAVIGATING -\u003e CLEANING (leaf-02)"],"frame_index":9,"remaining_trash_ids":["bottle-01","paper-01"],"robot_position":[3,5],"sim_step":6,"state":"CLEANING"},{"action":"move","cleaned_ids":["leaf-01","leaf-02"],"cleaned_this_frame":[],"dynamic_obstacles":[{"id":"pedestrian-01","kind":"pedestrian","position":[5,6]}],"events":[],"frame_index":10,"remaining_trash_ids":["bottle-01","paper-01"],"robot_position":[4,5],"sim_step":7,"state":"NAVIGATING"},{"action":"wait","cleaned_ids":["leaf-01","leaf-02"],"cleaned_this_frame":[],"dynamic_obstacles":[{"id":"pedestrian-01","kind":"pedestrian","position":[5,5]}],"events":["AVOIDING -\u003e REPLANNING"],"frame_index":11,"remaining_trash_ids":["bottle-01","paper-01"],"robot_position":[4,5],"sim_step":8,"state":"REPLANNING"},{"action":"move","cleaned_ids":["leaf-01","leaf-02"],"cleaned_this_frame":[],"dynamic_obstacles":[{"id":"pedestrian-01","kind":"pedestrian","position":[5,6]}],"events":[],"frame_index":12,"remaining_trash_ids":["bottle-01","paper-01"],"robot_position":[4,4],"sim_step":9,"state":"NAVIGATING"},{"action":"move","cleaned_ids":["leaf-01","leaf-02"],"cleaned_this_frame":[],"dynamic_obstacles":[{"id":"pedestrian-01","kind":"pedestrian","position":[3,6]}],"events":[],"frame_index":13,"remaining_trash_ids":["bottle-01","paper-01"],"robot_position":[4,3],"sim_step":10,"state":"NAVIGATING"},{"action":"move","cleaned_ids":["leaf-01","leaf-02"],"cleaned_this_frame":[],"dynamic_obstacles":[{"id":"pedestrian-01","kind":"pedestrian","position":[4,6]}],"events":[],"frame_index":14,"remaining_trash_ids":["bottle-01","paper-01"],"robot_position":[4,2],"sim_step":11,"state":"NAVIGATING"},{"action":"move","cleaned_ids":["leaf-01","leaf-02"],"cleaned_this_frame":[],"dynamic_obstacles":[{"id":"pedestrian-01","kind":"pedestrian","position":[5,6]}],"events":[],"frame_index":15,"remaining_trash_ids":["bottle-01","paper-01"],"robot_position":[4,1],"sim_step":12,"state":"NAVIGATING"},{"action":"move","cleaned_ids":["leaf-01","leaf-02"],"cleaned_this_frame":[],"dynamic_obstacles":[{"id":"pedestrian-01","kind":"pedestrian","position":[6,6]}],"events":[],"frame_index":16,"remaining_trash_ids":["bottle-01","paper-01"],"robot_position":[5,1],"sim_step":13,"state":"NAVIGATING"},{"action":"move","cleaned_ids":["leaf-01","leaf-02"],"cleaned_this_frame":[],"dynamic_obstacles":[{"id":"pedestrian-01","kind":"pedestrian","position":[7,6]}],"events":[],"frame_index":17,"remaining_trash_ids":["bottle-01","paper-01"],"robot_position":[6,1],"sim_step":14,"state":"NAVIGATING"},{"action":"move","cleaned_ids":["leaf-01","leaf-02"],"cleaned_this_frame":[],"dynamic_obstacles":[{"id":"pedestrian-01","kind":"pedestrian","position":[6,6]}],"events":[],"frame_index":18,"remaining_trash_ids":["bottle-01","paper-01"],"robot_position":[7,1],"sim_step":15,"state":"NAVIGATING"},{"action":"move","cleaned_ids":["leaf-01","leaf-02"],"cleaned_this_frame":[],"dynamic_obstacles":[{"id":"pedestrian-01","kind":"pedestrian","position":[6,6]}],"events":[],"frame_index":19,"remaining_trash_ids":["bottle-01","paper-01"],"robot_position":[8,1],"sim_step":16,"state":"NAVIGATING"},{"action":"move","cleaned_ids":["leaf-01","leaf-02"],"cleaned_this_frame":[],"dynamic_obstacles":[{"id":"pedestrian-01","kind":"pedestrian","position":[5,6]}],"events":[],"frame_index":20,"remaining_trash_ids":["bottle-01","paper-01"],"robot_position":[9,1],"sim_step":17,"state":"NAVIGATING"},{"action":"move","cleaned_ids":["leaf-01","leaf-02"],"cleaned_this_frame":[],"dynamic_obstacles":[{"id":"pedestrian-01","kind":"pedestrian","position":[5,5]}],"events":[],"frame_index":21,"remaining_trash_ids":["bottle-01","paper-01"],"robot_position":[9,2],"sim_step":18,"state":"NAVIGATING"},{"action":"clean","cleaned_ids":["leaf-01","leaf-02","bottle-01"],"cleaned_this_frame":["bottle-01"],"dynamic_obstacles":[{"id":"pedestrian-01","kind":"pedestrian","position":[5,5]}],"events":["NAVIGATING -\u003e CLEANING (bottle-01)"],"frame_index":22,"remaining_trash_ids":["paper-01"],"robot_position":[9,2],"sim_step":18,"state":"CLEANING"},{"action":"move","cleaned_ids":["leaf-01","leaf-02","bottle-01"],"cleaned_this_frame":[],"dynamic_obstacles":[{"id":"pedestrian-01","kind":"pedestrian","position":[5,6]}],"events":[],"frame_index":23,"remaining_trash_ids":["paper-01"],"robot_position":[9,3],"sim_step":19,"state":"NAVIGATING"},{"action":"move","cleaned_ids":["leaf-01","leaf-02","bottle-01"],"cleaned_this_frame":[],"dynamic_obstacles":[{"id":"pedestrian-01","kind":"pedestrian","position":[3,6]}],"events":[],"frame_index":24,"remaining_trash_ids":["paper-01"],"robot_position":[9,4],"sim_step":20,"state":"NAVIGATING"},{"action":"move","cleaned_ids":["leaf-01","leaf-02","bottle-01"],"cleaned_this_frame":[],"dynamic_obstacles":[{"id":"pedestrian-01","kind":"pedestrian","position":[4,6]}],"events":[],"frame_index":25,"remaining_trash_ids":["paper-01"],"robot_position":[9,5],"sim_step":21,"state":"NAVIGATING"},{"action":"clean","cleaned_ids":["leaf-01","leaf-02","bottle-01","paper-01"],"cleaned_this_frame":["paper-01"],"dynamic_obstacles":[{"id":"pedestrian-01","kind":"pedestrian","position":[4,6]}],"events":["NAVIGATING -\u003e CLEANING (paper-01)"],"frame_index":26,"remaining_trash_ids":[],"robot_position":[9,5],"sim_step":21,"state":"CLEANING"},{"action":"transition","cleaned_ids":["leaf-01","leaf-02","bottle-01","paper-01"],"cleaned_this_frame":[],"dynamic_obstacles":[{"id":"pedestrian-01","kind":"pedestrian","position":[4,6]}],"events":["NAVIGATING -\u003e COVERAGE_PLANNING"],"frame_index":27,"remaining_trash_ids":[],"robot_position":[9,5],"sim_step":21,"state":"PLANNING"},{"action":"transition","cleaned_ids":["leaf-01","leaf-02","bottle-01","paper-01"],"cleaned_this_frame":[],"dynamic_obstacles":[{"id":"pedestrian-01","kind":"pedestrian","position":[4,6]}],"events":["COVERAGE_PLANNING -\u003e NAVIGATING (53 cells)"],"frame_index":28,"remaining_trash_ids":[],"robot_position":[9,5],"sim_step":21,"state":"NAVIGATING"},{"action":"move","cleaned_ids":["leaf-01","leaf-02","bottle-01","paper-01"],"cleaned_this_frame":[],"dynamic_obstacles":[{"id":"pedestrian-01","kind":"pedestrian","position":[5,6]}],"events":[],"frame_index":29,"remaining_trash_ids":[],"robot_position":[8,5],"sim_step":22,"state":"NAVIGATING"},{"action":"move","cleaned_ids":["leaf-01","leaf-02","bottle-01","paper-01"],"cleaned_this_frame":[],"dynamic_obstacles":[{"id":"pedestrian-01","kind":"pedestrian","position":[6,6]}],"events":[],"frame_index":30,"remaining_trash_ids":[],"robot_position":[7,5],"sim_step":23,"state":"NAVIGATING"},{"action":"move","cleaned_ids":["leaf-01","leaf-02","bottle-01","paper-01"],"cleaned_this_frame":[],"dynamic_obstacles":[{"id":"pedestrian-01","kind":"pedestrian","position":[7,6]}],"events":[],"frame_index":31,"remaining_trash_ids":[],"robot_position":[6,5],"sim_step":24,"state":"NAVIGATING"},{"action":"move","cleaned_ids":["leaf-01","leaf-02","bottle-01","paper-01"],"cleaned_this_frame":[],"dynamic_obstacles":[{"id":"pedestrian-01","kind":"pedestrian","position":[6,6]}],"events":[],"frame_index":32,"remaining_trash_ids":[],"robot_position":[5,5],"sim_step":25,"state":"NAVIGATING"},{"action":"move","cleaned_ids":["leaf-01","leaf-02","bottle-01","paper-01"],"cleaned_this_frame":[],"dynamic_obstacles":[{"id":"pedestrian-01","kind":"pedestrian","position":[6,6]}],"events":[],"frame_index":33,"remaining_trash_ids":[],"robot_position":[4,5],"sim_step":26,"state":"NAVIGATING"},{"action":"move","cleaned_ids":["leaf-01","leaf-02","bottle-01","paper-01"],"cleaned_this_frame":[],"dynamic_obstacles":[{"id":"pedestrian-01","kind":"pedestrian","position":[5,6]}],"events":[],"frame_index":34,"remaining_trash_ids":[],"robot_position":[3,5],"sim_step":27,"state":"NAVIGATING"},{"action":"move","cleaned_ids":["leaf-01","leaf-02","bottle-01","paper-01"],"cleaned_this_frame":[],"dynamic_obstacles":[{"id":"pedestrian-01","kind":"pedestrian","position":[5,5]}],"events":[],"frame_index":35,"remaining_trash_ids":[],"robot_position":[2,5],"sim_step":28,"state":"NAVIGATING"},{"action":"move","cleaned_ids":["leaf-01","leaf-02","bottle-01","paper-01"],"cleaned_this_frame":[],"dynamic_obstacles":[{"id":"pedestrian-01","kind":"pedestrian","position":[5,6]}],"events":[],"frame_index":36,"remaining_trash_ids":[],"robot_position":[1,5],"sim_step":29,"state":"NAVIGATING"},{"action":"move","cleaned_ids":["leaf-01","leaf-02","bottle-01","paper-01"],"cleaned_this_frame":[],"dynamic_obstacles":[{"id":"pedestrian-01","kind":"pedestrian","position":[3,6]}],"events":[],"frame_index":37,"remaining_trash_ids":[],"robot_position":[1,4],"sim_step":30,"state":"NAVIGATING"},{"action":"move","cleaned_ids":["leaf-01","leaf-02","bottle-01","paper-01"],"cleaned_this_frame":[],"dynamic_obstacles":[{"id":"pedestrian-01","kind":"pedestrian","position":[4,6]}],"events":[],"frame_index":38,"remaining_trash_ids":[],"robot_position":[1,3],"sim_step":31,"state":"NAVIGATING"},{"action":"move","cleaned_ids":["leaf-01","leaf-02","bottle-01","paper-01"],"cleaned_this_frame":[],"dynamic_obstacles":[{"id":"pedestrian-01","kind":"pedestrian","position":[5,6]}],"events":[],"frame_index":39,"remaining_trash_ids":[],"robot_position":[1,2],"sim_step":32,"state":"NAVIGATING"},{"action":"move","cleaned_ids":["leaf-01","leaf-02","bottle-01","paper-01"],"cleaned_this_frame":[],"dynamic_obstacles":[{"id":"pedestrian-01","kind":"pedestrian","position":[6,6]}],"events":[],"frame_index":40,"remaining_trash_ids":[],"robot_position":[1,1],"sim_step":33,"state":"NAVIGATING"},{"action":"move","cleaned_ids":["leaf-01","leaf-02","bottle-01","paper-01"],"cleaned_this_frame":[],"dynamic_obstacles":[{"id":"pedestrian-01","kind":"pedestrian","position":[7,6]}],"events":[],"frame_index":41,"remaining_trash_ids":[],"robot_position":[2,1],"sim_step":34,"state":"NAVIGATING"},{"action":"move","cleaned_ids":["leaf-01","leaf-02","bottle-01","paper-01"],"cleaned_this_frame":[],"dynamic_obstacles":[{"id":"pedestrian-01","kind":"pedestrian","position":[6,6]}],"events":[],"frame_index":42,"remaining_trash_ids":[],"robot_position":[3,1],"sim_step":35,"state":"NAVIGATING"},{"action":"move","cleaned_ids":["leaf-01","leaf-02","bottle-01","paper-01"],"cleaned_this_frame":[],"dynamic_obstacles":[{"id":"pedestrian-01","kind":"pedestrian","position":[6,6]}],"events":[],"frame_index":43,"remaining_trash_ids":[],"robot_position":[4,1],"sim_step":36,"state":"NAVIGATING"},{"action":"move","cleaned_ids":["leaf-01","leaf-02","bottle-01","paper-01"],"cleaned_this_frame":[],"dynamic_obstacles":[{"id":"pedestrian-01","kind":"pedestrian","position":[5,6]}],"events":[],"frame_index":44,"remaining_trash_ids":[],"robot_position":[5,1],"sim_step":37,"state":"NAVIGATING"},{"action":"move","cleaned_ids":["leaf-01","leaf-02","bottle-01","paper-01"],"cleaned_this_frame":[],"dynamic_obstacles":[{"id":"pedestrian-01","kind":"pedestrian","position":[5,5]}],"events":[],"frame_index":45,"remaining_trash_ids":[],"robot_position":[6,1],"sim_step":38,"state":"NAVIGATING"},{"action":"move","cleaned_ids":["leaf-01","leaf-02","bottle-01","paper-01"],"cleaned_this_frame":[],"dynamic_obstacles":[{"id":"pedestrian-01","kind":"pedestrian","position":[5,6]}],"events":[],"frame_index":46,"remaining_trash_ids":[],"robot_position":[7,1],"sim_step":39,"state":"NAVIGATING"},{"action":"move","cleaned_ids":["leaf-01","leaf-02","bottle-01","paper-01"],"cleaned_this_frame":[],"dynamic_obstacles":[{"id":"pedestrian-01","kind":"pedestrian","position":[3,6]}],"events":[],"frame_index":47,"remaining_trash_ids":[],"robot_position":[8,1],"sim_step":40,"state":"NAVIGATING"},{"action":"move","cleaned_ids":["leaf-01","leaf-02","bottle-01","paper-01"],"cleaned_this_frame":[],"dynamic_obstacles":[{"id":"pedestrian-01","kind":"pedestrian","position":[4,6]}],"events":[],"frame_index":48,"remaining_trash_ids":[],"robot_position":[9,1],"sim_step":41,"state":"NAVIGATING"},{"action":"move","cleaned_ids":["leaf-01","leaf-02","bottle-01","paper-01"],"cleaned_this_frame":[],"dynamic_obstacles":[{"id":"pedestrian-01","kind":"pedestrian","position":[5,6]}],"events":[],"frame_index":49,"remaining_trash_ids":[],"robot_position":[10,1],"sim_step":42,"state":"NAVIGATING"},{"action":"move","cleaned_ids":["leaf-01","leaf-02","bottle-01","paper-01"],"cleaned_this_frame":[],"dynamic_obstacles":[{"id":"pedestrian-01","kind":"pedestrian","position":[6,6]}],"events":[],"frame_index":50,"remaining_trash_ids":[],"robot_position":[10,2],"sim_step":43,"state":"NAVIGATING"},{"action":"move","cleaned_ids":["leaf-01","leaf-02","bottle-01","paper-01"],"cleaned_this_frame":[],"dynamic_obstacles":[{"id":"pedestrian-01","kind":"pedestrian","position":[7,6]}],"events":[],"frame_index":51,"remaining_trash_ids":[],"robot_position":[9,2],"sim_step":44,"state":"NAVIGATING"},{"action":"move","cleaned_ids":["leaf-01","leaf-02","bottle-01","paper-01"],"cleaned_this_frame":[],"dynamic_obstacles":[{"id":"pedestrian-01","kind":"pedestrian","position":[6,6]}],"events":[],"frame_index":52,"remaining_trash_ids":[],"robot_position":[8,2],"sim_step":45,"state":"NAVIGATING"},{"action":"move","cleaned_ids":["leaf-01","leaf-02","bottle-01","paper-01"],"cleaned_this_frame":[],"dynamic_obstacles":[{"id":"pedestrian-01","kind":"pedestrian","position":[6,6]}],"events":[],"frame_index":53,"remaining_trash_ids":[],"robot_position":[7,2],"sim_step":46,"state":"NAVIGATING"},{"action":"move","cleaned_ids":["leaf-01","leaf-02","bottle-01","paper-01"],"cleaned_this_frame":[],"dynamic_obstacles":[{"id":"pedestrian-01","kind":"pedestrian","position":[5,6]}],"events":[],"frame_index":54,"remaining_trash_ids":[],"robot_position":[6,2],"sim_step":47,"state":"NAVIGATING"},{"action":"move","cleaned_ids":["leaf-01","leaf-02","bottle-01","paper-01"],"cleaned_this_frame":[],"dynamic_obstacles":[{"id":"pedestrian-01","kind":"pedestrian","position":[5,5]}],"events":[],"frame_index":55,"remaining_trash_ids":[],"robot_position":[6,1],"sim_step":48,"state":"NAVIGATING"},{"action":"move","cleaned_ids":["leaf-01","leaf-02","bottle-01","paper-01"],"cleaned_this_frame":[],"dynamic_obstacles":[{"id":"pedestrian-01","kind":"pedestrian","position":[5,6]}],"events":[],"frame_index":56,"remaining_trash_ids":[],"robot_position":[5,1],"sim_step":49,"state":"NAVIGATING"},{"action":"move","cleaned_ids":["leaf-01","leaf-02","bottle-01","paper-01"],"cleaned_this_frame":[],"dynamic_obstacles":[{"id":"pedestrian-01","kind":"pedestrian","position":[3,6]}],"events":[],"frame_index":57,"remaining_trash_ids":[],"robot_position":[4,1],"sim_step":50,"state":"NAVIGATING"},{"action":"move","cleaned_ids":["leaf-01","leaf-02","bottle-01","paper-01"],"cleaned_this_frame":[],"dynamic_obstacles":[{"id":"pedestrian-01","kind":"pedestrian","position":[4,6]}],"events":[],"frame_index":58,"remaining_trash_ids":[],"robot_position":[4,2],"sim_step":51,"state":"NAVIGATING"},{"action":"move","cleaned_ids":["leaf-01","leaf-02","bottle-01","paper-01"],"cleaned_this_frame":[],"dynamic_obstacles":[{"id":"pedestrian-01","kind":"pedestrian","position":[5,6]}],"events":[],"frame_index":59,"remaining_trash_ids":[],"robot_position":[3,2],"sim_step":52,"state":"NAVIGATING"},{"action":"move","cleaned_ids":["leaf-01","leaf-02","bottle-01","paper-01"],"cleaned_this_frame":[],"dynamic_obstacles":[{"id":"pedestrian-01","kind":"pedestrian","position":[6,6]}],"events":[],"frame_index":60,"remaining_trash_ids":[],"robot_position":[2,2],"sim_step":53,"state":"NAVIGATING"},{"action":"move","cleaned_ids":["leaf-01","leaf-02","bottle-01","paper-01"],"cleaned_this_frame":[],"dynamic_obstacles":[{"id":"pedestrian-01","kind":"pedestrian","position":[7,6]}],"events":[],"frame_index":61,"remaining_trash_ids":[],"robot_position":[2,3],"sim_step":54,"state":"NAVIGATING"},{"action":"move","cleaned_ids":["leaf-01","leaf-02","bottle-01","paper-01"],"cleaned_this_frame":[],"dynamic_obstacles":[{"id":"pedestrian-01","kind":"pedestrian","position":[6,6]}],"events":[],"frame_index":62,"remaining_trash_ids":[],"robot_position":[3,3],"sim_step":55,"state":"NAVIGATING"},{"action":"move","cleaned_ids":["leaf-01","leaf-02","bottle-01","paper-01"],"cleaned_this_frame":[],"dynamic_obstacles":[{"id":"pedestrian-01","kind":"pedestrian","position":[6,6]}],"events":[],"frame_index":63,"remaining_trash_ids":[],"robot_position":[4,3],"sim_step":56,"state":"NAVIGATING"},{"action":"move","cleaned_ids":["leaf-01","leaf-02","bottle-01","paper-01"],"cleaned_this_frame":[],"dynamic_obstacles":[{"id":"pedestrian-01","kind":"pedestrian","position":[5,6]}],"events":[],"frame_index":64,"remaining_trash_ids":[],"robot_position":[4,4],"sim_step":57,"state":"NAVIGATING"},{"action":"move","cleaned_ids":["leaf-01","leaf-02","bottle-01","paper-01"],"cleaned_this_frame":[],"dynamic_obstacles":[{"id":"pedestrian-01","kind":"pedestrian","position":[5,5]}],"events":[],"frame_index":65,"remaining_trash_ids":[],"robot_position":[4,5],"sim_step":58,"state":"NAVIGATING"},{"action":"move","cleaned_ids":["leaf-01","leaf-02","bottle-01","paper-01"],"cleaned_this_frame":[],"dynamic_obstacles":[{"id":"pedestrian-01","kind":"pedestrian","position":[5,6]}],"events":[],"frame_index":66,"remaining_trash_ids":[],"robot_position":[5,5],"sim_step":59,"state":"NAVIGATING"},{"action":"move","cleaned_ids":["leaf-01","leaf-02","bottle-01","paper-01"],"cleaned_this_frame":[],"dynamic_obstacles":[{"id":"pedestrian-01","kind":"pedestrian","position":[3,6]}],"events":[],"frame_index":67,"remaining_trash_ids":[],"robot_position":[6,5],"sim_step":60,"state":"NAVIGATING"},{"action":"move","cleaned_ids":["leaf-01","leaf-02","bottle-01","paper-01"],"cleaned_this_frame":[],"dynamic_obstacles":[{"id":"pedestrian-01","kind":"pedestrian","position":[4,6]}],"events":[],"frame_index":68,"remaining_trash_ids":[],"robot_position":[6,4],"sim_step":61,"state":"NAVIGATING"},{"action":"move","cleaned_ids":["leaf-01","leaf-02","bottle-01","paper-01"],"cleaned_this_frame":[],"dynamic_obstacles":[{"id":"pedestrian-01","kind":"pedestrian","position":[5,6]}],"events":[],"frame_index":69,"remaining_trash_ids":[],"robot_position":[6,3],"sim_step":62,"state":"NAVIGATING"},{"action":"move","cleaned_ids":["leaf-01","leaf-02","bottle-01","paper-01"],"cleaned_this_frame":[],"dynamic_obstacles":[{"id":"pedestrian-01","kind":"pedestrian","position":[6,6]}],"events":[],"frame_index":70,"remaining_trash_ids":[],"robot_position":[6,2],"sim_step":63,"state":"NAVIGATING"},{"action":"move","cleaned_ids":["leaf-01","leaf-02","bottle-01","paper-01"],"cleaned_this_frame":[],"dynamic_obstacles":[{"id":"pedestrian-01","kind":"pedestrian","position":[7,6]}],"events":[],"frame_index":71,"remaining_trash_ids":[],"robot_position":[7,2],"sim_step":64,"state":"NAVIGATING"},{"action":"move","cleaned_ids":["leaf-01","leaf-02","bottle-01","paper-01"],"cleaned_this_frame":[],"dynamic_obstacles":[{"id":"pedestrian-01","kind":"pedestrian","position":[6,6]}],"events":[],"frame_index":72,"remaining_trash_ids":[],"robot_position":[8,2],"sim_step":65,"state":"NAVIGATING"},{"action":"move","cleaned_ids":["leaf-01","leaf-02","bottle-01","paper-01"],"cleaned_this_frame":[],"dynamic_obstacles":[{"id":"pedestrian-01","kind":"pedestrian","position":[6,6]}],"events":[],"frame_index":73,"remaining_trash_ids":[],"robot_position":[9,2],"sim_step":66,"state":"NAVIGATING"},{"action":"move","cleaned_ids":["leaf-01","leaf-02","bottle-01","paper-01"],"cleaned_this_frame":[],"dynamic_obstacles":[{"id":"pedestrian-01","kind":"pedestrian","position":[5,6]}],"events":[],"frame_index":74,"remaining_trash_ids":[],"robot_position":[9,3],"sim_step":67,"state":"NAVIGATING"},{"action":"move","cleaned_ids":["leaf-01","leaf-02","bottle-01","paper-01"],"cleaned_this_frame":[],"dynamic_obstacles":[{"id":"pedestrian-01","kind":"pedestrian","position":[5,5]}],"events":[],"frame_index":75,"remaining_trash_ids":[],"robot_position":[10,3],"sim_step":68,"state":"NAVIGATING"},{"action":"move","cleaned_ids":["leaf-01","leaf-02","bottle-01","paper-01"],"cleaned_this_frame":[],"dynamic_obstacles":[{"id":"pedestrian-01","kind":"pedestrian","position":[5,6]}],"events":[],"frame_index":76,"remaining_trash_ids":[],"robot_position":[10,4],"sim_step":69,"state":"NAVIGATING"},{"action":"move","cleaned_ids":["leaf-01","leaf-02","bottle-01","paper-01"],"cleaned_this_frame":[],"dynamic_obstacles":[{"id":"pedestrian-01","kind":"pedestrian","position":[3,6]}],"events":[],"frame_index":77,"remaining_trash_ids":[],"robot_position":[9,4],"sim_step":70,"state":"NAVIGATING"},{"action":"move","cleaned_ids":["leaf-01","leaf-02","bottle-01","paper-01"],"cleaned_this_frame":[],"dynamic_obstacles":[{"id":"pedestrian-01","kind":"pedestrian","position":[4,6]}],"events":[],"frame_index":78,"remaining_trash_ids":[],"robot_position":[9,5],"sim_step":71,"state":"NAVIGATING"},{"action":"move","cleaned_ids":["leaf-01","leaf-02","bottle-01","paper-01"],"cleaned_this_frame":[],"dynamic_obstacles":[{"id":"pedestrian-01","kind":"pedestrian","position":[5,6]}],"events":[],"frame_index":79,"remaining_trash_ids":[],"robot_position":[8,5],"sim_step":72,"state":"NAVIGATING"},{"action":"move","cleaned_ids":["leaf-01","leaf-02","bottle-01","paper-01"],"cleaned_this_frame":[],"dynamic_obstacles":[{"id":"pedestrian-01","kind":"pedestrian","position":[6,6]}],"events":[],"frame_index":80,"remaining_trash_ids":[],"robot_position":[7,5],"sim_step":73,"state":"NAVIGATING"},{"action":"move","cleaned_ids":["leaf-01","leaf-02","bottle-01","paper-01"],"cleaned_this_frame":[],"dynamic_obstacles":[{"id":"pedestrian-01","kind":"pedestrian","position":[7,6]}],"events":[],"frame_index":81,"remaining_trash_ids":[],"robot_position":[6,5],"sim_step":74,"state":"NAVIGATING"},{"action":"move","cleaned_ids":["leaf-01","leaf-02","bottle-01","paper-01"],"cleaned_this_frame":[],"dynamic_obstacles":[{"id":"pedestrian-01","kind":"pedestrian","position":[6,6]}],"events":[],"frame_index":82,"remaining_trash_ids":[],"robot_position":[5,5],"sim_step":75,"state":"NAVIGATING"},{"action":"move","cleaned_ids":["leaf-01","leaf-02","bottle-01","paper-01"],"cleaned_this_frame":[],"dynamic_obstacles":[{"id":"pedestrian-01","kind":"pedestrian","position":[6,6]}],"events":[],"frame_index":83,"remaining_trash_ids":[],"robot_position":[4,5],"sim_step":76,"state":"NAVIGATING"},{"action":"move","cleaned_ids":["leaf-01","leaf-02","bottle-01","paper-01"],"cleaned_this_frame":[],"dynamic_obstacles":[{"id":"pedestrian-01","kind":"pedestrian","position":[5,6]}],"events":[],"frame_index":84,"remaining_trash_ids":[],"robot_position":[3,5],"sim_step":77,"state":"NAVIGATING"},{"action":"move","cleaned_ids":["leaf-01","leaf-02","bottle-01","paper-01"],"cleaned_this_frame":[],"dynamic_obstacles":[{"id":"pedestrian-01","kind":"pedestrian","position":[5,5]}],"events":[],"frame_index":85,"remaining_trash_ids":[],"robot_position":[3,4],"sim_step":78,"state":"NAVIGATING"},{"action":"move","cleaned_ids":["leaf-01","leaf-02","bottle-01","paper-01"],"cleaned_this_frame":[],"dynamic_obstacles":[{"id":"pedestrian-01","kind":"pedestrian","position":[5,6]}],"events":[],"frame_index":86,"remaining_trash_ids":[],"robot_position":[2,4],"sim_step":79,"state":"NAVIGATING"},{"action":"move","cleaned_ids":["leaf-01","leaf-02","bottle-01","paper-01"],"cleaned_this_frame":[],"dynamic_obstacles":[{"id":"pedestrian-01","kind":"pedestrian","position":[3,6]}],"events":[],"frame_index":87,"remaining_trash_ids":[],"robot_position":[3,4],"sim_step":80,"state":"NAVIGATING"},{"action":"move","cleaned_ids":["leaf-01","leaf-02","bottle-01","paper-01"],"cleaned_this_frame":[],"dynamic_obstacles":[{"id":"pedestrian-01","kind":"pedestrian","position":[4,6]}],"events":[],"frame_index":88,"remaining_trash_ids":[],"robot_position":[4,4],"sim_step":81,"state":"NAVIGATING"},{"action":"move","cleaned_ids":["leaf-01","leaf-02","bottle-01","paper-01"],"cleaned_this_frame":[],"dynamic_obstacles":[{"id":"pedestrian-01","kind":"pedestrian","position":[5,6]}],"events":[],"frame_index":89,"remaining_trash_ids":[],"robot_position":[4,5],"sim_step":82,"state":"NAVIGATING"},{"action":"move","cleaned_ids":["leaf-01","leaf-02","bottle-01","paper-01"],"cleaned_this_frame":[],"dynamic_obstacles":[{"id":"pedestrian-01","kind":"pedestrian","position":[6,6]}],"events":[],"frame_index":90,"remaining_trash_ids":[],"robot_position":[5,5],"sim_step":83,"state":"NAVIGATING"},{"action":"move","cleaned_ids":["leaf-01","leaf-02","bottle-01","paper-01"],"cleaned_this_frame":[],"dynamic_obstacles":[{"id":"pedestrian-01","kind":"pedestrian","position":[7,6]}],"events":[],"frame_index":91,"remaining_trash_ids":[],"robot_position":[6,5],"sim_step":84,"state":"NAVIGATING"},{"action":"move","cleaned_ids":["leaf-01","leaf-02","bottle-01","paper-01"],"cleaned_this_frame":[],"dynamic_obstacles":[{"id":"pedestrian-01","kind":"pedestrian","position":[6,6]}],"events":[],"frame_index":92,"remaining_trash_ids":[],"robot_position":[7,5],"sim_step":85,"state":"NAVIGATING"},{"action":"move","cleaned_ids":["leaf-01","leaf-02","bottle-01","paper-01"],"cleaned_this_frame":[],"dynamic_obstacles":[{"id":"pedestrian-01","kind":"pedestrian","position":[6,6]}],"events":[],"frame_index":93,"remaining_trash_ids":[],"robot_position":[8,5],"sim_step":86,"state":"NAVIGATING"},{"action":"move","cleaned_ids":["leaf-01","leaf-02","bottle-01","paper-01"],"cleaned_this_frame":[],"dynamic_obstacles":[{"id":"pedestrian-01","kind":"pedestrian","position":[5,6]}],"events":[],"frame_index":94,"remaining_trash_ids":[],"robot_position":[9,5],"sim_step":87,"state":"NAVIGATING"},{"action":"move","cleaned_ids":["leaf-01","leaf-02","bottle-01","paper-01"],"cleaned_this_frame":[],"dynamic_obstacles":[{"id":"pedestrian-01","kind":"pedestrian","position":[5,5]}],"events":[],"frame_index":95,"remaining_trash_ids":[],"robot_position":[10,5],"sim_step":88,"state":"NAVIGATING"},{"action":"move","cleaned_ids":["leaf-01","leaf-02","bottle-01","paper-01"],"cleaned_this_frame":[],"dynamic_obstacles":[{"id":"pedestrian-01","kind":"pedestrian","position":[5,6]}],"events":[],"frame_index":96,"remaining_trash_ids":[],"robot_position":[10,6],"sim_step":89,"state":"NAVIGATING"},{"action":"move","cleaned_ids":["leaf-01","leaf-02","bottle-01","paper-01"],"cleaned_this_frame":[],"dynamic_obstacles":[{"id":"pedestrian-01","kind":"pedestrian","position":[3,6]}],"events":[],"frame_index":97,"remaining_trash_ids":[],"robot_position":[9,6],"sim_step":90,"state":"NAVIGATING"},{"action":"move","cleaned_ids":["leaf-01","leaf-02","bottle-01","paper-01"],"cleaned_this_frame":[],"dynamic_obstacles":[{"id":"pedestrian-01","kind":"pedestrian","position":[4,6]}],"events":[],"frame_index":98,"remaining_trash_ids":[],"robot_position":[8,6],"sim_step":91,"state":"NAVIGATING"},{"action":"move","cleaned_ids":["leaf-01","leaf-02","bottle-01","paper-01"],"cleaned_this_frame":[],"dynamic_obstacles":[{"id":"pedestrian-01","kind":"pedestrian","position":[5,6]}],"events":[],"frame_index":99,"remaining_trash_ids":[],"robot_position":[7,6],"sim_step":92,"state":"NAVIGATING"},{"action":"wait","cleaned_ids":["leaf-01","leaf-02","bottle-01","paper-01"],"cleaned_this_frame":[],"dynamic_obstacles":[{"id":"pedestrian-01","kind":"pedestrian","position":[6,6]}],"events":["AVOIDING -\u003e REPLANNING"],"frame_index":100,"remaining_trash_ids":[],"robot_position":[7,6],"sim_step":93,"state":"REPLANNING"},{"action":"move","cleaned_ids":["leaf-01","leaf-02","bottle-01","paper-01"],"cleaned_this_frame":[],"dynamic_obstacles":[{"id":"pedestrian-01","kind":"pedestrian","position":[7,6]}],"events":[],"frame_index":101,"remaining_trash_ids":[],"robot_position":[6,6],"sim_step":94,"state":"NAVIGATING"},{"action":"move","cleaned_ids":["leaf-01","leaf-02","bottle-01","paper-01"],"cleaned_this_frame":[],"dynamic_obstacles":[{"id":"pedestrian-01","kind":"pedestrian","position":[6,6]}],"events":[],"frame_index":102,"remaining_trash_ids":[],"robot_position":[5,6],"sim_step":95,"state":"NAVIGATING"},{"action":"move","cleaned_ids":["leaf-01","leaf-02","bottle-01","paper-01"],"cleaned_this_frame":[],"dynamic_obstacles":[{"id":"pedestrian-01","kind":"pedestrian","position":[6,6]}],"events":[],"frame_index":103,"remaining_trash_ids":[],"robot_position":[4,6],"sim_step":96,"state":"NAVIGATING"},{"action":"move","cleaned_ids":["leaf-01","leaf-02","bottle-01","paper-01"],"cleaned_this_frame":[],"dynamic_obstacles":[{"id":"pedestrian-01","kind":"pedestrian","position":[5,6]}],"events":[],"frame_index":104,"remaining_trash_ids":[],"robot_position":[3,6],"sim_step":97,"state":"NAVIGATING"},{"action":"move","cleaned_ids":["leaf-01","leaf-02","bottle-01","paper-01"],"cleaned_this_frame":[],"dynamic_obstacles":[{"id":"pedestrian-01","kind":"pedestrian","position":[5,5]}],"events":[],"frame_index":105,"remaining_trash_ids":[],"robot_position":[2,6],"sim_step":98,"state":"NAVIGATING"},{"action":"move","cleaned_ids":["leaf-01","leaf-02","bottle-01","paper-01"],"cleaned_this_frame":[],"dynamic_obstacles":[{"id":"pedestrian-01","kind":"pedestrian","position":[5,6]}],"events":[],"frame_index":106,"remaining_trash_ids":[],"robot_position":[1,6],"sim_step":99,"state":"NAVIGATING"},{"action":"transition","cleaned_ids":["leaf-01","leaf-02","bottle-01","paper-01"],"cleaned_this_frame":[],"dynamic_obstacles":[{"id":"pedestrian-01","kind":"pedestrian","position":[5,6]}],"events":["NAVIGATING -\u003e RETURNING"],"frame_index":107,"remaining_trash_ids":[],"robot_position":[1,6],"sim_step":99,"state":"RETURNING"},{"action":"move","cleaned_ids":["leaf-01","leaf-02","bottle-01","paper-01"],"cleaned_this_frame":[],"dynamic_obstacles":[{"id":"pedestrian-01","kind":"pedestrian","position":[3,6]}],"events":[],"frame_index":108,"remaining_trash_ids":[],"robot_position":[1,5],"sim_step":100,"state":"RETURNING"},{"action":"move","cleaned_ids":["leaf-01","leaf-02","bottle-01","paper-01"],"cleaned_this_frame":[],"dynamic_obstacles":[{"id":"pedestrian-01","kind":"pedestrian","position":[4,6]}],"events":[],"frame_index":109,"remaining_trash_ids":[],"robot_position":[1,4],"sim_step":101,"state":"RETURNING"},{"action":"move","cleaned_ids":["leaf-01","leaf-02","bottle-01","paper-01"],"cleaned_this_frame":[],"dynamic_obstacles":[{"id":"pedestrian-01","kind":"pedestrian","position":[5,6]}],"events":[],"frame_index":110,"remaining_trash_ids":[],"robot_position":[1,3],"sim_step":102,"state":"RETURNING"},{"action":"move","cleaned_ids":["leaf-01","leaf-02","bottle-01","paper-01"],"cleaned_this_frame":[],"dynamic_obstacles":[{"id":"pedestrian-01","kind":"pedestrian","position":[6,6]}],"events":[],"frame_index":111,"remaining_trash_ids":[],"robot_position":[1,2],"sim_step":103,"state":"RETURNING"},{"action":"move","cleaned_ids":["leaf-01","leaf-02","bottle-01","paper-01"],"cleaned_this_frame":[],"dynamic_obstacles":[{"id":"pedestrian-01","kind":"pedestrian","position":[7,6]}],"events":[],"frame_index":112,"remaining_trash_ids":[],"robot_position":[1,1],"sim_step":104,"state":"RETURNING"},{"action":"terminal","cleaned_ids":["leaf-01","leaf-02","bottle-01","paper-01"],"cleaned_this_frame":[],"dynamic_obstacles":[{"id":"pedestrian-01","kind":"pedestrian","position":[7,6]}],"events":["RETURNING -\u003e COMPLETED"],"frame_index":113,"remaining_trash_ids":[],"robot_position":[1,1],"sim_step":104,"state":"COMPLETED"}],"schema_version":1},"trajectory":[[1,1],[2,1],[3,1],[3,2],[3,3],[3,4],[3,5],[4,5],[4,4],[4,3],[4,2],[4,1],[5,1],[6,1],[7,1],[8,1],[9,1],[9,2],[9,3],[9,4],[9,5],[8,5],[7,5],[6,5],[5,5],[4,5],[3,5],[2,5],[1,5],[1,4],[1,3],[1,2],[1,1],[2,1],[3,1],[4,1],[5,1],[6,1],[7,1],[8,1],[9,1],[10,1],[10,2],[9,2],[8,2],[7,2],[6,2],[6,1],[5,1],[4,1],[4,2],[3,2],[2,2],[2,3],[3,3],[4,3],[4,4],[4,5],[5,5],[6,5],[6,4],[6,3],[6,2],[7,2],[8,2],[9,2],[9,3],[10,3],[10,4],[9,4],[9,5],[8,5],[7,5],[6,5],[5,5],[4,5],[3,5],[3,4],[2,4],[3,4],[4,4],[4,5],[5,5],[6,5],[7,5],[8,5],[9,5],[10,5],[10,6],[9,6],[8,6],[7,6],[6,6],[5,6],[4,6],[3,6],[2,6],[1,6],[1,5],[1,4],[1,3],[1,2],[1,1]]},"scenario":{"areas":{"teaching_building_gate":[[1,1],[2,1],[3,1],[4,1],[5,1],[6,1],[7,1],[8,1],[9,1],[10,1],[1,2],[2,2],[3,2],[4,2],[5,2],[6,2],[7,2],[8,2],[9,2],[10,2],[1,3],[2,3],[3,3],[4,3],[5,3],[6,3],[7,3],[8,3],[9,3],[10,3],[1,4],[2,4],[3,4],[4,4],[5,4],[6,4],[7,4],[8,4],[9,4],[10,4],[1,5],[2,5],[3,5],[4,5],[5,5],[6,5],[7,5],[8,5],[9,5],[10,5],[1,6],[2,6],[3,6],[4,6],[5,6],[6,6],[7,6],[8,6],[9,6],[10,6]]},"dock":[1,1],"dynamic_obstacles":[{"id":"pedestrian-01","kind":"pedestrian","loop":true,"path":[[3,6],[4,6],[5,6],[6,6],[7,6],[6,6],[6,6],[5,6],[5,5],[5,6]],"start_step":0}],"hazards":{"water":[[7,3],[8,3],[7,4],[8,4]]},"height":8,"name":"teaching-building-gate","start":[1,1],"static_obstacles":[[0,0],[1,0],[2,0],[3,0],[4,0],[5,0],[6,0],[7,0],[8,0],[9,0],[10,0],[11,0],[0,1],[11,1],[0,2],[5,2],[11,2],[0,3],[5,3],[11,3],[0,4],[5,4],[11,4],[0,5],[11,5],[0,6],[11,6],[0,7],[1,7],[2,7],[3,7],[4,7],[5,7],[6,7],[7,7],[8,7],[9,7],[10,7],[11,7]],"trash":[{"area":"teaching_building_gate","id":"leaf-01","kind":"fallen_leaves","position":[3,2]},{"area":"teaching_building_gate","id":"bottle-01","kind":"plastic_bottle","position":[9,2]},{"area":"teaching_building_gate","id":"paper-01","kind":"paper_scrap","position":[9,5]},{"area":"teaching_building_gate","id":"leaf-02","kind":"fallen_leaves","position":[3,5]}],"width":12},"schema_version":1}</script>
+  <script>
+  "use strict";
+
+  (function () {
+    const payloadNode = document.getElementById("simulation-data");
+    const payload = JSON.parse(payloadNode.textContent);
+    const scenario = payload.scenario || {};
+    const result = payload.result || {};
+    const trace = result.trace || {};
+    const rawFrames = Array.isArray(trace.frames) ? trace.frames : [];
+    const initialTrash = Array.isArray(scenario.trash) ? scenario.trash : [];
+
+    function itemId(item) {
+      if (!item || typeof item !== "object") return "";
+      return String(item.id !== undefined ? item.id : (item.item_id || ""));
+    }
+
+    function asPosition(value) {
+      if (Array.isArray(value) && value.length >= 2) {
+        return {x: Number(value[0]), y: Number(value[1])};
+      }
+      if (value && typeof value === "object" && value.x !== undefined && value.y !== undefined) {
+        return {x: Number(value.x), y: Number(value.y)};
+      }
+      return null;
+    }
+
+    const defaultPosition = asPosition(result.final_position) || asPosition(scenario.start) || {x: 0, y: 0};
+    const fallbackFrame = {
+      frame_index: 0,
+      sim_step: 0,
+      state: result.status || "NO_TRACE",
+      action: "terminal",
+      robot_position: [defaultPosition.x, defaultPosition.y],
+      dynamic_obstacles: [],
+      remaining_trash_ids: initialTrash.map(itemId),
+      cleaned_ids: Array.isArray(result.cleaned_ids) ? result.cleaned_ids : [],
+      cleaned_this_frame: [],
+      events: ["未提供逐帧轨迹"]
+    };
+    const frames = rawFrames.length ? rawFrames : [fallbackFrame];
+
+    const canvas = document.getElementById("worldCanvas");
+    const context = canvas.getContext("2d");
+    const resetButton = document.getElementById("resetButton");
+    const previousButton = document.getElementById("previousButton");
+    const playButton = document.getElementById("playButton");
+    const nextButton = document.getElementById("nextButton");
+    const timeline = document.getElementById("timeline");
+    const speedSelect = document.getElementById("speedSelect");
+    const statePill = document.getElementById("statePill");
+    const stateMetric = document.getElementById("stateMetric");
+    const cleanedMetric = document.getElementById("cleanedMetric");
+    const pathMetric = document.getElementById("pathMetric");
+    const replanMetric = document.getElementById("replanMetric");
+    const collisionMetric = document.getElementById("collisionMetric");
+    const resultMetric = document.getElementById("resultMetric");
+    const frameLabel = document.getElementById("frameLabel");
+    const stepLabel = document.getElementById("stepLabel");
+    const actionLabel = document.getElementById("actionLabel");
+    const eventText = document.getElementById("eventText");
+
+    const worldWidth = Math.max(1, Number(scenario.width) || 1);
+    const worldHeight = Math.max(1, Number(scenario.height) || 1);
+    let viewWidth = 800;
+    let viewHeight = 500;
+    let currentIndex = 0;
+    let timer = null;
+    let playing = false;
+    const baseFrameDuration = 620;
+
+    timeline.max = String(Math.max(0, frames.length - 1));
+
+    function metricNumber(name) {
+      const metrics = result.metrics || {};
+      const number = Number(metrics[name]);
+      return Number.isFinite(number) ? number : 0;
+    }
+
+    function cellGeometry() {
+      return {width: viewWidth / worldWidth, height: viewHeight / worldHeight};
+    }
+
+    function cellCenter(position) {
+      const cell = cellGeometry();
+      return {
+        x: (position.x + 0.5) * cell.width,
+        y: (position.y + 0.5) * cell.height
+      };
+    }
+
+    function fillCell(position, color, inset) {
+      const cell = cellGeometry();
+      const gap = inset || 0;
+      context.fillStyle = color;
+      context.fillRect(
+        position.x * cell.width + gap,
+        position.y * cell.height + gap,
+        Math.max(0, cell.width - gap * 2),
+        Math.max(0, cell.height - gap * 2)
+      );
+    }
+
+    function drawGround() {
+      context.fillStyle = "#0a151e";
+      context.fillRect(0, 0, viewWidth, viewHeight);
+      const cell = cellGeometry();
+      context.strokeStyle = "rgba(117, 151, 174, 0.16)";
+      context.lineWidth = 1;
+      context.beginPath();
+      for (let x = 0; x <= worldWidth; x += 1) {
+        context.moveTo(x * cell.width, 0);
+        context.lineTo(x * cell.width, viewHeight);
+      }
+      for (let y = 0; y <= worldHeight; y += 1) {
+        context.moveTo(0, y * cell.height);
+        context.lineTo(viewWidth, y * cell.height);
+      }
+      context.stroke();
+    }
+
+    function hazardRows() {
+      const hazards = scenario.hazards;
+      const rows = [];
+      if (Array.isArray(hazards)) {
+        hazards.forEach(function (entry) {
+          if (!entry || typeof entry !== "object") return;
+          const kind = String(entry.kind || entry.type || "hazard");
+          const values = Array.isArray(entry.positions) ? entry.positions : [entry.position];
+          values.forEach(function (value) {
+            const position = asPosition(value);
+            if (position) rows.push({kind: kind, position: position});
+          });
+        });
+      } else if (hazards && typeof hazards === "object") {
+        Object.keys(hazards).sort().forEach(function (kind) {
+          const values = Array.isArray(hazards[kind]) ? hazards[kind] : [];
+          values.forEach(function (value) {
+            const position = asPosition(value);
+            if (position) rows.push({kind: kind, position: position});
+          });
+        });
+      }
+      return rows;
+    }
+
+    function drawHazards() {
+      hazardRows().forEach(function (hazard) {
+        const color = hazard.kind === "water" ? "rgba(55, 169, 214, 0.46)" : "rgba(231, 166, 68, 0.42)";
+        fillCell(hazard.position, color, 2);
+      });
+    }
+
+    function drawStaticObstacles() {
+      const obstacles = Array.isArray(scenario.static_obstacles) ? scenario.static_obstacles : [];
+      obstacles.forEach(function (value) {
+        const position = asPosition(value);
+        if (!position) return;
+        fillCell(position, "#334a5c", 1);
+        const cell = cellGeometry();
+        context.strokeStyle = "rgba(188, 211, 225, 0.18)";
+        context.lineWidth = 1;
+        context.beginPath();
+        context.moveTo(position.x * cell.width + 4, position.y * cell.height + 4);
+        context.lineTo((position.x + 1) * cell.width - 4, (position.y + 1) * cell.height - 4);
+        context.stroke();
+      });
+    }
+
+    function routePositions() {
+      const positions = [];
+      for (let index = 0; index <= currentIndex; index += 1) {
+        const position = asPosition(frames[index].robot_position);
+        if (!position) continue;
+        const previous = positions.length ? positions[positions.length - 1] : null;
+        if (!previous || previous.x !== position.x || previous.y !== position.y) {
+          positions.push(position);
+        }
+      }
+      return positions;
+    }
+
+    function drawRoute() {
+      const positions = routePositions();
+      if (positions.length < 2) return;
+      const cell = cellGeometry();
+      context.strokeStyle = "rgba(247, 200, 93, 0.88)";
+      context.lineWidth = Math.max(2, Math.min(cell.width, cell.height) * 0.12);
+      context.lineCap = "round";
+      context.lineJoin = "round";
+      context.beginPath();
+      positions.forEach(function (position, index) {
+        const center = cellCenter(position);
+        if (index === 0) context.moveTo(center.x, center.y);
+        else context.lineTo(center.x, center.y);
+      });
+      context.stroke();
+    }
+
+    function trashSymbol(kind) {
+      const symbols = {
+        fallen_leaves: "L",
+        plastic_bottle: "B",
+        paper_scrap: "P"
+      };
+      return symbols[kind] || "T";
+    }
+
+    function drawTrash(frame) {
+      const provided = Array.isArray(frame.remaining_trash_ids);
+      const remaining = new Set(provided ? frame.remaining_trash_ids.map(String) : initialTrash.map(itemId));
+      const cell = cellGeometry();
+      initialTrash.forEach(function (item) {
+        if (!remaining.has(itemId(item))) return;
+        const position = asPosition(item.position);
+        if (!position) return;
+        const center = cellCenter(position);
+        const radius = Math.max(5, Math.min(cell.width, cell.height) * 0.25);
+        context.fillStyle = "#f39b4a";
+        context.beginPath();
+        context.arc(center.x, center.y, radius, 0, Math.PI * 2);
+        context.fill();
+        context.fillStyle = "#291407";
+        context.font = "700 " + Math.max(9, radius) + "px sans-serif";
+        context.textAlign = "center";
+        context.textBaseline = "middle";
+        context.fillText(trashSymbol(String(item.kind || item.type || "")), center.x, center.y + 0.5);
+      });
+    }
+
+    function drawDock() {
+      const position = asPosition(scenario.dock || scenario.start);
+      if (!position) return;
+      const center = cellCenter(position);
+      const cell = cellGeometry();
+      const radius = Math.max(5, Math.min(cell.width, cell.height) * 0.29);
+      context.save();
+      context.translate(center.x, center.y);
+      context.rotate(Math.PI / 4);
+      context.fillStyle = "rgba(64, 101, 166, 0.26)";
+      context.strokeStyle = "#7da9ff";
+      context.lineWidth = 2;
+      context.fillRect(-radius, -radius, radius * 2, radius * 2);
+      context.strokeRect(-radius, -radius, radius * 2, radius * 2);
+      context.restore();
+    }
+
+    function drawDynamicObstacles(frame) {
+      const obstacles = Array.isArray(frame.dynamic_obstacles) ? frame.dynamic_obstacles : [];
+      const cell = cellGeometry();
+      obstacles.forEach(function (obstacle) {
+        const position = asPosition(obstacle && obstacle.position);
+        if (!position) return;
+        const center = cellCenter(position);
+        const radius = Math.max(6, Math.min(cell.width, cell.height) * 0.26);
+        context.fillStyle = "#ff6b6b";
+        context.strokeStyle = "#511b25";
+        context.lineWidth = 2;
+        context.beginPath();
+        context.arc(center.x, center.y, radius, 0, Math.PI * 2);
+        context.fill();
+        context.stroke();
+        context.fillStyle = "#2a0810";
+        context.font = "800 " + Math.max(9, radius) + "px sans-serif";
+        context.textAlign = "center";
+        context.textBaseline = "middle";
+        context.fillText("!", center.x, center.y + 0.5);
+      });
+    }
+
+    function previousDistinctRobotPosition() {
+      const current = asPosition(frames[currentIndex].robot_position);
+      if (!current) return null;
+      for (let index = currentIndex - 1; index >= 0; index -= 1) {
+        const candidate = asPosition(frames[index].robot_position);
+        if (candidate && (candidate.x !== current.x || candidate.y !== current.y)) return candidate;
+      }
+      return null;
+    }
+
+    function drawRobot(frame) {
+      const position = asPosition(frame.robot_position);
+      if (!position) return;
+      const center = cellCenter(position);
+      const cell = cellGeometry();
+      const radius = Math.max(7, Math.min(cell.width, cell.height) * 0.31);
+      context.fillStyle = "#50e3a4";
+      context.strokeStyle = "#063926";
+      context.lineWidth = 3;
+      context.beginPath();
+      context.arc(center.x, center.y, radius, 0, Math.PI * 2);
+      context.fill();
+      context.stroke();
+
+      const previous = previousDistinctRobotPosition();
+      const angle = previous ? Math.atan2(position.y - previous.y, position.x - previous.x) : 0;
+      context.strokeStyle = "#05281c";
+      context.lineWidth = Math.max(2, radius * 0.2);
+      context.lineCap = "round";
+      context.beginPath();
+      context.moveTo(center.x, center.y);
+      context.lineTo(center.x + Math.cos(angle) * radius * 0.72, center.y + Math.sin(angle) * radius * 0.72);
+      context.stroke();
+    }
+
+    function draw() {
+      const frame = frames[currentIndex];
+      context.clearRect(0, 0, viewWidth, viewHeight);
+      drawGround();
+      drawHazards();
+      drawStaticObstacles();
+      drawRoute();
+      drawTrash(frame);
+      drawDock();
+      drawDynamicObstacles(frame);
+      drawRobot(frame);
+    }
+
+    function updateLabels() {
+      const frame = frames[currentIndex];
+      const state = String(frame.state || "UNKNOWN");
+      const action = String(frame.action || "—");
+      const events = Array.isArray(frame.events) ? frame.events : [];
+      const cleaned = Array.isArray(frame.cleaned_ids) ? frame.cleaned_ids.length : 0;
+      const totalTargets = metricNumber("total_targets");
+
+      statePill.textContent = state;
+      stateMetric.textContent = state;
+      cleanedMetric.textContent = String(cleaned) + " / " + String(totalTargets);
+      pathMetric.textContent = String(metricNumber("path_length_cells")) + " 格";
+      replanMetric.textContent = String(metricNumber("replans")) + " 次";
+      collisionMetric.textContent = String(metricNumber("collisions")) + " 次";
+      resultMetric.textContent = String(result.status || "—");
+      frameLabel.textContent = "帧 " + String(currentIndex + 1) + " / " + String(frames.length);
+      stepLabel.textContent = "仿真步 " + String(frame.sim_step !== undefined ? frame.sim_step : 0);
+      actionLabel.textContent = "动作 " + action;
+      eventText.textContent = events.length ? events.map(String).join(" · ") : "当前帧无新增事件";
+      timeline.value = String(currentIndex);
+      previousButton.disabled = currentIndex === 0;
+      nextButton.disabled = currentIndex === frames.length - 1;
+    }
+
+    function render() {
+      draw();
+      updateLabels();
+    }
+
+    function stop() {
+      if (timer !== null) window.clearTimeout(timer);
+      timer = null;
+      playing = false;
+      playButton.textContent = "播放";
+      playButton.setAttribute("aria-pressed", "false");
+    }
+
+    function queueNext() {
+      if (!playing) return;
+      const speed = Math.max(0.1, Number(speedSelect.value) || 1);
+      timer = window.setTimeout(function () {
+        if (currentIndex >= frames.length - 1) {
+          stop();
+          return;
+        }
+        currentIndex += 1;
+        render();
+        queueNext();
+      }, baseFrameDuration / speed);
+    }
+
+    function play() {
+      if (playing) {
+        stop();
+        return;
+      }
+      if (currentIndex >= frames.length - 1) currentIndex = 0;
+      playing = true;
+      playButton.textContent = "暂停";
+      playButton.setAttribute("aria-pressed", "true");
+      render();
+      queueNext();
+    }
+
+    function selectFrame(index) {
+      stop();
+      currentIndex = Math.max(0, Math.min(frames.length - 1, index));
+      render();
+    }
+
+    function resizeCanvas() {
+      const pixelRatio = Math.max(1, window.devicePixelRatio || 1);
+      viewWidth = Math.max(280, canvas.parentElement.clientWidth || 800);
+      viewHeight = Math.max(220, viewWidth * worldHeight / worldWidth);
+      canvas.style.height = String(viewHeight) + "px";
+      canvas.width = Math.round(viewWidth * pixelRatio);
+      canvas.height = Math.round(viewHeight * pixelRatio);
+      context.setTransform(pixelRatio, 0, 0, pixelRatio, 0, 0);
+      render();
+    }
+
+    resetButton.addEventListener("click", function () { selectFrame(0); });
+    previousButton.addEventListener("click", function () { selectFrame(currentIndex - 1); });
+    playButton.addEventListener("click", play);
+    nextButton.addEventListener("click", function () { selectFrame(currentIndex + 1); });
+    timeline.addEventListener("input", function () { selectFrame(Number(timeline.value)); });
+    speedSelect.addEventListener("change", function () {
+      if (!playing) return;
+      if (timer !== null) window.clearTimeout(timer);
+      timer = null;
+      queueNext();
+    });
+    document.addEventListener("keydown", function (event) {
+      const tagName = event.target && event.target.tagName ? event.target.tagName.toLowerCase() : "";
+      if (tagName === "input" || tagName === "select" || tagName === "button") return;
+      if (event.code === "Space") {
+        event.preventDefault();
+        play();
+      } else if (event.code === "ArrowLeft") {
+        event.preventDefault();
+        selectFrame(currentIndex - 1);
+      } else if (event.code === "ArrowRight") {
+        event.preventDefault();
+        selectFrame(currentIndex + 1);
+      }
+    });
+    window.addEventListener("resize", resizeCanvas);
+
+    resizeCanvas();
+  }());
+  </script>
+</body>
+</html>

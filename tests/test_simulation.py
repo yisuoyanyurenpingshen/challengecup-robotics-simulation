@@ -99,3 +99,46 @@ def test_moving_obstacle_triggers_safe_replan() -> None:
     assert result.metrics.replans >= 1
     assert result.metrics.collisions == 0
     assert "AVOIDING -> REPLANNING" in result.events
+    for frame in result.frames:
+        assert len(frame.dynamic_obstacles) == 1
+        assert frame.dynamic_obstacles[0].position == pedestrian.position_at(
+            frame.sim_step
+        )
+        assert frame.robot_position != frame.dynamic_obstacles[0].position
+
+
+def test_clean_area_covers_named_region_before_returning() -> None:
+    world = GridWorld.from_dict(
+        {
+            "width": 5,
+            "height": 4,
+            "start": [0, 0],
+            "dock": [0, 0],
+            "static_obstacles": [[2, 1]],
+            "hazards": {"water": [[3, 1]]},
+            "areas": {
+                "gate": [
+                    [1, 1], [2, 1], [3, 1],
+                    [1, 2], [2, 2], [3, 2],
+                ]
+            },
+            "trash": [],
+        }
+    )
+    task = CleaningTask(
+        target_area="gate",
+        avoid_types=("water",),
+        return_to_dock=True,
+        mode="clean_area",
+    )
+
+    result = Simulator(world, task, max_steps=100).run()
+
+    expected = set(world.traversable_area_cells("gate", ("water",)))
+    assert result.status == "COMPLETED"
+    assert result.metrics.total_targets == 0
+    assert result.metrics.coverage_rate == 1.0
+    assert result.metrics.unique_visited_cells == len(expected)
+    assert result.metrics.navigable_cells == len(expected)
+    assert result.metrics.returned_to_dock is True
+    assert expected.issubset(result.trajectory)

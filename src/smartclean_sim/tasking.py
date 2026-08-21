@@ -36,6 +36,14 @@ class RuleBasedTaskParser:
         ("行人", "pedestrian"),
         ("车辆", "vehicle"),
     )
+    COVERAGE_PHRASES = (
+        "全覆盖清扫",
+        "全覆盖",
+        "覆盖清扫",
+        "全面清扫",
+        "清扫全部区域",
+        "清扫全区域",
+    )
 
     def parse(self, instruction: str) -> CleaningTask:
         if not isinstance(instruction, str) or not instruction.strip():
@@ -64,6 +72,11 @@ class RuleBasedTaskParser:
             priority_classes=priority_classes,
             avoid_types=avoid_types,
             return_to_dock=return_after_done,
+            mode=(
+                "clean_area"
+                if any(phrase in instruction for phrase in self.COVERAGE_PHRASES)
+                else "clean_spots"
+            ),
         )
 
     @staticmethod
@@ -95,6 +108,7 @@ def task_from_dict(payload: Dict[str, Any]) -> CleaningTask:
         "return_to_dock",
         payload.get("return_after_done", task.return_to_dock),
     )
+    mode = payload.get("mode", task.mode)
 
     if not isinstance(target_area, str) or not target_area.strip():
         raise TaskParseError("target_area 必须是非空字符串")
@@ -104,12 +118,15 @@ def task_from_dict(payload: Dict[str, Any]) -> CleaningTask:
         raise TaskParseError("avoid_types 必须是字符串列表")
     if not isinstance(return_to_dock, bool):
         raise TaskParseError("return_to_dock 必须是布尔值")
+    if mode not in ("clean_spots", "clean_area"):
+        raise TaskParseError("mode 仅支持 clean_spots 或 clean_area")
 
     return CleaningTask(
         target_area=target_area.strip(),
         priority_classes=tuple(priority_classes),
         avoid_types=tuple(avoid_types),
         return_to_dock=return_to_dock,
+        mode=mode,
     )
 
 

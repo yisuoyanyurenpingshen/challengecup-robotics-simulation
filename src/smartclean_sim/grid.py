@@ -36,6 +36,7 @@ class GridWorld:
         static_obstacles: Optional[Iterable[GridPosition]] = None,
         hazards: Optional[Mapping[str, Iterable[GridPosition]]] = None,
         trash: Optional[Iterable[TrashItem]] = None,
+        areas: Optional[Mapping[str, Iterable[GridPosition]]] = None,
     ) -> None:
         if isinstance(width, bool) or not isinstance(width, int) or width <= 0:
             raise ValueError("width must be a positive integer")
@@ -51,6 +52,9 @@ class GridWorld:
             kind: set(positions) for kind, positions in (hazards or {}).items()
         }
         self.trash: List[TrashItem] = list(trash or ())
+        self.areas: Dict[str, Set[GridPosition]] = {
+            area_id: set(positions) for area_id, positions in (areas or {}).items()
+        }
 
         self._validate_contents()
 
@@ -80,6 +84,7 @@ class GridWorld:
         }
         hazards = cls._parse_hazards(payload.get("hazards", {}))
         trash = cls._parse_trash(payload.get("trash", ()))
+        areas = cls._parse_areas(payload.get("areas", {}))
 
         return cls(
             width=width,
@@ -89,7 +94,37 @@ class GridWorld:
             static_obstacles=obstacles,
             hazards=hazards,
             trash=trash,
+            areas=areas,
         )
+
+    @staticmethod
+    def _parse_areas(raw_areas: object) -> Dict[str, Set[GridPosition]]:
+        """Parse named areas represented by explicit grid-coordinate lists."""
+
+        if raw_areas is None:
+            return {}
+        if not isinstance(raw_areas, Mapping):
+            raise ValueError("areas must be a mapping of area names to positions")
+
+        parsed: Dict[str, Set[GridPosition]] = {}
+        for area_id, positions in raw_areas.items():
+            if not isinstance(area_id, str) or not area_id:
+                raise ValueError("area name must be a non-empty string")
+            if area_id == "all":
+                raise ValueError("area name 'all' is reserved")
+            if not isinstance(positions, Sequence) or isinstance(
+                positions, (str, bytes)
+            ):
+                raise ValueError("areas.{} must be a list of positions".format(area_id))
+
+            cells = {
+                _position_from_value(value, "areas.{}".format(area_id))
+                for value in positions
+            }
+            if not cells:
+                raise ValueError("areas.{} must not be empty".format(area_id))
+            parsed[area_id] = cells
+        return parsed
 
     @staticmethod
     def _parse_hazards(raw_hazards: object) -> Dict[str, Set[GridPosition]]:
@@ -196,6 +231,19 @@ class GridWorld:
                         "{} hazard is outside the world: {}".format(kind, position)
                     )
 
+        for area_id, positions in self.areas.items():
+            if not isinstance(area_id, str) or not area_id:
+                raise ValueError("area name must be a non-empty string")
+            if area_id == "all":
+                raise ValueError("area name 'all' is reserved")
+            if not positions:
+                raise ValueError("area {} must not be empty".format(area_id))
+            for position in positions:
+                if not self.in_bounds(position):
+                    raise ValueError(
+                        "area {} is outside the world: {}".format(area_id, position)
+                    )
+
         seen_ids: Set[str] = set()
         for item in self.trash:
             if item.item_id in seen_ids:
@@ -282,10 +330,44 @@ class GridWorld:
             sorted(kind for kind, positions in self.hazards.items() if position in positions)
         )
 
-    def traversable_count(self, avoid_types: Iterable[str] = ()) -> int:
-        return sum(
-            1
-            for y in range(self.height)
-            for x in range(self.width)
-            if not self.is_blocked(GridPosition(x, y), avoid_types)
+    def traversable_area_cells(
+        self,
+        target_area: str = "all",
+        avoid_types: Iterable[str] = (),
+    ) -> Tuple[GridPosition, ...]:
+        """Return traversable cells in a named area in deterministic row order.
+
+        ``all`` is an implicit area covering the complete world.  Named areas are
+        explicit semantic regions and may contain obstacles or hazards; those cells
+        are filtered according to the same traversal policy used by path planners.
+        """
+
+        if not isinstance(target_area, str) or not target_area:
+            raise ValueError("target_area must be a non-empty string")
+
+        if target_area == "all":
+            candidates = (
+                GridPosition(x, y)
+                for y in range(self.height)
+                for x in range(self.width)
+            )
+        else:
+            try:
+                candidates = iter(self.areas[target_area])
+            except KeyError as exc:
+                raise ValueError("unknown target area: {}".format(target_area)) from exc
+
+        avoided = tuple(avoid_types)
+        return tuple(
+            sorted(
+                (
+                    position
+                    for position in candidates
+                    if not self.is_blocked(position, avoided)
+                ),
+                key=lambda position: (position.y, position.x),
+            )
         )
+
+    def traversable_count(self, avoid_types: Iterable[str] = ()) -> int:
+        return len(self.traversable_area_cells("all", avoid_types))

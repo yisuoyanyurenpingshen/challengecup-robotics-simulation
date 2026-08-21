@@ -7,6 +7,7 @@ from pathlib import Path
 from typing import List, Optional
 
 from smartclean_sim.config import ConfigError, load_config
+from smartclean_sim.html_visualization import write_animation_html
 from smartclean_sim.rendering import render_ascii
 from smartclean_sim.simulation import Simulator
 from smartclean_sim.tasking import TaskParseError, task_from_dict
@@ -17,6 +18,11 @@ def build_parser() -> argparse.ArgumentParser:
     parser.add_argument("--config", default="configs/demo.json", help="JSON 配置路径")
     parser.add_argument("--task", help="覆盖配置中的自然语言任务")
     parser.add_argument("--output", help="将结构化结果写入 JSON 文件")
+    parser.add_argument(
+        "--animate",
+        metavar="HTML_PATH",
+        help="导出可离线打开的自包含 HTML 动画",
+    )
     parser.add_argument("--show-map", action="store_true", help="在终端显示最终路线图")
     return parser
 
@@ -62,9 +68,19 @@ def main(argv: Optional[List[str]] = None) -> int:
             stream.write("\n")
         print("结果已写入：{}".format(output_path))
 
+    if args.animate:
+        animation_path = write_animation_html(
+            config["scenario"],
+            result,
+            args.animate,
+            title="SmartClean-Sim · {}".format(
+                config["scenario"].get("name", "清扫演示")
+            ),
+        )
+        print("动画已写入：{}".format(animation_path))
+
     return 0 if result.metrics.completed else 1
 
 
 if __name__ == "__main__":
     raise SystemExit(main())
-

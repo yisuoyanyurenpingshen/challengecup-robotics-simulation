@@ -13,9 +13,10 @@
 ```text
 GridPosition(x, y)
 TrashItem(item_id, kind, position, area)
-CleaningTask(target_area, priority_classes, avoid_types, return_to_dock)
+CleaningTask(target_area, priority_classes, avoid_types, return_to_dock, mode)
 GridWorld.from_dict(scenario)
 AStarPlanner.plan(world, start, goal, avoid_types, extra_blocked)
+CoveragePlanner.plan(world, start, target_area, avoid_types)
 RuleBasedTaskParser.parse(instruction)
 Simulator.from_config(config, task).run() -> SimulationResult
 ```
@@ -23,6 +24,8 @@ Simulator.from_config(config, task).run() -> SimulationResult
 当前仓库配置使用整数 `schema_version: 1`。外部任务字段优先采用 `return_after_done`；P0 同时接受 `return_after_done` 和内部历史名称 `return_to_dock`，进入核心后统一映射为 `CleaningTask.return_to_dock`。
 
 P0 栅格坐标原点在左上角，`x` 向右、`y` 向下，单位是“格”。后续 ROS2 `map` 坐标采用右手系、米制且 `y` 向上，适配器必须显式完成轴向和比例转换，禁止直接混用。
+
+P1 已实现 `clean_spots` 和 `clean_area` 两种模式、显式命名栅格区域、全覆盖规划，以及 `SimulationResult.trace.frames` 完整回放快照。目标契约中的 `patrol`、连续位姿、固定 `dt` 和感知对象仍未实现。
 
 ## 2. 全局约定
 

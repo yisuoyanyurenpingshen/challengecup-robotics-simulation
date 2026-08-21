@@ -21,7 +21,9 @@
 | 动态障碍预测与安全重规划 | 已实现、已测试 | `simulation.py` |
 | 清扫、返航和基础指标 | 已实现、已测试 | `simulation.py` |
 | CLI 与 ASCII 路线图 | 已实现、已测试 | `cli.py`、`rendering.py` |
-| 区域全覆盖规划、固定 `dt`、感知与控制器分层 | 设计中 | 尚未实现 |
+| 命名栅格区域与蛇形全覆盖规划 | 已实现、已测试 | `grid.py`、`planning.py`、`simulation.py` |
+| 逐帧轨迹与离线 HTML 动画 | 已实现、已测试 | `simulation.py`、`html_visualization.py` |
+| 固定 `dt`、感知与控制器分层 | 设计中 | 尚未实现 |
 | ROS2、Gazebo、YOLO、LLM、Web、RDK | 适配规划 | 尚未集成或硬件验证 |
 
 P0 使用整数栅格坐标，每次移动一个单元，不包含随机行为；因此当前可复现性来自确定性排序和算法，而不是随机种子。引入噪声或随机场景时再把 `seed` 纳入配置和结果。
