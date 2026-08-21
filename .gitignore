@@ -9,6 +9,11 @@ dist/
 # 虚拟环境 / Conda 环境
 .env
 .venv/
+.pixi/
+.tools/
+.cache/
+.ros/
+.gazebo/
 venv/
 env/
 envs/*
@@ -49,6 +54,7 @@ results/*
 # ROS2 / colcon 构建产物（不要忽略公共 logs/）
 install/
 log/
+ros2_ws/.colcon/
 
 # 模型文件
 *.pt

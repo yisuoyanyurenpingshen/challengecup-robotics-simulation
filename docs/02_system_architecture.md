@@ -6,11 +6,11 @@
 
 项目的正式定位是：**面向 RDK 国产机器人平台的智慧环卫无人清扫车仿真与边缘部署验证系统**。
 
-当前阶段先交付一个可重复验证的 PC 端闭环，再逐步接入 ROS2、Gazebo、YOLO、LLM、Web 和 RDK。本文中的“核心”不依赖这些外部系统；外部能力统一通过适配器接入。
+当前已经交付可重复验证的 PC 端二维闭环，并通过 ROS2 Humble 回放桥发布状态、轨迹和位姿；Gazebo 物理闭环、YOLO、LLM、Web 和 RDK 仍按适配器边界逐步接入。本文中的“核心”不依赖这些外部系统；外部能力统一通过适配器接入。
 
 ## 0. 实现状态（2026-08-21）
 
-本文同时描述“已经落地的 P0 基线”和“后续目标架构”。除本节明确列为已实现的部分外，其余分层、数据对象和外部适配器均是设计约束，不能在汇报中表述为已经完成。
+本文同时描述“已经落地的 P0/P1 与 ROS2 回放基线”和“后续目标架构”。除本节明确列为已实现的部分外，其余分层、数据对象和外部适配器均是设计约束，不能在汇报中表述为已经完成。
 
 | 能力 | 状态 | 当前实现 |
 | --- | --- | --- |
@@ -23,8 +23,13 @@
 | CLI 与 ASCII 路线图 | 已实现、已测试 | `cli.py`、`rendering.py` |
 | 命名栅格区域与蛇形全覆盖规划 | 已实现、已测试 | `grid.py`、`planning.py`、`simulation.py` |
 | 逐帧轨迹与离线 HTML 动画 | 已实现、已测试 | `simulation.py`、`html_visualization.py` |
+| 仓库内 ROS2 Humble 环境 | 已实现、已验证 | Pixi/RoboStack、`pixi.lock`；19 项 `colcon` 测试通过 |
+| ROS2 状态、轨迹与位姿回放桥 | 已实现、已验证 | `ros2_ws/src/smartclean_ros`；三条 Topic 探针通过 |
+| Jammy/Humble Docker 复现定义 | 已实现、待 daemon 验证 | `compose.ros2.yaml`、`containers/ros2-humble/Dockerfile` |
+| Gazebo Fortress 最小 World 与 `/clock` | 已实现、已验证 | `smartclean_gazebo`；headless 启动和 ROS-Gazebo 时钟桥通过 |
+| Nav2、SLAM Toolbox | 包已安装、未形成闭环 | 不等同于定位、规划或控制已经接入 |
 | 固定 `dt`、感知与控制器分层 | 设计中 | 尚未实现 |
-| ROS2、Gazebo、YOLO、LLM、Web、RDK | 适配规划 | 尚未集成或硬件验证 |
+| Gazebo 物理闭环、YOLO、LLM、Web、RDK | 适配规划 | 尚未集成或硬件验证 |
 
 P0 使用整数栅格坐标，每次移动一个单元，不包含随机行为；因此当前可复现性来自确定性排序和算法，而不是随机种子。引入噪声或随机场景时再把 `seed` 纳入配置和结果。
 
@@ -176,7 +181,7 @@ domain ← tasking ← orchestration → perception / planning / control
 
 | 适配器 | 输入 | 输出 | 明确边界 |
 |---|---|---|---|
-| ROS2 | Topic、Service、Action | 核心数据对象或 ROS2 消息 | 核心不出现 `rclpy` 和 ROS 消息类型 |
+| ROS2 | Topic、Service、Action | 核心数据对象或 ROS2 消息 | 已实现只读回放桥；核心不出现 `rclpy` 和 ROS 消息类型 |
 | Gazebo | 模型状态、相机、雷达 | `Observation`、`RobotState` | 高保真世界替换二维世界，但不改变任务语义 |
 | YOLO | 图像帧 | 标准 `Detection` | 不做路径规划和任务决策 |
 | LLM | 自然语言和受限上下文 | 候选 `TaskSpec` | 必须校验；失败时拒绝或回退规则解析器 |
@@ -211,18 +216,14 @@ domain ← tasking ← orchestration → perception / planning / control
 ### 4.3 RDK 感知流
 
 ```text
-仿真或真实相机 → RDK 模型预处理 → BPU 推理 → 后处理
-                                              │
-                                              ▼
-                                   标准 Detection 列表
-                                              │
-                               ROS2/网络传输或本地调用
-                                              │
-                                              ▼
-                                      PC 端世界与规划
+PC：二维核心 / Gazebo / 规划 / 指标
+                      ▲
+                      │ ROS2 Humble，ROS_DOMAIN_ID=42
+                      ▼
+RDK：相机 → 预处理 → BPU 推理 → 后处理 → 标准 Detection
 ```
 
-RDK 适配验证的是模型转换、量化、板端推理和通信链路；在没有开发板时，应使用相同接口的 PC 适配器完成协议验证，并明确标注未进行板端实测。
+RDK 适配验证的是模型转换、量化、板端推理和通信链路；基线为 RDK OS 3.x、Ubuntu 22.04 和 TROS-Humble，X5 为主目标、X3 为兼容目标。在没有开发板时，应使用相同接口的 PC 适配器完成协议验证，并明确标注未进行板端实测。完整部署边界见 `09_rdk_tros_deployment.md`。
 
 ## 5. 任务状态机
 
@@ -270,23 +271,36 @@ COMPLETED / FAILED / EMERGENCY_STOPPED --reset→ IDLE
 
 ## 6. ROS2 集成边界
 
-ROS2 是通信和生态集成层，不是核心算法的唯一运行方式。建议后续在独立工作空间中组织：
+ROS2 是通信和生态集成层，不是核心算法的唯一运行方式。当前独立工作空间已经建立：
 
 ```text
 ros2_ws/src/
-├── smartclean_interfaces/   自定义 msg/srv/action
-├── smartclean_bridge/       核心对象与 ROS2 消息转换
-└── smartclean_bringup/      launch、参数和演示编排
+├── smartclean_core/           平台无关核心与 demo 配置的 ROS 安装包装
+├── smartclean_ros/
+│   ├── smartclean_ros/      核心调用、坐标转换与 ROS2 节点
+│   ├── launch/              回放演示编排
+│   └── test/                转换与桥接契约测试
+└── smartclean_gazebo/
+    ├── launch/              Fortress headless 与 `/clock` 桥接
+    └── worlds/              无在线资源依赖的最小环卫场景
 ```
 
-首批映射建议：
+当前已经验证的只读输出：
+
+- `/smartclean/status`：`std_msgs/msg/String`，承载版本化 JSON 状态。
+- `/smartclean/trajectory`：`nav_msgs/msg/Path`，发布完整 `map` 轨迹。
+- `/smartclean/robot_pose`：`geometry_msgs/msg/PoseStamped`，发布逐帧回放位置。
+
+栅格桥接显式完成“左上原点、`y` 向下、整数格”到“左下原点、`y` 向上、米制 `map` 格中心”的转换。实现、QoS、参数和验证结果见 `08_ros2_environment_and_bridge.md`。
+
+后续导航闭环的首批映射目标：
 
 - 标准输入：`/odom`、`/scan`、相机图像。
 - 标准输出：`/cmd_vel`。
 - 项目消息：`/smartclean/detections`、`/smartclean/robot_state`、`/smartclean/metrics`。
 - 项目动作：`/smartclean/clean_area`，支持反馈、取消和最终结果。
 
-ROS2 节点只转换协议并调用核心服务；不得在回调中复制一套独立状态机。ROS2 不可用时，CLI 闭环仍必须正常运行。
+ROS2 节点只转换协议并调用核心服务；不得在回调中复制一套独立状态机。ROS2 不可用时，CLI 闭环仍必须正常运行。当前三条 Topic 只证明回放通信已打通，不能表述为 `/odom`—Nav2—`/cmd_vel` 导航闭环。
 
 ## 7. 故障与降级策略
 
@@ -315,8 +329,9 @@ ROS2 节点只转换协议并调用核心服务；不得在回调中复制一套
 
 ### 阶段 C：机器人生态
 
-- 接入 ROS2 和 Gazebo。
-- 验证标准消息、动作取消、状态反馈和 `/cmd_vel` 安全约束。
+- ROS2 Humble 环境与状态/轨迹/位姿回放桥已完成。
+- Gazebo Fortress 最小 World 与 ROS-Gazebo `/clock` 冒烟已完成。
+- 标准传感器、Nav2、动作取消、状态反馈和 `/cmd_vel` 安全约束待实现。
 
 ### 阶段 D：国产边缘适配
 

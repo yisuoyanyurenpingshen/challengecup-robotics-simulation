@@ -1,0 +1,41 @@
+"$schema" = "https://pixi.sh/latest/schema/manifest/schema.json"
+
+[workspace]
+name = "smartclean-ros2"
+version = "0.2.0"
+description = "Repository-local ROS 2 Humble development environment for SmartClean-Sim"
+channels = [
+  "https://prefix.dev/robostack-humble",
+  "https://prefix.dev/conda-forge",
+]
+platforms = ["linux-64"]
+channel-priority = "strict"
+
+[dependencies]
+python = "3.12.*"
+ros-humble-ros-base = "*"
+ros-humble-desktop = "*"
+ros-humble-demo-nodes-cpp = "*"
+ros-humble-demo-nodes-py = "*"
+ros-humble-nav2-bringup = "*"
+ros-humble-ros-gz = "*"
+colcon-common-extensions = "*"
+pytest = ">=8,<9"
+vcstool = "*"
+
+[activation.env]
+PYTHONPATH = "$PIXI_PROJECT_ROOT/src"
+ROS_DOMAIN_ID = "42"
+ROS_LOG_DIR = "$PIXI_PROJECT_ROOT/.ros/log"
+IGN_TRANSPORT_LOG_SQL_PATH = "$CONDA_PREFIX/share/ignition/ignition-transport11/sql"
+RCUTILS_COLORIZED_OUTPUT = "1"
+
+[tasks]
+sim-test = "python -m pytest -q tests"
+ros-build = "bash scripts/ros2_build.sh"
+ros-test = { cmd = "bash scripts/ros2_test.sh", depends-on = ["ros-build"] }
+ros-demo = "bash scripts/ros2_demo.sh"
+ros-verify = "bash scripts/verify_ros2.sh"
+gazebo-smoke = "bash scripts/gazebo_smoke.sh"
+gazebo-verify = "bash scripts/verify_gazebo.sh"
+ros-doctor = "ros2 doctor --report"

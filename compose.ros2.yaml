@@ -1,0 +1,19 @@
+services:
+  ros2:
+    build:
+      context: .
+      dockerfile: containers/ros2-humble/Dockerfile
+      args:
+        USER_ID: "${SMARTCLEAN_UID:-1000}"
+        GROUP_ID: "${SMARTCLEAN_GID:-1000}"
+    image: smartclean/ros2-humble:local
+    network_mode: host
+    ipc: host
+    working_dir: /workspace
+    volumes:
+      - .:/workspace
+    environment:
+      ROS_DOMAIN_ID: "${ROS_DOMAIN_ID:-42}"
+      DISPLAY: "${DISPLAY:-}"
+    stdin_open: true
+    tty: true

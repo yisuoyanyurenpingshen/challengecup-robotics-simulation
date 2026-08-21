@@ -6,7 +6,7 @@
 
 本文描述的是逻辑接口；实际 Python 类型、JSON Schema 和 ROS2 消息应由同一份字段定义生成或逐项测试，避免三套结构逐渐不一致。
 
-## 0. P0 已实现接口与目标契约
+## 0. 已实现接口与目标契约
 
 第 3 节起的大部分对象是 ROS2/Gazebo/视觉接入阶段的目标契约。当前可运行 P0 有意保持最小，只实现下列 Python 接口：
 
@@ -26,6 +26,17 @@ Simulator.from_config(config, task).run() -> SimulationResult
 P0 栅格坐标原点在左上角，`x` 向右、`y` 向下，单位是“格”。后续 ROS2 `map` 坐标采用右手系、米制且 `y` 向上，适配器必须显式完成轴向和比例转换，禁止直接混用。
 
 P1 已实现 `clean_spots` 和 `clean_area` 两种模式、显式命名栅格区域、全覆盖规划，以及 `SimulationResult.trace.frames` 完整回放快照。目标契约中的 `patrol`、连续位姿、固定 `dt` 和感知对象仍未实现。
+
+ROS2 Humble 回放桥已经实现以下公开入口和只读输出：
+
+```text
+GridMapTransform.grid_to_map(grid_x, grid_y) -> (map_x_m, map_y_m)
+load_and_run(config_path) -> BridgeRun
+build_status_payload(run, frame_index) -> JSON-compatible dict
+SmartCleanBridgeNode -> status(String JSON), trajectory(Path), robot_pose(PoseStamped)
+```
+
+这组接口用于把现有确定性仿真结果送入 ROS2，并不接受 `/odom`、`/scan` 或 `/cmd_vel`，也不具备 Nav2 导航控制语义。
 
 ## 2. 全局约定
 
@@ -429,7 +440,37 @@ MetricsCollector.finalize(run_context) -> RunSummary
 
 ### 5.1 ROS2
 
-建议映射：
+当前已实现并通过 Topic 探针的回放契约：
+
+| Topic | ROS2 类型 | QoS | 语义 |
+|---|---|---|---|
+| `/smartclean/status` | `std_msgs/msg/String` | Reliable、Transient Local、depth 1 | UTF-8 JSON 状态、事件和指标；`schema_version=1` |
+| `/smartclean/trajectory` | `nav_msgs/msg/Path` | Reliable、Transient Local、depth 1 | 完整仿真轨迹，`frame_id=map` |
+| `/smartclean/robot_pose` | `geometry_msgs/msg/PoseStamped` | Reliable、Transient Local、depth 1 | 当前回放帧的格中心位置，`frame_id=map`；晚加入者可取得最近一帧 |
+
+状态 JSON 的稳定顶层字段为：
+
+```text
+schema_version, scenario_name, status, task_state, run_result_status,
+frame_index, frame_count, sim_step, action,
+robot_grid_position, cleaned_ids, remaining_trash_ids, events,
+progress, final_metrics, final_rates
+```
+
+`status` / `task_state` 表示当前回放帧，不能提前使用最终结果；
+`run_result_status`、`final_metrics` 和 `final_rates` 明确表示这次确定性
+运行的最终汇总。`progress` 只包含当前帧可证明的进度字段。
+
+当前格坐标转换规则为：
+
+```text
+map_x = origin_x_m + (grid_x + 0.5) * cell_size_m
+map_y = origin_y_m + (grid_height - grid_y - 0.5) * cell_size_m
+```
+
+其中 `origin_x_m`、`origin_y_m` 表示完整栅格左下角，发布位置位于格中心。转换必须拒绝非正栅格尺寸、非正分辨率、非有限原点和越界格坐标。当前核心没有连续朝向，`PoseStamped` 暂用单位四元数，调用方不得把它解释为实车航向。
+
+后续导航闭环的目标映射：
 
 | 核心对象 | ROS2 接口 |
 |---|---|
@@ -442,7 +483,9 @@ MetricsCollector.finalize(run_context) -> RunSummary
 | `TaskSpec` 与执行反馈 | `smartclean_interfaces/action/CleanArea` |
 | `RunSummary` | `smartclean_interfaces/msg/RunMetrics` 或结果文件 |
 
-转换函数必须成对测试：核心对象转 ROS2 消息再转回后，除允许的时间戳精度外语义应保持不变。
+转换函数必须成对测试：核心对象转 ROS2 消息再转回后，除允许的时间戳精度外语义应保持不变。当前 `String` JSON 是过渡接口；增加任务控制或板端感知后，应迁移到 `smartclean_interfaces` 自定义消息，并提供 schema 迁移与兼容测试。
+
+ROS2 环境固定 `ROS_DOMAIN_ID=42`。PC、容器和 RDK 需要跨机通信时，消息类型、domain、RMW 与 QoS 必须相容；不得把“能发现 Topic”当成“已通过消息契约”。
 
 ### 5.2 YOLO
 
@@ -472,6 +515,10 @@ RDK 适配器封装模型加载、BPU 内存、预处理、推理和后处理。
 - 固定测试图片及期望结果容差。
 
 量化造成的精度差异应记录在对比结果中，不允许为板端另建一套业务类别或规划接口。
+
+板端基线为 RDK OS 3.x、Ubuntu 22.04 和 TROS-Humble；X5 是主目标，X3 是兼容目标。旧 X3 OS 2.x/Foxy 不属于当前接口兼容范围。PC 与 RDK 在同一网络和 domain 42 中通信，板端只能 source `/opt/tros/humble/setup.bash` 或同一终端中的一套等价 ROS 环境，禁止与 `/opt/ros` 或 Foxy 前缀混用。
+
+`amd64` PC 构建产物不能直接作为 `arm64` RDK 二进制部署。包必须在板端 TROS 环境构建，或使用与板型、RDK OS 和 TROS 版本严格匹配的 D-Robotics 官方交叉编译环境。完整步骤和验收清单见 `09_rdk_tros_deployment.md`。
 
 ### 5.5 Web/CLI
 
@@ -504,6 +551,8 @@ Web 与 CLI 都调用任务执行器的公开命令接口，不直接修改状�
 5. 清除目标垃圾，按任务要求返航。
 6. 任务进入 `COMPLETED`，碰撞数为零。
 7. 连续运行两次，事件序列和 `RunSummary` 一致。
+
+ROS2 回放桥另有一组已通过的集成验收：工作空间可构建、19 项 `colcon` 测试通过；探针在 20 秒内收到状态、完整轨迹和位姿，并等待当前回放帧进入 `COMPLETED`；最终目标清除率与覆盖率均为 1.0、碰撞为 0 且已经返航。Gazebo 另有独立的 headless World 与 `/clock` 冒烟；这两组验收都不覆盖机器人动力学、Nav2、RDK 或真实底盘。
 
 接口实现的最低测试范围：
 

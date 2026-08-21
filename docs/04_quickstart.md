@@ -62,6 +62,75 @@ smartclean-sim --config configs/demo.json --show-map
 pytest -q
 ```
 
+## ROS 2 Humble 快速开始
+
+ROS 环境与二维核心互相隔离。首次使用执行：
+
+```bash
+# 在仓库根目录执行
+bash scripts/ros2.sh install
+bash scripts/ros2.sh build
+bash scripts/ros2.sh verify
+bash scripts/ros2.sh gazebo-verify
+```
+
+`verify` 会自动启动桥接节点并订阅三个 Topic，只有同时满足以下条件才返回 0：
+
+- 状态为 `COMPLETED`
+- 垃圾清扫 `4/4`
+- 区域覆盖率 `1.0`
+- 碰撞 `0`
+- 成功返航
+- 收到 103 个轨迹位姿和逐帧机器人位姿
+
+`gazebo-verify` 会在无界面模式启动本地 Fortress World，通过
+`ros_gz_bridge` 收到非负且推进中的 `/clock` 后自动退出。
+
+启动持续回放，保留这个终端：
+
+```bash
+bash scripts/ros2.sh demo replay_period_s:=0.1 loop_replay:=true
+```
+
+单独启动 Gazebo 最小场景，保留终端并用 `Ctrl+C` 停止：
+
+```bash
+bash scripts/ros2.sh gazebo
+```
+
+另开一个终端检查 ROS 图：
+
+```bash
+# 另一个终端也先进入仓库根目录
+bash scripts/ros2.sh run ros2 node list
+bash scripts/ros2.sh run ros2 topic list -t
+bash scripts/ros2.sh run ros2 topic echo --once \
+  --qos-reliability reliable \
+  --qos-durability transient_local /smartclean/status
+bash scripts/ros2.sh run ros2 topic echo --once \
+  --qos-reliability reliable \
+  --qos-durability transient_local /smartclean/trajectory
+```
+
+已发布接口：
+
+| Topic | 消息 | 说明 |
+| --- | --- | --- |
+| `/smartclean/status` | `std_msgs/msg/String` | Schema v1 JSON 状态、指标和当前回放帧 |
+| `/smartclean/trajectory` | `nav_msgs/msg/Path` | `map` 坐标系中的完整轨迹 |
+| `/smartclean/robot_pose` | `geometry_msgs/msg/PoseStamped` | 按帧回放的当前位置 |
+
+打开完整环境 shell：
+
+```bash
+bash scripts/ros2.sh shell
+source ros2_ws/install/setup.bash
+```
+
+退出 shell 使用 `exit`。不要在同一个终端再 source 系统 ROS 或其他 Conda 环境。
+
+当前桥接器回放确定性二维结果，不接收 `/cmd_vel`，也没有发布真实 `/odom` 或 TF。Gazebo 最小 World 与 ROS 仿真时钟已经独立冒烟通过，但没有机器人模型、传感器或动力学控制；Nav2 也尚未接入闭环。技术边界见 `docs/08_ros2_environment_and_bridge.md`。
+
 ## 结果说明
 
 - `completion_rate`：当前任务目标中已清扫目标的比例。

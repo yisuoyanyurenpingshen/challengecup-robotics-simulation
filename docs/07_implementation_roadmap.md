@@ -14,6 +14,15 @@
 - 与动态障碍同步的逐帧仿真快照。
 - 无外部依赖的自包含 HTML/Canvas 动画。
 
+### P1.5：ROS 2 环境与回放桥
+
+- 锁定仓库内 ROS 2 Humble Desktop、Nav2、SLAM Toolbox 和 Gazebo Fortress 桥环境。
+- 建立独立 `ros2_ws/`，保持二维核心零 ROS 依赖。
+- 发布状态 JSON、完整 `nav_msgs/Path` 和逐帧 `PoseStamped`。
+- 完成格坐标到右手米制 `map` 坐标转换、colcon 测试和 Topic 端到端探针。
+- 增加无在线资源依赖的 Gazebo Fortress 最小环卫 World，并自动验证 ROS `/clock` 桥接。
+- 提供 Ubuntu 22.04 / Humble 官方容器蓝图；当前代理会话因 Docker daemon 权限未完成镜像构建。
+
 ## 后续优先级
 
 ### P2：场景与实验体系
@@ -42,12 +51,12 @@
 
 目标：把核心算法接入机器人通信和三维仿真。
 
-- 确认与当前 Ubuntu 环境匹配的 ROS2/Gazebo 版本。
-- 建立独立 `ros2_ws/`、接口包、桥接节点和 bringup。
+- 已完成版本决策、独立工作空间、基础桥接节点、可复现环境和 Gazebo `/clock` 冒烟。
+- 将当前轨迹回放升级为 Gazebo 机器人模型和闭环控制。
 - 对接 `/odom`、`/scan`、相机、`/cmd_vel` 和清扫 Action。
 - 再评估 Nav2 与 OpenNav Coverage，而不是复制第二套状态机。
 
-验收：一条 launch 命令启动、可取消任务、动态障碍时安全停车或重规划、CLI 基线不回归。
+最终验收：一条 launch 命令启动、可取消任务、动态障碍时安全停车或重规划、CLI 基线不回归。当前只达到“环境 + 回放桥 + Gazebo World/时钟自动验收”，不得提前宣称完成 P4。
 
 ### P5：LLM、Web 与 RDK
 
