@@ -9,7 +9,7 @@
 - **Phase 12 `trash-mission`（检测→导航→清扫→指标更新→返航）尚未开始。**
 - Phase 13（五场景批量实验）尚未开始。
 - 最终交接文档 `docs/README0822.md`（21 项）尚未生成。
-- 当前 HEAD `415ec18`（推送后本地==origin==GitHub 已核对）。
+- 当前 HEAD `ad17b60`，已推送：本地 == origin/main == GitHub main。
 
 ## 1. 任务来源与主线
 
@@ -32,6 +32,7 @@
 | `5ce5cb9` | fix(gazebo) footprint 碰撞盒抬高整车→车轮悬空，移入车体 | 真值位移证据 |
 | `5d58976` | **feat(nav2) 验证过的导航闭环 + 单调时钟中继** | nav2-verify（见 §3） |
 | `415ec18` | docs(nav2) 地图生成器坐标注释修正 | — |
+| `ad17b60` | docs(handoff) 日志收尾 + 本交接文档 | 本地==origin==GitHub |
 | 日志 | `5ca0d37`/`5473f56` 等 docs(log) 提交 | — |
 
 交接基线：`6c5d718`（用户给出的起点）。
@@ -61,7 +62,7 @@ bash scripts/ros2.sh nav2-verify
 本机（推荐直接继续）：
 ```bash
 cd /home/bktx/projects/challengecup-robotics-simulation
-git status --short && git log --oneline -3   # 应先看到干净的树与 415ec18
+git status --short && git log --oneline -3   # 应先看到干净的树与 ad17b60
 ```
 
 新机器从零开始：
@@ -155,7 +156,7 @@ Gazebo+RViz → 相机看到垃圾 → 识别输出类别/框/置信度 → 可�
 
 ## 9. 当前工作区状态（截至本文档）
 
-- 已提交未推送：`5ce5cb9`、`5d58976`、`415ec18`（编写本文档时；推送后会更新 §0/§2）。
-- 未提交改动：仅 `logs/` 两篇日志 + 本文档。
+- 已提交并推送：`5ce5cb9`、`5d58976`、`415ec18`、`ad17b60`。
+- `git status --short` 干净（本文档落盘后为空输出）。
 - 不在版本控制且应保持：`.pixi/`、`.tools/`、`.cache/`、`weights/downloads/`、
   `ros2_ws/{build,install,log}/`（见 .gitignore）。
