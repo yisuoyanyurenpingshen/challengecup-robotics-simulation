@@ -274,4 +274,4 @@ git push --dry-run origin main  # Everything up-to-date, exit=0
 - `ign sdf -k` Valid；`git diff --check` 干净；无残留 Gazebo/Xvfb/桥进程。
 
 ### 提交
-- `feat(gazebo): add lidar and complete robot tf`（哈希见文末提交记录）。
+- `feat(gazebo): add lidar and complete robot tf` -> `054c5148f0b19c9c6714dea5c50999c0ae38a377`（本地==origin/main==GitHub）。
