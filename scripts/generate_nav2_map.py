@@ -2,8 +2,9 @@
 """Generate the SmartClean arena static map (PGM + YAML) for Nav2.
 
 The Gazebo trash world is a 20 x 16 m plane. The map uses the full plane with
-its origin at world (-10, -8), so world (0, 0) equals map (10, 8) and pixel
-(200, 160) at 0.05 m/pixel. Static obstacles mirror the world:
+its origin at world (-10, -8), so map coordinates equal world coordinates
+(world (0, 0) is map (0, 0), i.e. pixel (200, 160) at 0.05 m/pixel). Static
+obstacles mirror the world:
 
   - north_planter: cylinder, world (4, 3), radius 0.8 m (+0.08 margin);
   - waste_bin: box, world (-4, -3), 0.75 x 0.75 m (+0.08 margin).
