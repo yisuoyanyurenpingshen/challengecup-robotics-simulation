@@ -275,3 +275,123 @@ git push --dry-run origin main  # Everything up-to-date, exit=0
 
 ### 提交
 - `feat(gazebo): add lidar and complete robot tf` -> `054c5148f0b19c9c6714dea5c50999c0ae38a377`（本地==origin/main==GitHub）。
+
+---
+
+## Phase 11：Nav2 最小自主导航（2026-08-22 09:50–10:20 CST）
+
+### 目标
+- 与 Gazebo World 坐标一致的静态地图 + map_server + AMCL + Nav2 全家桶；
+- `bash scripts/ros2.sh nav2`（可 `gui:=true rviz:=true`）与 `bash scripts/ros2.sh nav2-verify`；
+- 验证真实移动、Nav2 来源的 `/cmd_vel`、/plan、到达误差、停车与子进程清理。
+
+### 设计
+- **静态地图** `maps/smartclean_arena.{pgm,yaml}`：20×16 m 全场、0.05 m/px（400×320），
+  origin=(-10,-8)（map 帧=世界帧，机器人起点即 map (0,0)）；静态障碍（north_planter
+  圆柱 r0.8、waste_bin 0.75×0.75）与 World 一致，各加 0.08 m 裕量；垃圾不写入静态
+  地图（由 LiDAR 运行时观测）；边缘画 2 像素边界防驶出。由 `scripts/generate_nav2_map.py`
+  确定性生成（numpy，无 PIL/Fuel 依赖）。
+- **AMCL**：`set_initial_pose` + `initial_pose=(0,0,0)`（实测该 Humble 版
+  libamcl_core 支持 `initial_pose.x/y/z/yaw`）；map→odom 由 AMCL 提供，Gazebo
+  DiffDrive 与 RSP 职责不变。
+- **nav2.launch.py**：Include drive.launch（trash world、lidar:=true、看门狗
+  timeout 放宽到 1.0s）+ nav2_bringup localization/navigation（use_sim_time:=true、
+  autostart:=true、use_composition:=False）。
+- **params** `config/nav2_params.yaml`：基于 Humble 官方样例，footprint
+  [±0.45,±0.31]、xy_goal_tolerance 0.25、max_vel_x 0.26、acc_lim 匹配
+  DiffDrive 0.8/1.5/2.0 上限、laser_max_range 12。
+- **探针** `scripts/nav2_probe.py`：/scan(360、lidar_link)→/odom→完整 TF→/map→
+  AMCL map→odom（20s 无则发一次 /initialpose 兜底）→action 就绪→双目标
+  (1.5,2.5)、(-2.5,1.0)→每目标断言 /plan、/odom 位移>0.2m、/cmd_vel 发布者为
+  velocity_smoother/controller_server、到达误差<0.40m→最终 1.5s 停车
+  （位移<0.03m、速度<0.02m/s）。探针从不发布 /cmd_vel。
+
+### 关键踩坑（均已修复并留契约）
+1. 地图 `mode: trinary` 下 free 像素必须是 254（205 被解析为 unknown→全图无
+   自由空间，planner 无法规划）；已改生成器并断言 PGM 值域 {0,254}。
+2. AMCL `initial_pose` 是 map 帧坐标（=世界坐标），不是像素坐标；错误地设为
+   (10,8) 导致机器人被判定在 map 边界外。
+3. nav2_bringup 的 `PythonExpression(['not ', use_composition])` 会 eval
+   `'not false'` 报 NameError——`use_composition` 必须传 Python 字面量 `"False"`。
+4. ROS_DOMAIN_ID 上限 232，verify 脚本 domain 基数调为 30+pid%100。
+5. 该 rclpy 无 `Subscription.get_publishers_info()`，改用
+   `Node.get_publishers_info_by_topic()`。
+
+### 验证结果
+- `bash scripts/ros2.sh nav2-verify` exit=0：
+  - 目标 1 (1.5,2.5)：/plan=True、/odom 移动、max_speed=0.260 m/s、
+    cmd_vel 来源=['velocity_smoother']、到达误差 0.223 m；
+  - 目标 2 (-2.5,1.0)：到达误差 0.224 m；
+  - 最终停车：1.5s 位移 0.0000 m、速度 0.000 m/s。
+- 新增 5 条 nav2 契约测试；CMakeLists 补注册 camera/lidar/nav2 契约（此前
+  camera/lidar 契约文件未被 colcon 运行）。
+
+### 第二轮排查：TF“jump back in time”风暴 + 热启动目标被拒（2026-08-22 10:20–11:20 CST）
+第一版 nav2-verify 曾通过，随后发现两类不稳定问题，全部修复：
+
+**问题 A：/clock 乱序导致 tf2 报 `Detected jump back in time`，AMCL/planner 失效**
+- 根因：`parameter_bridge` 的 Ignition 订阅回调由传输线程池分发，高频率
+  `/clock` 转发可能乱序；任何 use_sim_time 消费者（tf2、AMCL、Nav2）都假设节点
+  时钟单调。
+- 修复：新增 `smartclean_ros/smartclean_ros/clock_monotonic_relay_node.py`
+  （console script `smartclean_clock_relay`）：订阅 `/clock_raw`（桥改名），丢弃
+  倒退时间戳，只发布严格单调的 `/clock`。drive.launch 中桥的 `/clock` 重映射为
+  `/clock_raw`，中继成为唯一 `/clock` 发布者。
+- 守卫：`nav2_probe.py` 全程计数 `/clock` 倒退并断言为 0；
+  `verify_nav2.sh` 对 launch.log `grep "Detected jump back"` 发现即失败。
+- 结果：nav2-verify 中 /clock 56063 条消息零倒退（末值 56.064s）；实测本机
+  中继丢弃数=0，属于防御性保障。
+
+**问题 B：热启动下目标被 Nav2 拒绝（action server 在 CONFIGURING 阶段即可见）**
+- 根因：Nav2 生命周期管理器激活前 action server 已可见，此时发目标会被拒；
+  冷启动时探针前置检查耗时足够掩盖竞态，热启动（~15s 就绪）暴露。
+- 修复：`nav2_probe.py` 新增 lifecycle 门控——轮询 planner_server /
+  controller_server / bt_navigator 的 `get_state` 服务直到
+  PRIMARY_STATE_ACTIVE(3) 才发送目标。
+
+**附带修复 1：底盘悬空（车轮空转，实体不动）**
+- 根因：`model.sdf` 给 base_footprint 的 0.02m 碰撞盒在 z=0 接触地面，把整车
+  抬高约 0.005m，四轮悬空；/odom 由轮速积分仍更新，但 Gazebo 真值不动。
+- 修复：footprint_collision 移到 `<pose>0 0 0.25 0 0 0</pose>`（与 base_link
+  重叠，self_collide=false）。
+- 证据：/world/smartclean_trash/dynamic_pose/info 旋转 4s 后真值 (0.188,-0.099)。
+
+**附带修复 2：`verify_ros2.sh` 孤儿 bridge + 管道卡死**
+- 根因：`ros2 run` 包装器是独立进程，SIGTERM 不会可靠转发给真正的 bridge；
+  rclpy 的 SIGTERM 处理器也不唤醒阻塞中的 DDS wait set，残留进程持有管道写端，
+  使 `| tail` 永不 EOF。
+- 修复：直接执行 `install/.../smartclean_bridge` console script；cleanup 改为
+  SIGINT→SIGTERM→SIGKILL 阶梯；bridge_node.py 捕获 ExternalShutdownException
+  消除退出 traceback。验证后 exit=0 且无残留进程。
+
+**附带修复 3：探针退出竞态**
+- `nav2_probe.py` 原先让 TransformListener 使用探针节点 + spin_thread，退出时
+  action client 与 TF 执行器 wait set 竞态导致 RCLError/`terminate called`。
+- 修复：TF listener 使用独立节点 + 自管 SingleThreadedExecutor 线程，
+  teardown 时 shutdown 后 join，输出干净、exit=0。
+
+### 最终验证（全部 exit=0，改动后重跑）
+- `install` / `test`（137 项，0 失败）/ `verify` / `gazebo-verify` /
+  `drive-verify` / `python -m pytest -q tests`（41 项）/ `camera-verify` /
+  `perception-verify` / `lidar-verify` / `nav2-verify`。
+- nav2-verify 末轮：目标 1 到达误差 0.155–0.172 m、目标 2 误差 0.155–0.166 m、
+  停车 0.0000 m、/clock 单调 PASS、Nav2 lifecycle 全部 ACTIVE、无 jump-back、
+  无残留进程。
+
+### 提交
+- `fix(gazebo): keep wheels grounded with raised footprint collision`
+- `feat(nav2): add verified navigation loop`
+- `docs(log): record nav2 commit hash`（哈希见文末提交记录）。
+
+---
+
+## 文末提交记录（Phase 11 收尾，2026-08-22）
+
+| 提交 | 内容 |
+|---|---|
+| `5ce5cb9` | fix(gazebo): 底盘悬空（footprint 碰撞盒移入车体） |
+| `5d58976` | feat(nav2): 验证过的导航闭环（含单调时钟中继与 lifecycle 门控） |
+| `415ec18` | docs(nav2): 地图生成器坐标注释修正 |
+
+交接文档（给下一位 Codex 代理）：`logs/2026-08-22-handoff-to-next-agent.md`。
+Phase 12 trash-mission 与 Phase 13 未开始，详见交接文档 §6/§7。
