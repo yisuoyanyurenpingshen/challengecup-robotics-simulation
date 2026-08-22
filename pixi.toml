@@ -51,4 +51,6 @@ gazebo-position-verify = { cmd = "bash scripts/verify_position.sh", depends-on =
 gazebo-lidar-verify = { cmd = "bash scripts/verify_lidar.sh", depends-on = ["ros-build"] }
 gazebo-nav2 = { cmd = "bash scripts/gazebo_nav2.sh", depends-on = ["ros-build"] }
 gazebo-nav2-verify = { cmd = "bash scripts/verify_nav2.sh", depends-on = ["ros-build"] }
+gazebo-trash-mission = { cmd = "bash scripts/gazebo_trash_mission.sh", depends-on = ["ros-build"] }
+gazebo-trash-mission-verify = { cmd = "bash scripts/verify_trash_mission.sh", depends-on = ["ros-build"] }
 ros-doctor = "ros2 doctor --report"

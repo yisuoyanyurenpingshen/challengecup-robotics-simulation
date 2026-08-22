@@ -12,7 +12,7 @@ Checks, in order:
   - the /navigate_to_pose action server becomes ready;
   - for every goal: Nav2 publishes /plan, the /cmd_vel publisher is a Nav2
     node (velocity_smoother or controller_server), and /odom really moves;
-  - after each goal: result.success and arrival error within tolerance;
+  - after each goal: action status is SUCCEEDED and arrival error is within tolerance;
   - after the last goal: the robot stops (odom displacement decays to ~0).
 The probe never publishes /cmd_vel itself.
 """
@@ -26,6 +26,7 @@ from collections import deque
 
 import rclpy
 import tf2_ros
+from action_msgs.msg import GoalStatus
 from lifecycle_msgs.srv import GetState
 from rclpy._rclpy_pybind11 import RCLError
 from rclpy.executors import ExternalShutdownException, SingleThreadedExecutor
@@ -384,9 +385,12 @@ class Nav2Probe(Node):
             return False
 
         result = result_future.result()
-        success = bool(result.result.data if hasattr(result.result, "data") else result.result)
-        if not success:
-            self.get_logger().error("目标 {}：Nav2 报告失败".format(index))
+        if result.status != GoalStatus.STATUS_SUCCEEDED:
+            self.get_logger().error(
+                "目标 {}：Nav2 action 状态 {}，期望 SUCCEEDED({})".format(
+                    index, result.status, GoalStatus.STATUS_SUCCEEDED
+                )
+            )
             return False
 
         if not observed_plan:

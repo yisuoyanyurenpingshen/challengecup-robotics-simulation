@@ -136,15 +136,27 @@ class TrashDetectorNode(Node):
 
     def _lookup_transform(self, target_frame: str, stamp: RosTime):
         try:
-            transform = self._tf_buffer.lookup_transform(
+            return self._tf_buffer.lookup_transform(
                 target_frame,
                 "camera_optical_frame",
                 Time.from_msg(stamp),
                 Duration(seconds=0.1),
             )
-            return transform
-        except Exception:  # noqa: BLE001 - missing TF means invalid position
-            return None
+        except Exception:  # noqa: BLE001 - try latest common TF below
+            # A single-threaded detector cannot service new TF callbacks while
+            # waiting inside this image callback.  AMCL also stamps map->odom
+            # slightly into the future.  Prefer the exact image transform,
+            # then use the latest common transform so stationary discovery
+            # keeps producing valid multi-frame position evidence.
+            try:
+                return self._tf_buffer.lookup_transform(
+                    target_frame,
+                    "camera_optical_frame",
+                    Time(),
+                    Duration(seconds=0.0),
+                )
+            except Exception:  # noqa: BLE001 - position remains invalid
+                return None
 
     def _estimate_position(
         self, bbox_xyxy, image_stamp: RosTime

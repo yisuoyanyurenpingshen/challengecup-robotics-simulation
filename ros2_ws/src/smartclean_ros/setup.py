@@ -48,6 +48,10 @@ setup(
                 "smartclean_clock_relay = "
                 "smartclean_ros.clock_monotonic_relay_node:main"
             ),
+            (
+                "trash_mission_controller = "
+                "smartclean_ros.trash_mission_controller_node:main"
+            ),
         ],
     },
 )

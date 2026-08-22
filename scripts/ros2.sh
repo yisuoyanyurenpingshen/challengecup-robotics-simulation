@@ -63,6 +63,13 @@ case "${1:-shell}" in
   nav2-verify)
     exec "${pixi_bin}" run gazebo-nav2-verify
     ;;
+  trash-mission)
+    shift
+    exec "${pixi_bin}" run gazebo-trash-mission -- "$@"
+    ;;
+  trash-mission-verify)
+    exec "${pixi_bin}" run gazebo-trash-mission-verify
+    ;;
   drive)
     shift
     exec "${pixi_bin}" run gazebo-drive -- "$@"
@@ -86,7 +93,7 @@ case "${1:-shell}" in
     ;;
   *)
     cat >&2 <<'USAGE'
-用法：bash scripts/ros2.sh {install|shell|build|test|demo|verify|gazebo|gazebo-verify|trash-verify|camera-verify|perception-verify|position-verify|lidar-verify|nav2|nav2-verify|drive|drive-verify|drive-gui|doctor|run}
+用法：bash scripts/ros2.sh {install|shell|build|test|demo|verify|gazebo|gazebo-verify|trash-verify|camera-verify|perception-verify|position-verify|lidar-verify|nav2|nav2-verify|trash-mission|trash-mission-verify|drive|drive-verify|drive-gui|doctor|run}
 
 示例：
   bash scripts/ros2.sh drive          # 启动 Gazebo 差速清扫车（Ctrl+C 停止）
@@ -98,6 +105,8 @@ case "${1:-shell}" in
   bash scripts/ros2.sh lidar-verify       # 自动验证 2D LiDAR /scan 与完整 TF
   bash scripts/ros2.sh nav2              # Gazebo + Nav2 导航（可加 gui:=true rviz:=true）
   bash scripts/ros2.sh nav2-verify       # 自动验证 Nav2 双目标导航闭环
+  bash scripts/ros2.sh trash-mission     # 感知、导航、清扫并返航的完整任务闭环
+  bash scripts/ros2.sh trash-mission-verify # 自动验收完整垃圾任务闭环
 
 注意：一次只输入一个命令。不要把两条命令粘贴成一行，
 例如 "bash scripts/ros2.sh drivebash scripts/ros2.sh drive"

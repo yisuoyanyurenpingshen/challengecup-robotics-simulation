@@ -56,6 +56,11 @@ def generate_launch_description() -> LaunchDescription:
                 default_value="false",
                 description="Bridge the RGB camera when true.",
             ),
+            DeclareLaunchArgument(
+                "record",
+                default_value="false",
+                description="Record Gazebo state when true.",
+            ),
             IncludeLaunchDescription(
                 PythonLaunchDescriptionSource([DRIVE_LAUNCH]),
                 launch_arguments={
@@ -64,7 +69,7 @@ def generate_launch_description() -> LaunchDescription:
                     "camera": LaunchConfiguration("camera"),
                     "gui": LaunchConfiguration("gui"),
                     "rviz": "false",
-                    "record": "false",
+                    "record": LaunchConfiguration("record"),
                     # Nav2 can pause briefly during replanning; keep the
                     # safety watchdog slightly more patient than the default.
                     "command_timeout_s": "1.0",
@@ -100,4 +105,3 @@ def generate_launch_description() -> LaunchDescription:
             ),
         ]
     )
-

@@ -445,3 +445,53 @@ Phase 12 trash-mission 与 Phase 13 未开始，详见交接文档 §6/§7。
 下一节点：实现异步 `trash_mission_controller`、专用 launch 与 DeleteEntity bridge；
 严格按 Nav2 `GoalStatus.STATUS_SUCCEEDED`、实际工具距离、车体净空和连续停车四重门控
 后才删除实体与发布 `LitterCleaned`。
+
+Phase 12A 关键节点已提交并推送：
+`5b8fc548e9538c93b9eba7dadd7ed8ec1c7895de`
+（`feat(mission): add tracked target mission contracts`）。本地 `HEAD`、
+`origin/main` 与 GitHub `refs/heads/main` 三方一致。
+
+### Phase 12B：真实感知驱动的清扫、删除与物理返航闭环
+
+- 新增异步 `trash_mission_controller`：等待 Nav2 lifecycle ACTIVE、TF、odom 与
+  DeleteEntity 服务；仅消费 `TrashDetectionArray`，以主机 steady clock 形成至少
+  3 帧稳定观测并冻结 5 个 mission-local track。控制器不读场景 JSON、不读 Gazebo
+  实体列表、不发布速度，也不以评估真值参与目标选择。
+- 状态发布到 `/smartclean/mission/state`（reliable + transient local）；成功删除后
+  才原子发布 `/smartclean/mission/litter_cleaned`。Nav2 结果严格检查
+  `GoalStatus.STATUS_SUCCEEDED`，修正了旧 probe 对 `std_msgs/Empty` action result
+  做布尔判断、可能把 ABORTED 当成功的隐患。
+- 新增 `trash_mission.launch.py`、DeleteEntity bridge、`gazebo_trash_mission.sh`、
+  `trash_mission_probe.py` 与 `verify_trash_mission.sh`；统一入口为
+  `bash scripts/ros2.sh trash-mission[-verify]`。验收探针是纯旁路观察者：不发布
+  `/cmd_vel`、不发导航目标、不调用删除服务；场景真值和 `ign model --list` 只用于
+  最终评估实体是否真实消失。
+- 清扫门控必须同时满足：Nav2 SUCCEEDED、底盘前缘不侵入目标碰撞半径+0.05m、
+  前置工具到目标不超过 0.45m、朝向误差不超过 0.35rad，以及 odom 连续停车至少
+  0.75s。导航接近点增加 0.10m 缓冲；Nav2 goal checker 与 DWB 到点容差由 0.25m
+  收紧到 0.08m，使整段容差区间同时满足车体净空与工具可达。
+- 真实运行暴露并修复三类仅靠单测看不到的问题：
+  1. AMCL `map→odom` 的未来容差与单线程 TF 回调使精确图像时刻变换偶发不可用；
+     感知和控制器均保持“精确时刻优先”，失败后使用 latest common TF。原始位置
+     可在 map/odom，进入 tracker 前统一为 map。
+  2. Gazebo 启动阶段传感器 stamp 可能相等/回拨；多帧独立性改由主机 steady
+     receipt time 判定，20ms 内重复 burst 才丢弃，不再把整个新仿真纪元误判为旧帧。
+  3. 仅按 AMCL map 坐标返航会出现“逻辑到桩、物理未到桩”；dock 现锚定 odom
+     物理原点，发目标前实时变换到 map，最终只以 odom 距离+连续停车验收，并保留
+     最多 3 次有界纠偏。
+
+最终 E2E（`bash scripts/ros2.sh trash-mission-verify`，exit=0）：
+
+- 初始 Gazebo 快照：机器人 + 5 个垃圾实体；稳定目标 5、唯一清扫事件 5；
+- 5 类实体逐一真实消失，remaining 严格按 5→4→3→2→1→0 递减；
+- RGB 有效帧 24、有效位置检测 392、最佳位置误差 0.032m；
+- Nav2 `/plan` 102 条，`/cmd_vel` 来源为 `velocity_smoother`，实际最大位移 3.242m；
+- 全部清扫后物理返航：dock error 0.155m、COMPLETED 后漂移 0.0000m、看门狗
+  持续零速样本 36；`/clock` 104553 个样本无倒退。
+
+回归（全部 exit=0）：
+
+- `bash scripts/ros2.sh test`：218 tests，0 errors/failures/skipped；
+- `bash scripts/ros2.sh nav2-verify`：双目标到达误差 0.054m / 0.062m，最终停车
+  0.0000m，Nav2 lifecycle ACTIVE、时钟单调；
+- `py_compile`、`bash -n`、`git diff --check` 与任务/安全专项测试全部通过。

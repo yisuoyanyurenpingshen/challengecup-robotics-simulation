@@ -34,6 +34,10 @@ if(BUILD_TESTING)
     test_nav2_contract
     test/test_nav2_contract.py
   )
+  ament_add_pytest_test(
+    test_trash_mission_contract
+    test/test_trash_mission_contract.py
+  )
 endif()
 
 ament_package()

@@ -5,6 +5,7 @@ from pathlib import Path
 import yaml
 
 PACKAGE_ROOT = Path(__file__).resolve().parents[1]
+REPO_ROOT = PACKAGE_ROOT.parents[2]
 MAPS_DIR = PACKAGE_ROOT / "maps"
 CONFIG_DIR = PACKAGE_ROOT / "config"
 LAUNCH_DIR = PACKAGE_ROOT / "launch"
@@ -63,7 +64,8 @@ def test_nav2_params_use_sim_time_and_frames() -> None:
 
     controller = params["controller_server"]["ros__parameters"]
     assert controller["FollowPath"]["max_vel_x"] <= 1.2
-    assert controller["general_goal_checker"]["xy_goal_tolerance"] == 0.25
+    assert controller["general_goal_checker"]["xy_goal_tolerance"] == 0.08
+    assert controller["FollowPath"]["xy_goal_tolerance"] == 0.08
 
 
 def test_nav2_launch_combines_drive_localization_navigation() -> None:
@@ -85,3 +87,12 @@ def test_nav2_params_reference_local_scan_only() -> None:
     assert observation_sources == "scan"
     scan_topic = local["voxel_layer"]["scan"]["topic"]
     assert scan_topic == "/scan"
+
+
+def test_nav2_probe_requires_succeeded_action_status() -> None:
+    probe = (REPO_ROOT / "scripts" / "nav2_probe.py").read_text(
+        encoding="utf-8"
+    )
+    assert "GoalStatus.STATUS_SUCCEEDED" in probe
+    assert "result.status != GoalStatus.STATUS_SUCCEEDED" in probe
+    assert "bool(result.result" not in probe

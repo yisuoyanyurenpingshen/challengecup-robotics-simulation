@@ -60,6 +60,9 @@ def test_node_declares_depth_position_pipeline() -> None:
         "position_frame_id = position.frame_id",
     ):
         assert required in node, required
+    assert "Time.from_msg(stamp)" in node
+    assert "latest common transform" in node
+    assert "Time()," in node
 
 
 def test_launch_file_enables_depth_by_default() -> None:
