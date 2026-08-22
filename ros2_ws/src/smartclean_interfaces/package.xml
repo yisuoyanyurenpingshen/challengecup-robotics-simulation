@@ -3,7 +3,7 @@
 <package format="3">
   <name>smartclean_interfaces</name>
   <version>0.1.0</version>
-  <description>Custom ROS 2 messages for SmartClean trash detections.</description>
+  <description>Custom ROS 2 messages for SmartClean detections and cleaning missions.</description>
   <maintainer email="smartclean@example.com">SmartClean Team</maintainer>
   <license>Proprietary</license>
   <url type="repository">https://github.com/yisuoyanyurenpingshen/challengecup-robotics-simulation</url>
@@ -14,6 +14,8 @@
   <exec_depend>builtin_interfaces</exec_depend>
   <exec_depend>rosidl_default_runtime</exec_depend>
   <exec_depend>std_msgs</exec_depend>
+
+  <test_depend>ament_cmake_pytest</test_depend>
 
   <member_of_group>rosidl_interface_packages</member_of_group>
 

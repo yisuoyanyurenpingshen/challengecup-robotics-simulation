@@ -395,3 +395,53 @@ git push --dry-run origin main  # Everything up-to-date, exit=0
 
 交接文档（给下一位 Codex 代理）：`logs/2026-08-22-handoff-to-next-agent.md`。
 Phase 12 trash-mission 与 Phase 13 未开始，详见交接文档 §6/§7。
+
+---
+
+## 续作：Phase 12 识别—导航—清扫闭环（2026-08-23）
+
+### 接手审计与 GitHub 登录
+
+- 完整读取本日志、交接文档和仓库内 14 个受跟踪的 `README*`；未发现
+  `AGENTS.md`。确认 Phase 1–11 已完成，真实接手点为 Phase 12，不按文首陈旧的
+  未勾选任务框重复施工。
+- 接手时工作树干净；`HEAD`、本地跟踪的 `origin/main` 与 GitHub
+  `refs/heads/main` 均为 `ab65002fa87287c6f81f04f6df4c78b19c1b0eae`。
+- 通过浏览器设备授权刷新仓库内 `.tools/gh-config/` 的 GitHub CLI 登录；配置文件
+  权限为 0600 且整个 `.tools/` 被 Git 忽略。`git push --dry-run origin main`
+  返回 `Everything up-to-date`，未把口令、Token 或设备码写入受跟踪文件。
+- 基线复核：二维核心 41 项通过，已有 colcon 结果 137 项零失败；无残留
+  Gazebo/Xvfb/bridge 进程。
+
+### Phase 12A：任务契约、稳定目标跟踪与安全接近几何
+
+- 新增 `smartclean_interfaces/LitterCleaned` 与 `TrashMissionState`：状态消息使用
+  mission-local 稳定 track ID；清扫事件携带源检测、目标/base/工具位置、Nav2
+  状态、连续停车与实体删除回执证据。
+- 新增纯 Python `smartclean_ros.mission_core`，不导入 ROS/Gazebo、不读取
+  `configs/gazebo_scene.json` 或任何仿真真值：
+  - 同类空间最近邻一对一关联，把每帧变化的 `detection_id` 变成确定性
+    `track-000001`；位置/置信度取运行均值，cleaned tombstone 防视觉残留复活；
+  - 按 `priority_classes → confidence 降序 → 机器人距离 → track_id` 稳定选目标，
+    区分无检测、无可靠位置、过期、低置信度和全部已清扫；
+  - 建立结构化 mission state/failure reason；
+  - 保留侧向几何测试，同时新增实际控制器必须采用的
+    `compute_front_tool_approach`。车体前缘保持目标半径+安全余量，清扫半径 0.45m
+    解释为“前置工具点到目标”的距离，避免 0.90×0.62m 车体挤压垃圾。
+- `scripts/ros2_test.sh` 开始纳入 `smartclean_interfaces`，避免消息契约只构建不测试；
+  `docs/03_module_interfaces.md` 同步固定稳定 track、状态 Topic 和清扫安全门顺序。
+- Gazebo 删除服务实际探针（隔离 domain/partition）确认：
+  `/world/smartclean_trash/remove@ros_gz_interfaces/srv/DeleteEntity` 可用；以
+  `name=trash_plastic_bottle,type=MODEL(2)` 调用返回 `success=True`，模型列表中瓶子
+  真实消失且其余四件垃圾与机器人仍在。控制器后续只消费执行器回执，实体列表仅由
+  独立验收器读取，不能反向参与目标选择。
+
+验证（首轮）：
+
+- mission core 54 项 + message contract 2 项：56 项通过；
+- `bash scripts/ros2.sh test`：194 tests，0 errors/failures/skipped；
+- `py_compile`、`bash -n scripts/ros2_test.sh`、`git diff --check` 通过。
+
+下一节点：实现异步 `trash_mission_controller`、专用 launch 与 DeleteEntity bridge；
+严格按 Nav2 `GoalStatus.STATUS_SUCCEEDED`、实际工具距离、车体净空和连续停车四重门控
+后才删除实体与发布 `LitterCleaned`。

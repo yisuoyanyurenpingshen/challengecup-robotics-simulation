@@ -343,6 +343,27 @@ SmartCleanBridgeNode -> status(String JSON), trajectory(Path), robot_pose(PoseSt
 
 摘要必须携带局限性，便于区分二维仿真、Gazebo 仿真和实车/RDK 实测结果。
 
+### 3.13 ROS2 垃圾任务状态与清扫事件（schema 1）
+
+Phase 12 的任务编排使用两个自定义消息：
+
+- `/smartclean/mission/state`：`smartclean_interfaces/msg/TrashMissionState`。
+  它发布任务状态、结构化失败码、活动目标，以及任务内稳定的
+  `discovered_trash_ids` / `cleaned_ids` / `remaining_trash_ids`。
+- `/smartclean/mission/litter_cleaned`：`smartclean_interfaces/msg/LitterCleaned`。
+  它同时携带最近一次图像检测 ID、稳定轨迹 ID、目标与机器人位置、清扫距离，
+  以及仿真清扫执行器的实体删除确认。
+
+图像节点的 `TrashDetection.detection_id` 只保证单次检测会话内唯一，并且每帧都会
+变化，不能直接作为任务进度 ID。任务编排器必须只使用检测消息中的
+`position_valid=true` 地图位置，通过同类空间最近邻关联生成稳定 `track_id`；任何
+Gazebo 场景真值都不得参与目标发现、排序或导航。
+
+`LitterCleaned` 的发布是一个有顺序的安全门：Nav2 目标状态必须为
+`STATUS_SUCCEEDED`，实测清扫工具到目标的距离必须位于清扫半径内，机器人必须连续
+停车，然后 Gazebo/实车清扫执行器必须返回成功。任一条件失败时，只能发布带
+`failure_code` 的任务状态；不得提前删除实体、更新 `cleaned_ids` 或伪造清扫事件。
+
 ## 4. 模块调用接口
 
 以下签名用于约束职责，命名可在实现前统一确认，但语义不得私自改变。
