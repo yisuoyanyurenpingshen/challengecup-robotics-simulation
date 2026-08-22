@@ -9,6 +9,7 @@ import rclpy
 from ament_index_python.packages import get_package_share_directory
 from geometry_msgs.msg import PoseStamped
 from nav_msgs.msg import Path
+from rclpy.executors import ExternalShutdownException
 from rclpy.node import Node
 from rclpy.qos import (
     DurabilityPolicy,
@@ -158,6 +159,9 @@ def main(args: Optional[list] = None) -> int:
         node = SmartCleanBridgeNode()
         rclpy.spin(node)
     except KeyboardInterrupt:
+        pass
+    except ExternalShutdownException:
+        # SIGINT/SIGTERM 触发 context shutdown 时 executor 的正常退出路径。
         pass
     except (BridgeError, CoordinateTransformError, ValueError) as exc:
         print("smartclean_bridge 启动失败：{}".format(exc), file=sys.stderr)

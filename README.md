@@ -59,6 +59,12 @@ bash scripts/ros2.sh build
 bash scripts/ros2.sh verify
 bash scripts/ros2.sh gazebo-verify
 bash scripts/ros2.sh drive-verify
+bash scripts/ros2.sh trash-verify
+bash scripts/ros2.sh camera-verify
+bash scripts/ros2.sh perception-verify
+bash scripts/ros2.sh position-verify
+bash scripts/ros2.sh lidar-verify
+bash scripts/ros2.sh nav2-verify
 ```
 
 启动清扫轨迹回放节点：
@@ -79,11 +85,14 @@ bash scripts/ros2.sh gazebo
 bash scripts/ros2.sh drive
 ```
 
-验证带本地垃圾模型的 Gazebo 场景（塑料瓶、纸杯、易拉罐、落叶、纸屑）：
+启动 Gazebo 垃圾场景 + 2D LiDAR + AMCL + Nav2 导航栈（headless，`Ctrl+C` 停止；
+有桌面时可追加 `gui:=true rviz:=true`）：
 
 ```bash
-bash scripts/ros2.sh trash-verify
+bash scripts/ros2.sh nav2
 ```
+
+`nav2-verify` 会自动发送两个自由区域目标并断言真实到达（误差 < 0.4 m）与最终停车。
 
 在有桌面的机器上弹出 Gazebo GUI 与 RViz2（首次会同时构建工作空间）：
 

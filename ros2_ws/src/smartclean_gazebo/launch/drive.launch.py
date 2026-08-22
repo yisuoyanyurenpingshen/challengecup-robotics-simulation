@@ -176,9 +176,24 @@ def generate_launch_description() -> LaunchDescription:
         remappings=[
             ("/smartclean/odom", "/odom"),
             ("/smartclean/tf", "/tf"),
+            # The bridge forwards /clock onto /clock_raw; the monotonic relay
+            # below republishes it on /clock so downstream sim-time consumers
+            # never observe a backwards clock jump.
+            ("/clock", "/clock_raw"),
         ],
         output="screen",
         on_exit=Shutdown(reason="ROS-Gazebo drive bridge exited"),
+    )
+
+    clock_monotonic_relay = Node(
+        package="smartclean_ros",
+        executable="smartclean_clock_relay",
+        name="smartclean_clock_relay",
+        parameters=[
+            {"input_topic": "/clock_raw", "output_topic": "/clock"}
+        ],
+        output="screen",
+        on_exit=Shutdown(reason="simulation clock relay exited"),
     )
 
     command_guard = Node(
@@ -389,6 +404,7 @@ def generate_launch_description() -> LaunchDescription:
             ),
             OpaqueFunction(function=_launch_gazebo),
             bridge,
+            clock_monotonic_relay,
             command_guard,
             camera_bridge,
             lidar_bridge,

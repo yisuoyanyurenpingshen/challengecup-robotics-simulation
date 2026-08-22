@@ -44,6 +44,10 @@ setup(
             ),
             "smartclean_cmd_vel_guard = smartclean_ros.cmd_vel_guard_node:main",
             "smartclean_bridge = smartclean_ros.bridge_node:main",
+            (
+                "smartclean_clock_relay = "
+                "smartclean_ros.clock_monotonic_relay_node:main"
+            ),
         ],
     },
 )
