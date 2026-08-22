@@ -4,6 +4,33 @@
     <static>false</static>
     <self_collide>false</self_collide>
 
+    <!-- Ground-level origin frame: DiffDrive publishes odom -> base_footprint,
+         robot_state_publisher owns base_footprint -> base_link. -->
+    <link name="base_footprint">
+      <pose>0 0 0 0 0 0</pose>
+      <inertial>
+        <mass>0.01</mass>
+        <inertia>
+          <ixx>0.00001</ixx>
+          <iyy>0.00001</iyy>
+          <izz>0.00001</izz>
+        </inertia>
+      </inertial>
+      <collision name="footprint_collision">
+        <geometry>
+          <box>
+            <size>0.02 0.02 0.01</size>
+          </box>
+        </geometry>
+      </collision>
+    </link>
+
+    <joint name="base_footprint_joint" type="fixed">
+      <parent>base_footprint</parent>
+      <child>base_link</child>
+      <pose>0 0 0.25 0 0 0</pose>
+    </joint>
+
     <!-- The base link represents the main cleaning-vehicle body. -->
     <link name="base_link">
       <pose>0 0 0.25 0 0 0</pose>
@@ -326,6 +353,65 @@
       <parent>base_link</parent>
       <child>camera_link</child>
     </joint>
+    <link name="lidar_link">
+      <pose>0.05 0 0.47 0 0 0</pose>
+      <inertial>
+        <mass>0.15</mass>
+        <inertia>
+          <ixx>0.0001</ixx>
+          <iyy>0.0001</iyy>
+          <izz>0.0001</izz>
+        </inertia>
+      </inertial>
+      <collision name="lidar_collision">
+        <geometry>
+          <cylinder>
+            <radius>0.06</radius>
+            <length>0.04</length>
+          </cylinder>
+        </geometry>
+      </collision>
+      <visual name="lidar_visual">
+        <geometry>
+          <cylinder>
+            <radius>0.06</radius>
+            <length>0.04</length>
+          </cylinder>
+        </geometry>
+        <material>
+          <ambient>0.55 0.10 0.10 1</ambient>
+          <diffuse>0.55 0.10 0.10 1</diffuse>
+        </material>
+      </visual>
+      <sensor name="lidar" type="gpu_lidar">
+        <pose>0 0 0 0 0 0</pose>
+        <topic>/smartclean/lidar/scan</topic>
+        <update_rate>10</update_rate>
+        <ray>
+          <scan>
+            <horizontal>
+              <samples>360</samples>
+              <resolution>1</resolution>
+              <min_angle>-3.14159265359</min_angle>
+              <max_angle>3.14159265359</max_angle>
+            </horizontal>
+          </scan>
+          <range>
+            <min>0.1</min>
+            <max>12</max>
+            <resolution>0.01</resolution>
+          </range>
+        </ray>
+        <always_on>1</always_on>
+        <visualize>0</visualize>
+      </sensor>
+    </link>
+
+    <joint name="lidar_joint" type="fixed">
+      <parent>base_link</parent>
+      <child>lidar_link</child>
+    </joint>
+
 
     <plugin
       filename="ignition-gazebo-diff-drive-system"
@@ -338,7 +424,7 @@
       <odom_topic>/smartclean/odom</odom_topic>
       <tf_topic>/smartclean/tf</tf_topic>
       <frame_id>odom</frame_id>
-      <child_frame_id>base_link</child_frame_id>
+      <child_frame_id>base_footprint</child_frame_id>
       <odom_publish_frequency>30</odom_publish_frequency>
       <max_linear_velocity>1.2</max_linear_velocity>
       <min_linear_velocity>-0.5</min_linear_velocity>

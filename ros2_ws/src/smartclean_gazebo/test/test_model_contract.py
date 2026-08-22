@@ -108,7 +108,48 @@ def test_fortress_diff_drive_contract_is_stable() -> None:
     assert _required_text(plugin, "odom_topic") == "/smartclean/odom"
     assert _required_text(plugin, "tf_topic") == "/smartclean/tf"
     assert _required_text(plugin, "frame_id") == "odom"
-    assert _required_text(plugin, "child_frame_id") == "base_link"
+    assert _required_text(plugin, "child_frame_id") == "base_footprint"
+
+
+def test_model_declares_footprint_and_lidar_for_complete_tf() -> None:
+    model = _model()
+    footprint = model.find("./link[@name='base_footprint']")
+    assert footprint is not None, "缺少 base_footprint link"
+    footprint_joint = model.find("./joint[@name='base_footprint_joint']")
+    assert footprint_joint is not None
+    assert footprint_joint.findtext("parent") == "base_footprint"
+    assert footprint_joint.findtext("child") == "base_link"
+
+    lidar_link = model.find("./link[@name='lidar_link']")
+    assert lidar_link is not None, "缺少 lidar_link"
+    assert lidar_link.find("inertial") is not None
+    assert lidar_link.find("collision") is not None
+    assert lidar_link.find("visual") is not None
+    lidar_joint = model.find("./joint[@name='lidar_joint']")
+    assert lidar_joint is not None
+    assert lidar_joint.findtext("parent") == "base_link"
+    assert lidar_joint.findtext("child") == "lidar_link"
+
+    sensors = lidar_link.findall("sensor")
+    assert len(sensors) == 1
+    sensor = sensors[0]
+    # conda 构建的 ignition-sensors 6.6.3 不含 CPU lidar，必须用 gpu_lidar。
+    assert sensor.attrib["type"] == "gpu_lidar"
+    assert sensor.findtext("topic") == "/smartclean/lidar/scan"
+    assert sensor.findtext("update_rate") == "10"
+    ray = sensor.find("ray")
+    assert ray is not None
+    horizontal = ray.find("scan/horizontal")
+    assert horizontal is not None
+    assert int(horizontal.findtext("samples")) >= 180
+    assert float(horizontal.findtext("min_angle")) < 0
+    assert float(horizontal.findtext("max_angle")) > 0
+    range_element = ray.find("range")
+    assert range_element is not None
+    assert float(range_element.findtext("min")) > 0
+    assert float(range_element.findtext("max")) > float(
+        range_element.findtext("min")
+    )
 
 
 def test_model_is_self_contained_without_remote_assets() -> None:

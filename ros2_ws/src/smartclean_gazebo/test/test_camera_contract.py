@@ -102,6 +102,9 @@ def test_launch_bridges_camera_with_default_off() -> None:
     assert "/camera/image_raw" in text
     assert "/camera/camera_info" in text
     assert "/camera/depth/image_rect_raw" in text
+    assert 'default_value="false"' in text
+    assert '"lidar"' in text
+    assert "/scan" in text
     assert "IfCondition(LaunchConfiguration(\"camera\")" in text
     assert "sensors_config_path" in text
 

@@ -110,7 +110,7 @@ class CameraProbe(Node):
     def _check_tf(self, timeout_s: float = 15.0) -> bool:
         # 相机链全部位于 /tf_static（RSP 发布），沿父子链从
         # camera_optical_frame 走到 base_footprint；同时确认 Gazebo 动态
-        # /tf 仍携带 odom -> base_link（差速闭环不回归）。
+        # /tf 仍携带 odom -> base_footprint（差速闭环不回归）。
         deadline = time.monotonic() + timeout_s
         while time.monotonic() < deadline:
             rclpy.spin_once(self, timeout_sec=0.2)
@@ -124,7 +124,7 @@ class CameraProbe(Node):
                 chain.append(parent)
             if chain[-1] == "base_footprint":
                 self.tf_ok = True
-                if self.dynamic_frames.get("base_link") == "odom":
+                if self.dynamic_frames.get("base_footprint") == "odom":
                     return True
         print(
             "[camera-probe] 已见静态 TF 链：{}；动态 TF 链：{}".format(

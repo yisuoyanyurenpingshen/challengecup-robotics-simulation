@@ -38,6 +38,10 @@ setup(
     entry_points={
         "console_scripts": [
             "cmd_vel_guard = smartclean_ros.cmd_vel_guard_node:main",
+            (
+                "scan_frame_republisher = "
+                "smartclean_ros.scan_frame_republisher_node:main"
+            ),
             "smartclean_cmd_vel_guard = smartclean_ros.cmd_vel_guard_node:main",
             "smartclean_bridge = smartclean_ros.bridge_node:main",
         ],

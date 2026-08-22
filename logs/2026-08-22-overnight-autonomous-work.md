@@ -223,3 +223,55 @@ git push --dry-run origin main  # Everything up-to-date, exit=0
   camera-verify/trash-verify/perception-verify/position-verify 全部 exit=0。
 - 提交与推送：`feat(perception): add depth-based trash position estimation`
   （哈希见下方提交记录）。
+
+---
+
+## Phase 10：LiDAR 与完整 TF（2026-08-22 09:20–09:50 CST）
+
+### 目标
+- 2D LiDAR `/scan`（sensor_msgs/LaserScan，360 样本，10Hz，0.1–12m）；
+- TF 链：map → odom → base_footprint → base_link → lidar_link / camera_link → camera_optical_frame；
+- 新增 `bash scripts/ros2.sh lidar-verify` 全自动验收；原 `/cmd_vel`、`/odom`、看门狗不回归。
+
+### 关键设计决策（实测驱动）
+- **传感器类型必须 `gpu_lidar`**：conda ignition-sensors 6.6.3 对 `type="lidar"`
+  直接报 “Sensor type LIDAR not supported yet. Try using a GPU LIDAR”。
+  已实测 `gpu_lidar` 正常发布 `/smartclean/lidar/scan`（360 样本）。
+- **DiffDrive child_frame_id 改为 `base_footprint`**：新增 ground-level 空 link
+  `base_footprint`（fixed joint，base_link 抬高 +0.25）；DiffDrive 发布
+  odom→base_footprint（经 `/smartclean/tf` 桥），robot_state_publisher 只发布
+  base_footprint 以下。单一 TF 单一发布者，map→odom 留给 AMCL（Phase 11）。
+- **`scan_frame_republisher` 新节点**：Gazebo Fortress 传感器帧带作用域
+  `smartclean_robot/lidar_link/lidar`，与 TF 树 `lidar_link` 不一致。
+  smartclean_ros 新增节点：`/scan_raw` → `/scan` 并改写 frame_id=lidar_link，
+  避免 Nav2/AMCL/RViz 查帧失败。逻辑抽成纯函数 `remap_frame_id()`。
+- lidar_link 位于 base_link 前上 (0.05, 0, +0.47)；URDF 镜像同步（joint z=+0.22）。
+
+### 新增/修改文件
+- `models/smartclean_robot/model.sdf`：base_footprint link（含 0.02m 极小 collision，
+  满足「所有 link 必须有 collision」契约）+ lidar_joint/lidar_link + gpu_lidar；
+- `launch/drive.launch.py`：`lidar:=true` 参数、lidar_bridge、scan_frame_republisher；
+- `smartclean_ros/scan_frame_republisher_node.py` + setup.py 入口 + 3 条单测
+  （纯函数 + 真实 rclpy 往返：frame 被改写、其余字段不变）；
+- `scripts/verify_lidar.sh` + `scripts/lidar_probe.py`：/scan 360 样本、角度/距离
+  参数、有限测距、时间戳推进、odom→lidar_link TF、旋转后 ranges 变化≥5 个 >0.02m、
+  看门狗/RSP 存活；
+- 契约测试：`test_lidar_contract.py`、`test_model_contract.py`（child=base_footprint、
+  gpu_lidar、每 link 有 collision）、`test_camera_contract.py`、`test_gui_contract.py`
+  同步更新；
+- `scripts/gazebo_drive_probe.py`、`scripts/camera_probe.py`：TF 断言改为
+  odom→base_footprint（与 DiffDrive 新 child 一致）；
+- `scripts/ros2.sh` + `pixi.toml`：注册 `lidar-verify`。
+
+### 验证结果（全部 exit=0）
+- `bash scripts/ros2.sh lidar-verify`：`[lidar-probe] PASS`；
+- `bash scripts/ros2.sh test`：先失败 1 条（base_footprint 无 collision），补
+  极小 collision 后修复；全包通过（smartclean_gazebo 8/8 等）；
+- `drive-verify`：forward=0.589m、turn=0.971rad、stop_drift=0.000m、
+  TF=odom->base_footprint、watchdog=passed；
+- `camera-verify`、`trash-verify`、`perception-verify`、`position-verify`、
+  `verify`、`gazebo-verify`、`sim-test`：全部 exit=0；
+- `ign sdf -k` Valid；`git diff --check` 干净；无残留 Gazebo/Xvfb/桥进程。
+
+### 提交
+- `feat(gazebo): add lidar and complete robot tf`（哈希见文末提交记录）。

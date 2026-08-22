@@ -67,7 +67,7 @@ class DriveProbe(Node):
         for transform in message.transforms:
             if (
                 transform.header.frame_id == "odom"
-                and transform.child_frame_id == "base_link"
+                and transform.child_frame_id == "base_footprint"
             ):
                 self.has_odom_tf = True
 
@@ -122,12 +122,14 @@ def main() -> int:
         ), "未收到两个递增的 /clock 样本"
         assert node.wait_for(
             lambda: node.has_odom_tf, 10.0
-        ), "未收到 odom -> base_link TF"
+        ), "未收到 odom -> base_footprint TF"
 
         initial = node.latest_odom
         assert initial is not None
         assert initial.header.frame_id == "odom", initial.header.frame_id
-        assert initial.child_frame_id == "base_link", initial.child_frame_id
+        assert (
+            initial.child_frame_id == "base_footprint"
+        ), initial.child_frame_id
         start_x, start_y, _ = _pose(initial)
 
         forward_command = Twist()

@@ -76,10 +76,11 @@ def test_urdf_mirrors_sdf_links_and_adds_sensor_frames() -> None:
 
 
 def test_urdf_never_publishes_odom_to_base() -> None:
-    """Gazebo DiffDrive already publishes odom -> base_link.
+    """Gazebo DiffDrive already publishes odom -> base_footprint.
 
     The URDF must not declare an odom link or an odom parent frame, otherwise
-    two publishers would race on the same transform.
+    two publishers would race on the same transform. The URDF owns
+    base_footprint -> base_link and all attached sensor frames.
     """
 
     robot = _urdf_root()

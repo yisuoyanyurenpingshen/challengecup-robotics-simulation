@@ -58,9 +58,14 @@ def _launch_gazebo(context):
     server_config_path = Path(
         LaunchConfiguration("server_config_path").perform(context)
     )
-    # 相机等传感器需要 Sensors 系统，而 Sensors 系统会初始化渲染引擎；
+    # 相机/LiDAR 等传感器需要 Sensors 系统，而 Sensors 系统会初始化渲染引擎；
     # headless 差速验证（无 GLX 显示）必须继续使用不含 Sensors 的基础配置。
-    if _as_bool(LaunchConfiguration("camera").perform(context), "camera"):
+    sensors_enabled = _as_bool(
+        LaunchConfiguration("camera").perform(context), "camera"
+    ) or _as_bool(
+        LaunchConfiguration("lidar").perform(context), "lidar"
+    )
+    if sensors_enabled:
         server_config_path = Path(
             LaunchConfiguration("sensors_config_path").perform(context)
         )
@@ -228,9 +233,44 @@ def generate_launch_description() -> LaunchDescription:
         on_exit=Shutdown(reason="ROS-Gazebo camera bridge exited"),
     )
 
+    lidar_bridge = Node(
+        package="ros_gz_bridge",
+        executable="parameter_bridge",
+        name="smartclean_lidar_bridge",
+        arguments=[
+            (
+                "/smartclean/lidar/scan@"
+                "sensor_msgs/msg/LaserScan[ignition.msgs.LaserScan"
+            ),
+        ],
+        remappings=[
+            ("/smartclean/lidar/scan", "/scan_raw"),
+        ],
+        condition=IfCondition(LaunchConfiguration("lidar")),
+        output="screen",
+        on_exit=Shutdown(reason="ROS-Gazebo lidar bridge exited"),
+    )
+
+    scan_frame_republisher = Node(
+        package="smartclean_ros",
+        executable="scan_frame_republisher",
+        name="smartclean_scan_frame_republisher",
+        parameters=[
+            {
+                "input_topic": "/scan_raw",
+                "output_topic": "/scan",
+                "frame_id": "lidar_link",
+            }
+        ],
+        condition=IfCondition(LaunchConfiguration("lidar")),
+        output="screen",
+        on_exit=Shutdown(reason="scan frame republisher exited"),
+    )
+
     # Publishes base_footprint -> base_link and every attached child frame.
-    # Gazebo DiffDrive already owns odom -> base_link, so this publisher
-    # intentionally never declares an odom link or odom -> base transform.
+    # Gazebo DiffDrive owns odom -> base_footprint, and this publisher owns
+    # base_footprint -> base_link plus the attached sensor frames, so it
+    # intentionally never declares an odom link or an odom parent frame.
     robot_state_publisher = Node(
         package="robot_state_publisher",
         executable="robot_state_publisher",
@@ -320,6 +360,11 @@ def generate_launch_description() -> LaunchDescription:
                 description="Bridge the RGB camera to /camera when true.",
             ),
             DeclareLaunchArgument(
+                "lidar",
+                default_value="false",
+                description="Bridge the 2D LiDAR to /scan when true.",
+            ),
+            DeclareLaunchArgument(
                 "record",
                 default_value="false",
                 description="Record Gazebo state and console output when true.",
@@ -346,6 +391,8 @@ def generate_launch_description() -> LaunchDescription:
             bridge,
             command_guard,
             camera_bridge,
+            lidar_bridge,
+            scan_frame_republisher,
             robot_state_publisher,
             gazebo_gui_client,
             rviz_node,
